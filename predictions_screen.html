@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>WORLD CUP - Predictor WC26</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;700;900&amp;family=Manrope:wght@400;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "outline-variant": "#484847",
+                      "on-surface-variant": "#adaaaa",
+                      "tertiary-dim": "#00cdec",
+                      "on-error-container": "#ffa8a3",
+                      "on-primary-fixed": "#004820",
+                      "inverse-on-surface": "#565555",
+                      "inverse-surface": "#fcf9f8",
+                      "surface-variant": "#262626",
+                      "on-primary": "#005d2c",
+                      "primary-fixed": "#3fff8b",
+                      "on-secondary": "#005e3d",
+                      "primary-fixed-dim": "#24f07e",
+                      "tertiary-fixed": "#00dcfd",
+                      "on-secondary-fixed": "#00492f",
+                      "on-primary-fixed-variant": "#006832",
+                      "error-dim": "#d7383b",
+                      "surface-container-high": "#201f1f",
+                      "on-tertiary": "#005360",
+                      "on-surface": "#ffffff",
+                      "surface-tint": "#3fff8b",
+                      "on-tertiary-fixed-variant": "#005361",
+                      "surface-dim": "#0e0e0e",
+                      "tertiary-container": "#00dcfd",
+                      "secondary-fixed-dim": "#65ecae",
+                      "error-container": "#9f0519",
+                      "surface-container": "#1a1919",
+                      "inverse-primary": "#006e35",
+                      "primary-dim": "#24f07e",
+                      "tertiary": "#7ae6ff",
+                      "surface-container-highest": "#262626",
+                      "surface-container-lowest": "#000000",
+                      "secondary-container": "#006c47",
+                      "surface-bright": "#2c2c2c",
+                      "on-background": "#ffffff",
+                      "surface-container-low": "#131313",
+                      "on-primary-container": "#004f24",
+                      "surface": "#0e0e0e",
+                      "primary": "#3fff8b",
+                      "on-tertiary-fixed": "#00343d",
+                      "on-tertiary-container": "#004955",
+                      "secondary-dim": "#65ecae",
+                      "error": "#ff716c",
+                      "primary-container": "#13ea79",
+                      "on-secondary-fixed-variant": "#006945",
+                      "secondary": "#74fbbb",
+                      "outline": "#767575",
+                      "tertiary-fixed-dim": "#00cdec",
+                      "background": "#0e0e0e",
+                      "on-secondary-container": "#e1ffeb",
+                      "secondary-fixed": "#74fbbb",
+                      "on-error": "#490006"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.125rem",
+                      "lg": "0.25rem",
+                      "xl": "0.5rem",
+                      "full": "0.75rem"
+              },
+              "spacing": {},
+              "fontFamily": {
+                      "headline": [
+                              "Lexend"
+                      ],
+                      "body": [
+                              "Manrope"
+                      ],
+                      "label": [
+                              "Manrope"
+                      ]
+              }
+            }
+          }
+        }
+    </script>
+<style>
+        /* Subtle noise texture for Stadium Pulse aesthetic */
+        .bg-noise {
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.03'/%3E%3C/svg%3E");
+        }
+        /* Hide scrollbar for clean filter scrolling */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        /* Remove default number input arrows */
+        input[type="number"]::-webkit-inner-spin-button,
+        input[type="number"]::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-surface text-on-surface font-body bg-noise min-h-screen flex flex-col selection:bg-primary/30 selection:text-primary">
+<!-- TopAppBar -->
+<header class="flex justify-between items-center w-full px-6 py-4 max-w-full bg-[#0e0e0e] border-none docked full-width top-0 z-50 flat no shadows sticky">
+<button class="hover:bg-[#201f1f] transition-colors duration-300 p-2 rounded-full flex items-center justify-center">
+<span class="material-symbols-outlined text-[#adaaaa] font-bold">sports_soccer</span>
+</button>
+<div class="text-[#3fff8b] text-2xl font-black italic tracking-tighter uppercase font-lexend">WORLD CUP</div>
+<button class="hover:bg-[#201f1f] transition-colors duration-300 p-2 rounded-full flex items-center justify-center">
+<span class="material-symbols-outlined text-[#adaaaa] font-bold">account_circle</span>
+</button>
+</header>
+<!-- Main Canvas -->
+<main class="flex-1 pb-32">
+<!-- Hero Title & Filters -->
+<section class="px-6 pt-8 pb-6 relative">
+<div class="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full blur-[80px] pointer-events-none -translate-y-1/2 translate-x-1/4"></div>
+<h1 class="text-5xl md:text-6xl font-headline font-black tracking-tighter uppercase mb-6 leading-none shadow-sm">PREDIKSI</h1>
+<div class="flex gap-3 overflow-x-auto no-scrollbar pb-2">
+<button class="whitespace-nowrap bg-surface-container-highest text-primary px-5 py-2.5 rounded-full text-sm font-bold shadow-[0_4px_12px_rgba(0,0,0,0.2)]">Semua</button>
+<button class="whitespace-nowrap bg-transparent text-on-surface-variant hover:text-on-surface transition-colors px-5 py-2.5 rounded-full text-sm font-bold">Terbuka</button>
+<button class="whitespace-nowrap bg-transparent text-on-surface-variant hover:text-on-surface transition-colors px-5 py-2.5 rounded-full text-sm font-bold">Selesai</button>
+</div>
+</section>
+<!-- Match Feed -->
+<section class="px-4 md:px-6 flex flex-col gap-5 max-w-3xl mx-auto">
+<!-- Sticky Group Header -->
+<div class="sticky top-[72px] z-40 bg-surface/80 backdrop-blur-xl py-3 -mx-4 px-4 md:-mx-6 md:px-6 shadow-[0_10px_30px_-10px_rgba(0,0,0,0.5)]">
+<h2 class="text-xs font-bold text-on-surface-variant tracking-[0.2em] uppercase font-label">GROUP A — 15 Jun 2026</h2>
+</div>
+<!-- Match Card 1: Open Prediction (Bento Style Emphasis) -->
+<div class="bg-surface-container-low rounded-xl p-6 flex flex-col relative overflow-hidden group">
+<!-- Inner glow -->
+<div class="absolute inset-0 bg-gradient-to-br from-primary/10 via-transparent to-transparent opacity-50 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"></div>
+<div class="flex justify-between items-center mb-8 z-10">
+<div class="text-primary text-xs font-bold flex items-center gap-1.5 uppercase tracking-wide">
+<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">timer</span>
+                        Kunci dalam 1j 24m
+                    </div>
+</div>
+<div class="flex justify-between items-center w-full z-10 mb-8">
+<!-- Team 1 -->
+<div class="flex flex-col items-center gap-3 flex-1">
+<span class="text-4xl drop-shadow-lg">🇺🇸</span>
+<span class="font-headline text-3xl font-black tracking-tight">USA</span>
+</div>
+<!-- Score Input Container -->
+<div class="flex items-center gap-4 bg-surface-container-highest p-3 rounded-lg shadow-[inset_0_2px_10px_rgba(0,0,0,0.5)]">
+<input class="w-16 h-20 bg-transparent rounded text-center text-4xl font-headline font-black text-on-surface border-none focus:ring-0 focus:outline focus:outline-primary/50 focus:outline-offset-0 focus:bg-surface-variant transition-colors placeholder:text-on-surface-variant/30" placeholder="-" type="number"/>
+<span class="text-on-surface-variant/50 font-black text-xl">:</span>
+<input class="w-16 h-20 bg-transparent rounded text-center text-4xl font-headline font-black text-on-surface border-none focus:ring-0 focus:outline focus:outline-primary/50 focus:outline-offset-0 focus:bg-surface-variant transition-colors placeholder:text-on-surface-variant/30" placeholder="-" type="number"/>
+</div>
+<!-- Team 2 -->
+<div class="flex flex-col items-center gap-3 flex-1">
+<span class="text-4xl drop-shadow-lg">🏴󠁧󠁢󠁷󠁬󠁳󠁿</span>
+<span class="font-headline text-3xl font-black tracking-tight">WAL</span>
+</div>
+</div>
+<button class="w-full bg-primary text-on-primary py-4 rounded font-bold uppercase tracking-widest hover:shadow-[0_0_24px_rgba(63,255,139,0.3)] hover:-translate-y-0.5 transition-all duration-200 z-10 text-sm">Simpan Prediksi</button>
+</div>
+<!-- Match Card 2: Locked -->
+<div class="bg-surface-container-low/50 rounded-xl p-6 flex flex-col relative overflow-hidden">
+<div class="absolute inset-0 bg-surface/40 backdrop-blur-[2px] z-20 pointer-events-none"></div>
+<div class="flex justify-center items-center mb-6 z-10 relative">
+<div class="bg-surface-variant text-on-surface-variant px-3 py-1.5 rounded text-[10px] font-bold uppercase tracking-widest flex items-center gap-1.5 shadow-sm">
+<span class="material-symbols-outlined text-[14px]">lock</span>
+                        Terkunci
+                    </div>
+</div>
+<div class="flex justify-between items-center w-full z-10 relative opacity-60">
+<div class="flex flex-col items-center gap-2 flex-1">
+<span class="text-3xl grayscale">🏴󠁧󠁢󠁥󠁮󠁧󠁿</span>
+<span class="font-headline text-2xl font-black text-on-surface-variant tracking-tight">ENG</span>
+</div>
+<div class="flex items-center gap-4">
+<div class="w-14 h-16 bg-surface-container-high rounded flex items-center justify-center text-3xl font-headline font-black text-on-surface-variant">1</div>
+<span class="text-on-surface-variant/40 font-black text-xl">:</span>
+<div class="w-14 h-16 bg-surface-container-high rounded flex items-center justify-center text-3xl font-headline font-black text-on-surface-variant">1</div>
+</div>
+<div class="flex flex-col items-center gap-2 flex-1">
+<span class="text-3xl grayscale">🇮🇷</span>
+<span class="font-headline text-2xl font-black text-on-surface-variant tracking-tight">IRA</span>
+</div>
+</div>
+</div>
+<!-- Match Card 3: Finished (Win) - Asymmetric layout -->
+<div class="bg-surface-container-low rounded-xl p-0 flex flex-col relative overflow-hidden border-none">
+<!-- Success accent bar -->
+<div class="absolute top-0 left-0 w-1.5 h-full bg-primary z-20"></div>
+<!-- Large background typographic element -->
+<div class="absolute -right-6 -bottom-6 text-[120px] font-headline font-black text-primary/5 pointer-events-none select-none leading-none z-0">WIN</div>
+<div class="p-5 flex flex-col z-10">
+<div class="flex justify-between items-center mb-5">
+<div class="text-on-surface-variant text-[10px] font-bold uppercase tracking-[0.15em]">Selesai</div>
+<div class="bg-surface-container-highest text-primary px-3 py-1.5 rounded-full text-xs font-bold flex items-center gap-1.5 border border-outline-variant/30 shadow-sm backdrop-blur-sm">
+<span class="material-symbols-outlined text-[14px]" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+                            +3 PTS
+                        </div>
+</div>
+<div class="flex justify-between items-center w-full">
+<!-- Away Team (Lost) -->
+<div class="flex items-center gap-4 flex-1">
+<span class="text-3xl drop-shadow-sm opacity-70">🇸🇳</span>
+<span class="font-headline text-2xl font-bold text-on-surface-variant">SEN</span>
+</div>
+<!-- Score Display -->
+<div class="flex items-center gap-5 px-6 py-2 bg-surface-container-highest rounded-lg shadow-inner">
+<div class="text-3xl font-headline font-black text-on-surface-variant">0</div>
+<span class="text-outline-variant font-bold text-sm">—</span>
+<div class="text-3xl font-headline font-black text-primary">2</div>
+</div>
+<!-- Home Team (Won) -->
+<div class="flex items-center gap-4 flex-1 justify-end">
+<span class="font-headline text-2xl font-bold text-primary drop-shadow-[0_0_10px_rgba(63,255,139,0.3)]">NED</span>
+<span class="text-3xl drop-shadow-md">🇳🇱</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Match Card 4: Finished (Loss) -->
+<div class="bg-surface-container-low rounded-xl p-0 flex flex-col relative overflow-hidden border-none">
+<!-- Error accent bar -->
+<div class="absolute top-0 left-0 w-1.5 h-full bg-error-dim z-20"></div>
+<div class="p-5 flex flex-col z-10">
+<div class="flex justify-between items-center mb-5">
+<div class="text-on-surface-variant text-[10px] font-bold uppercase tracking-[0.15em]">Selesai</div>
+<div class="bg-surface-container-highest text-error-dim px-3 py-1.5 rounded-full text-xs font-bold flex items-center gap-1.5 border border-outline-variant/30 shadow-sm">
+<span class="material-symbols-outlined text-[14px]">close</span>
+                            0 PTS
+                        </div>
+</div>
+<div class="flex justify-between items-center w-full mb-4">
+<div class="flex items-center gap-4 flex-1">
+<span class="text-3xl drop-shadow-sm">🇦🇷</span>
+<span class="font-headline text-2xl font-bold text-on-surface-variant">ARG</span>
+</div>
+<div class="flex items-center gap-5 px-6 py-2">
+<div class="text-3xl font-headline font-black text-on-surface">1</div>
+<span class="text-outline-variant font-bold text-sm">—</span>
+<div class="text-3xl font-headline font-black text-on-surface">2</div>
+</div>
+<div class="flex items-center gap-4 flex-1 justify-end">
+<span class="font-headline text-2xl font-bold text-on-surface-variant">KSA</span>
+<span class="text-3xl drop-shadow-sm">🇸🇦</span>
+</div>
+</div>
+<!-- Prediction Context Footer -->
+<div class="mt-2 pt-3 border-t border-outline-variant/20 flex justify-between items-center bg-surface-container-highest/50 -mx-5 px-5 -mb-5 pb-5">
+<span class="text-xs text-on-surface-variant font-medium">Prediksimu</span>
+<span class="text-sm font-headline font-bold text-on-surface-variant tracking-wider">ARG 3 - 0 KSA</span>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 pb-6 pt-2 bg-[#131313]/95 backdrop-blur-xl rounded-t-xl no-line shadow-[0px_-8px_24px_rgba(0,0,0,0.6)]">
+<!-- Matches (Active) -->
+<button class="flex flex-col items-center justify-center text-[#3fff8b] bg-[#262626] rounded-lg px-6 py-2 scale-105 transition-all duration-150">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">event_note</span>
+<span class="text-[10px] uppercase font-bold tracking-widest font-manrope mt-1">Matches</span>
+</button>
+<!-- Leaderboard -->
+<button class="flex flex-col items-center justify-center text-[#adaaaa] opacity-60 px-6 py-2 hover:text-[#3fff8b] hover:opacity-100 transition-all duration-200">
+<span class="material-symbols-outlined">leaderboard</span>
+<span class="text-[10px] uppercase font-bold tracking-widest font-manrope mt-1">Leaderboard</span>
+</button>
+<!-- Rewards -->
+<button class="flex flex-col items-center justify-center text-[#adaaaa] opacity-60 px-6 py-2 hover:text-[#3fff8b] hover:opacity-100 transition-all duration-200">
+<span class="material-symbols-outlined">emoji_events</span>
+<span class="text-[10px] uppercase font-bold tracking-widest font-manrope mt-1">Rewards</span>
+</button>
+<!-- Profile -->
+<button class="flex flex-col items-center justify-center text-[#adaaaa] opacity-60 px-6 py-2 hover:text-[#3fff8b] hover:opacity-100 transition-all duration-200">
+<span class="material-symbols-outlined">person</span>
+<span class="text-[10px] uppercase font-bold tracking-widest font-manrope mt-1">Profile</span>
+</button>
+</nav>
+</body></html>

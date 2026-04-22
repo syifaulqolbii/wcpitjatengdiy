@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="id"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>User Profile - Predictor WC26</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;500;700;900&amp;family=Manrope:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "primary-fixed-dim": "#24f07e",
+                    "on-tertiary": "#005360",
+                    "on-secondary": "#005e3d",
+                    "primary-fixed": "#3fff8b",
+                    "on-error": "#490006",
+                    "error": "#ff716c",
+                    "primary-container": "#13ea79",
+                    "on-tertiary-container": "#004955",
+                    "surface-dim": "#0e0e0e",
+                    "on-secondary-fixed-variant": "#006945",
+                    "on-primary-container": "#004f24",
+                    "surface-bright": "#2c2c2c",
+                    "inverse-on-surface": "#565555",
+                    "surface": "#0e0e0e",
+                    "surface-container": "#1a1919",
+                    "tertiary-dim": "#00cdec",
+                    "primary-dim": "#24f07e",
+                    "inverse-primary": "#006e35",
+                    "surface-container-high": "#201f1f",
+                    "tertiary-fixed-dim": "#00cdec",
+                    "background": "#0e0e0e",
+                    "outline": "#767575",
+                    "on-secondary-fixed": "#00492f",
+                    "on-primary-fixed": "#004820",
+                    "on-surface-variant": "#adaaaa",
+                    "secondary-fixed": "#74fbbb",
+                    "surface-container-low": "#131313",
+                    "error-container": "#9f0519",
+                    "surface-container-lowest": "#000000",
+                    "outline-variant": "#484847",
+                    "on-background": "#ffffff",
+                    "on-primary-fixed-variant": "#006832",
+                    "secondary-fixed-dim": "#65ecae",
+                    "secondary-dim": "#65ecae",
+                    "surface-tint": "#3fff8b",
+                    "primary": "#3fff8b",
+                    "tertiary-container": "#00dcfd",
+                    "on-secondary-container": "#e1ffeb",
+                    "error-dim": "#d7383b",
+                    "surface-container-highest": "#262626",
+                    "secondary-container": "#006c47",
+                    "secondary": "#74fbbb",
+                    "on-primary": "#005d2c",
+                    "on-surface": "#ffffff",
+                    "surface-variant": "#262626",
+                    "on-tertiary-fixed-variant": "#005361",
+                    "tertiary-fixed": "#00dcfd",
+                    "on-tertiary-fixed": "#00343d",
+                    "inverse-surface": "#fcf9f8",
+                    "on-error-container": "#ffa8a3",
+                    "tertiary": "#7ae6ff"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.125rem",
+                    "lg": "0.25rem",
+                    "xl": "0.5rem",
+                    "full": "0.75rem"
+            },
+            "fontFamily": {
+                    "headline": ["Lexend"],
+                    "body": ["Manrope"],
+                    "label": ["Manrope"]
+            }
+          }
+        }
+      }
+    </script>
+<style>
+        /* Stadium Noise Texture */
+        .bg-noise {
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+            opacity: 0.03;
+            pointer-events: none;
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-surface text-on-surface font-body antialiased selection:bg-primary/30 min-h-screen flex flex-col relative pb-safe">
+<!-- Background Texture -->
+<div class="bg-noise"></div>
+<div class="fixed inset-0 pointer-events-none z-0" style="background: radial-gradient(circle at 50% 0%, rgba(63, 255, 139, 0.05) 0%, transparent 60%);"></div>
+<!-- TopAppBar -->
+<header class="docked full-width top-0 bg-[#0e0e0e] dark:bg-[#0e0e0e] z-50 sticky top-0">
+<div class="flex items-center justify-between px-6 py-4 w-full z-50 bg-[#131313] h-[2px] w-full absolute bottom-0 left-0"></div>
+<div class="flex items-center justify-between px-6 py-4 w-full z-50 relative">
+<button class="scale-95 active:opacity-80 transition-all text-[#3fff8b] hover:text-[#3fff8b] transition-colors p-2 -ml-2 rounded-lg">
+<span class="material-symbols-outlined" data-icon="arrow_back">arrow_back</span>
+</button>
+<h1 class="font-['Lexend'] font-bold tracking-tighter uppercase text-on-surface text-xl">PROFIL</h1>
+<div class="w-8"></div> <!-- Spacer for centering -->
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="flex-1 flex flex-col z-10 w-full max-w-lg mx-auto relative px-4 pt-6 pb-24">
+<!-- Player Card Profile -->
+<section class="mb-10 relative">
+<div class="bg-surface-container-low rounded-xl p-6 shadow-[0px_24px_48px_rgba(0,0,0,0.4)] relative overflow-hidden flex flex-col items-center border border-outline-variant/15">
+<!-- Diagonal Grid Background Accent -->
+<div class="absolute inset-0 opacity-10 pointer-events-none" style="background-image: linear-gradient(45deg, #3fff8b 25%, transparent 25%, transparent 50%, #3fff8b 50%, #3fff8b 75%, transparent 75%, transparent); background-size: 8px 8px;"></div>
+<div class="relative z-10 mb-4">
+<div class="w-24 h-24 rounded-full bg-surface-container-highest border-4 border-primary flex items-center justify-center shadow-[0_0_20px_rgba(63,255,139,0.3)]">
+<span class="font-headline font-black text-4xl text-primary tracking-tighter">JD</span>
+</div>
+</div>
+<h2 class="font-headline font-black text-3xl tracking-tight uppercase text-on-surface mb-1 z-10 relative">Joko D.</h2>
+<p class="text-on-surface-variant text-sm font-medium mb-6 z-10 relative">joko.d@email.com</p>
+<!-- Stats Row -->
+<div class="flex w-full justify-between items-center bg-surface-container-highest/80 backdrop-blur-md rounded-lg p-4 z-10 relative border border-outline-variant/20">
+<div class="flex flex-col items-center">
+<span class="text-on-surface-variant text-[10px] font-bold tracking-widest uppercase mb-1">Poin</span>
+<span class="font-headline font-bold text-2xl text-primary">24</span>
+</div>
+<div class="w-px h-8 bg-outline-variant/30"></div>
+<div class="flex flex-col items-center">
+<span class="text-on-surface-variant text-[10px] font-bold tracking-widest uppercase mb-1">Peringkat</span>
+<span class="font-headline font-bold text-2xl text-on-surface">#3</span>
+</div>
+<div class="w-px h-8 bg-outline-variant/30"></div>
+<div class="flex flex-col items-center">
+<span class="text-on-surface-variant text-[10px] font-bold tracking-widest uppercase mb-1">Sempurna</span>
+<span class="font-headline font-bold text-xl text-tertiary flex items-center gap-1">5<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">star</span></span>
+</div>
+</div>
+</div>
+</section>
+<!-- Prediction History -->
+<section class="mb-10">
+<h3 class="font-headline font-bold text-lg text-on-surface uppercase tracking-tight mb-4 flex items-center gap-2">
+<span class="w-1 h-5 bg-primary rounded-sm"></span>
+                RIWAYAT PREDIKSI
+            </h3>
+<div class="flex flex-col gap-4">
+<!-- Group 1 -->
+<div>
+<div class="sticky top-16 z-20 bg-surface/90 backdrop-blur-md py-2 mb-2">
+<span class="text-xs font-bold text-on-surface-variant uppercase tracking-widest">12 JUN 2026</span>
+</div>
+<div class="flex flex-col gap-3">
+<!-- Match 1 -->
+<div class="bg-surface-container-low rounded-lg p-4 border border-outline-variant/15 flex flex-col gap-3">
+<div class="flex justify-between items-center">
+<div class="flex items-center gap-2 w-1/3">
+<span class="text-xl">🇧🇷</span>
+<span class="font-headline font-bold text-on-surface uppercase truncate">BRA</span>
+</div>
+<div class="font-headline font-black text-2xl tracking-tighter text-on-surface bg-surface-container-highest px-3 py-1 rounded-DEFAULT border border-outline-variant/20">
+                                    2 - 1
+                                </div>
+<div class="flex items-center gap-2 w-1/3 justify-end">
+<span class="font-headline font-bold text-on-surface uppercase truncate">FRA</span>
+<span class="text-xl">🇫🇷</span>
+</div>
+</div>
+<div class="flex justify-between items-center bg-surface-container py-2 px-3 rounded-DEFAULT border border-outline-variant/10">
+<span class="text-xs text-on-surface-variant font-medium">Hasil: 2-1</span>
+<span class="text-xs font-bold text-primary bg-primary/10 px-2 py-1 rounded-sm flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">check</span> +3 PTS
+                                </span>
+</div>
+</div>
+<!-- Match 2 -->
+<div class="bg-surface-container-low rounded-lg p-4 border border-outline-variant/15 flex flex-col gap-3">
+<div class="flex justify-between items-center">
+<div class="flex items-center gap-2 w-1/3">
+<span class="text-xl">🇦🇷</span>
+<span class="font-headline font-bold text-on-surface uppercase truncate">ARG</span>
+</div>
+<div class="font-headline font-black text-2xl tracking-tighter text-on-surface bg-surface-container-highest px-3 py-1 rounded-DEFAULT border border-outline-variant/20">
+                                    1 - 1
+                                </div>
+<div class="flex items-center gap-2 w-1/3 justify-end">
+<span class="font-headline font-bold text-on-surface uppercase truncate">ESP</span>
+<span class="text-xl">🇪🇸</span>
+</div>
+</div>
+<div class="flex justify-between items-center bg-surface-container py-2 px-3 rounded-DEFAULT border border-outline-variant/10">
+<span class="text-xs text-on-surface-variant font-medium">Hasil: 1-0</span>
+<span class="text-xs font-bold text-tertiary bg-tertiary/10 px-2 py-1 rounded-sm flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">check</span> +1 PT
+                                </span>
+</div>
+</div>
+</div>
+</div>
+<!-- Group 2 -->
+<div>
+<div class="sticky top-16 z-20 bg-surface/90 backdrop-blur-md py-2 mb-2">
+<span class="text-xs font-bold text-on-surface-variant uppercase tracking-widest">10 JUN 2026</span>
+</div>
+<div class="flex flex-col gap-3">
+<!-- Match 3 -->
+<div class="bg-surface-container-low rounded-lg p-4 border border-outline-variant/15 flex flex-col gap-3">
+<div class="flex justify-between items-center opacity-70">
+<div class="flex items-center gap-2 w-1/3">
+<span class="text-xl">🇩🇪</span>
+<span class="font-headline font-bold text-on-surface uppercase truncate">GER</span>
+</div>
+<div class="font-headline font-black text-2xl tracking-tighter text-on-surface bg-surface-container-highest px-3 py-1 rounded-DEFAULT border border-outline-variant/20">
+                                    3 - 0
+                                </div>
+<div class="flex items-center gap-2 w-1/3 justify-end">
+<span class="font-headline font-bold text-on-surface uppercase truncate">ENG</span>
+<span class="text-xl">🏴󠁧󠁢󠁥󠁮󠁧󠁿</span>
+</div>
+</div>
+<div class="flex justify-between items-center bg-surface-container py-2 px-3 rounded-DEFAULT border border-outline-variant/10">
+<span class="text-xs text-on-surface-variant font-medium">Hasil: 0-1</span>
+<span class="text-xs font-bold text-error bg-error/10 px-2 py-1 rounded-sm flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">close</span> 0 PTS
+                                </span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Account Settings -->
+<section class="mb-8">
+<h3 class="font-headline font-bold text-lg text-on-surface uppercase tracking-tight mb-4 flex items-center gap-2">
+<span class="w-1 h-5 bg-outline-variant rounded-sm"></span>
+                PENGATURAN AKUN
+            </h3>
+<div class="bg-surface-container-low rounded-lg border border-outline-variant/15 overflow-hidden">
+<button class="w-full flex items-center justify-between p-4 hover:bg-surface-container-highest transition-colors text-left active:scale-[0.98]">
+<span class="font-medium text-on-surface text-sm">Ganti Password</span>
+<span class="material-symbols-outlined text-on-surface-variant">chevron_right</span>
+</button>
+</div>
+</section>
+<!-- Logout Button -->
+<div class="mt-auto">
+<button class="w-full py-4 rounded-DEFAULT border-2 border-error-dim text-error-dim font-headline font-bold uppercase tracking-widest text-sm hover:bg-error-dim/10 transition-colors active:scale-[0.98] flex justify-center items-center gap-2">
+                Keluar
+            </button>
+</div>
+</main>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 w-full z-50 border-t-0 rounded-t-none bg-[#131313]/90 backdrop-blur-xl shadow-[0px_-12px_24px_rgba(0,0,0,0.5)] h-20 md:hidden">
+<!-- Tonal Shift Indicator (Top Edge) -->
+<div class="w-full h-[1px] bg-white/5 absolute top-0 left-0"></div>
+<div class="flex justify-around items-center h-full px-4 pb-safe">
+<button class="flex flex-col items-center justify-center text-gray-500 hover:text-gray-300 px-4 py-1 hover:bg-[#201f1f] transition-all tap-highlight-transparent active:scale-90 duration-150 rounded-sm">
+<span class="material-symbols-outlined mb-1" data-icon="home">home</span>
+<span class="font-['Lexend'] font-medium text-[10px] tracking-widest uppercase">LOBBY</span>
+</button>
+<button class="flex flex-col items-center justify-center text-gray-500 hover:text-gray-300 px-4 py-1 hover:bg-[#201f1f] transition-all tap-highlight-transparent active:scale-90 duration-150 rounded-sm">
+<span class="material-symbols-outlined mb-1" data-icon="query_stats">query_stats</span>
+<span class="font-['Lexend'] font-medium text-[10px] tracking-widest uppercase">PREDICT</span>
+</button>
+<button class="flex flex-col items-center justify-center text-gray-500 hover:text-gray-300 px-4 py-1 hover:bg-[#201f1f] transition-all tap-highlight-transparent active:scale-90 duration-150 rounded-sm">
+<span class="material-symbols-outlined mb-1" data-icon="emoji_events">emoji_events</span>
+<span class="font-['Lexend'] font-medium text-[10px] tracking-widest uppercase">RESULTS</span>
+</button>
+<button class="flex flex-col items-center justify-center text-[#3fff8b] bg-[#262626] rounded-sm px-4 py-1 hover:bg-[#201f1f] transition-all tap-highlight-transparent active:scale-90 duration-150">
+<span class="material-symbols-outlined mb-1 text-[#3fff8b]" data-icon="person" style="font-variation-settings: 'FILL' 1;">person</span>
+<span class="font-['Lexend'] font-medium text-[10px] tracking-widest uppercase text-[#3fff8b]">PROFILE</span>
+</button>
+</div>
+</nav>
+</body></html>

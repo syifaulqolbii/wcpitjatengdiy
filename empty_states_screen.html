@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Stadium Pulse - Empty States</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;700;800;900&amp;family=Manrope:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "primary": "#3fff8b",
+                    "on-surface-variant": "#adaaaa",
+                    "on-tertiary-fixed": "#00343d",
+                    "error-dim": "#d7383b",
+                    "surface": "#0e0e0e",
+                    "on-tertiary": "#005360",
+                    "surface-variant": "#262626",
+                    "on-secondary": "#005e3d",
+                    "surface-dim": "#0e0e0e",
+                    "tertiary-fixed-dim": "#00cdec",
+                    "outline-variant": "#484847",
+                    "secondary-container": "#006c47",
+                    "surface-container-highest": "#262626",
+                    "on-secondary-fixed-variant": "#006945",
+                    "primary-fixed": "#3fff8b",
+                    "on-background": "#ffffff",
+                    "tertiary-fixed": "#00dcfd",
+                    "secondary": "#74fbbb",
+                    "inverse-on-surface": "#565555",
+                    "on-tertiary-fixed-variant": "#005361",
+                    "surface-container-low": "#131313",
+                    "surface-container-lowest": "#000000",
+                    "outline": "#767575",
+                    "on-primary-fixed-variant": "#006832",
+                    "primary-container": "#13ea79",
+                    "tertiary-dim": "#00cdec",
+                    "on-primary-fixed": "#004820",
+                    "secondary-dim": "#65ecae",
+                    "primary-dim": "#24f07e",
+                    "on-primary-container": "#004f24",
+                    "error-container": "#9f0519",
+                    "primary-fixed-dim": "#24f07e",
+                    "error": "#ff716c",
+                    "inverse-surface": "#fcf9f8",
+                    "inverse-primary": "#006e35",
+                    "on-error": "#490006",
+                    "secondary-fixed": "#74fbbb",
+                    "surface-container": "#1a1919",
+                    "tertiary": "#7ae6ff",
+                    "surface-tint": "#3fff8b",
+                    "surface-container-high": "#201f1f",
+                    "on-error-container": "#ffa8a3",
+                    "secondary-fixed-dim": "#65ecae",
+                    "on-tertiary-container": "#004955",
+                    "on-secondary-fixed": "#00492f",
+                    "on-primary": "#005d2c",
+                    "background": "#0e0e0e",
+                    "tertiary-container": "#00dcfd",
+                    "on-surface": "#ffffff",
+                    "surface-bright": "#2c2c2c",
+                    "on-secondary-container": "#e1ffeb"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.125rem",
+                    "lg": "0.25rem",
+                    "xl": "0.5rem",
+                    "full": "0.75rem"
+            },
+            "spacing": {},
+            "fontFamily": {
+                    "headline": [
+                            "Lexend"
+                    ],
+                    "body": [
+                            "Manrope"
+                    ],
+                    "label": [
+                            "Manrope"
+                    ]
+            }
+    },
+        },
+      }
+    </script>
+<style>
+        body {
+            background-color: #0e0e0e;
+            background-image: 
+                linear-gradient(rgba(63, 255, 139, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(63, 255, 139, 0.03) 1px, transparent 1px);
+            background-size: 40px 40px;
+        }
+        
+        .noise-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 50;
+            opacity: 0.03;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+        }
+
+        .stadium-glow {
+            background: radial-gradient(circle at center, rgba(63, 255, 139, 0.15) 0%, transparent 70%);
+        }
+        
+        .mobile-frame {
+            box-shadow: 0 0 0 12px #1a1a1a, 0 24px 48px rgba(0, 0, 0, 0.8);
+            border-radius: 2rem;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .mobile-frame::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 120px;
+            height: 24px;
+            background: #1a1a1a;
+            border-bottom-left-radius: 12px;
+            border-bottom-right-radius: 12px;
+            z-index: 20;
+        }
+    </style>
+</head>
+<body class="font-body text-on-surface min-h-screen flex items-center justify-center py-20 px-4">
+<div class="noise-overlay"></div>
+<div class="max-w-[1400px] mx-auto w-full flex flex-col md:flex-row items-center justify-center gap-12 lg:gap-20">
+<!-- Variation A: Jadwal Belum Tersedia -->
+<div class="w-[390px] h-[844px] bg-surface flex flex-col mobile-frame flex-shrink-0">
+<!-- Top Nav -->
+<div class="flex justify-between items-center w-full px-6 py-4 bg-[#0e0e0e] pt-12 relative z-10">
+<span class="text-2xl font-black italic tracking-tighter text-primary uppercase font-headline">STADIUM PULSE</span>
+<div class="flex gap-4">
+<span class="material-symbols-outlined text-on-surface-variant">notifications</span>
+<span class="material-symbols-outlined text-on-surface-variant">account_circle</span>
+</div>
+</div>
+<!-- Content -->
+<div class="flex-1 flex flex-col items-center justify-center p-8 relative">
+<div class="absolute inset-0 stadium-glow opacity-50"></div>
+<div class="relative z-10 flex flex-col items-center text-center">
+<!-- Illustration -->
+<div class="w-32 h-32 mb-8 relative flex items-center justify-center">
+<span class="material-symbols-outlined text-8xl text-outline-variant" style="font-variation-settings: 'wght' 100;">scoreboard</span>
+<div class="absolute w-4 h-4 rounded-full bg-primary blur-[8px] animate-pulse"></div>
+</div>
+<h2 class="font-headline text-3xl font-bold tracking-tight mb-4 text-on-surface">JADWAL BELUM TERSEDIA</h2>
+<p class="font-body text-base text-on-surface-variant max-w-xs">Pertandingan akan muncul di sini saat admin menambahkan jadwal.</p>
+</div>
+</div>
+<!-- Bottom Nav -->
+<div class="bg-[#131313]/95 backdrop-blur-md w-full flex justify-around items-center px-4 pb-8 pt-4 rounded-t-xl z-50">
+<div class="flex flex-col items-center justify-center text-primary bg-[#262626] rounded px-4 py-2">
+<span class="material-symbols-outlined mb-1">home</span>
+<span class="font-headline text-[10px] uppercase font-bold tracking-widest">Home</span>
+</div>
+<div class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-2">
+<span class="material-symbols-outlined mb-1">query_stats</span>
+<span class="font-headline text-[10px] uppercase font-bold tracking-widest">Predict</span>
+</div>
+<div class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-2">
+<span class="material-symbols-outlined mb-1">leaderboard</span>
+<span class="font-headline text-[10px] uppercase font-bold tracking-widest">Ranks</span>
+</div>
+<div class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-2">
+<span class="material-symbols-outlined mb-1">history</span>
+<span class="font-headline text-[10px] uppercase font-bold tracking-widest">History</span>
+</div>
+</div>
+</div>
+<!-- Variation B: Belum Ada Peringkat -->
+<div class="w-[390px] h-[844px] bg-surface flex flex-col mobile-frame flex-shrink-0">
+<!-- Top Nav -->
+<div class="flex justify-between items-center w-full px-6 py-4 bg-[#0e0e0e] pt-12 relative z-10">
+<span class="text-2xl font-black italic tracking-tighter text-primary uppercase font-headline">STADIUM PULSE</span>
+<div class="flex gap-4">
+<span class="material-symbols-outlined text-on-surface-variant">notifications</span>
+<span class="material-symbols-outlined text-on-surface-variant">account_circle</span>
+</div>
+</div>
+<!-- Content -->
+<div class="flex-1 flex flex-col items-center justify-center p-8 relative">
+<div class="absolute inset-0 stadium-glow opacity-30"></div>
+<div class="relative z-10 flex flex-col items-center text-center">
+<!-- Illustration -->
+<div class="w-32 h-32 mb-8 relative flex items-center justify-center">
+<span class="material-symbols-outlined text-8xl text-outline-variant" style="font-variation-settings: 'wght' 100;">emoji_events</span>
+<div class="absolute bottom-2 w-8 h-2 rounded bg-primary blur-[4px]"></div>
+</div>
+<h2 class="font-headline text-3xl font-bold tracking-tight mb-4 text-on-surface">BELUM ADA PERINGKAT</h2>
+<p class="font-body text-base text-on-surface-variant max-w-xs">Klasemen akan terisi setelah pertandingan pertama selesai.</p>
+</div>
+</div>
+<!-- Bottom Nav -->
+<div class="bg-[#131313]/95 backdrop-blur-md w-full flex justify-around items-center px-4 pb-8 pt-4 rounded-t-xl z-50">
+<div class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-2">
+<span class="material-symbols-outlined mb-1">home</span>
+<span class="font-headline text-[10px] uppercase font-bold tracking-widest">Home</span>
+</div>
+<div class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-2">
+<span class="material-symbols-outlined mb-1">query_stats</span>
+<span class="font-headline text-[10px] uppercase font-bold tracking-widest">Predict</span>
+</div>
+<div class="flex flex-col items-center justify-center text-primary bg-[#262626] rounded px-4 py-2">
+<span class="material-symbols-outlined mb-1">leaderboard</span>
+<span class="font-headline text-[10px] uppercase font-bold tracking-widest">Ranks</span>
+</div>
+<div class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-2">
+<span class="material-symbols-outlined mb-1">history</span>
+<span class="font-headline text-[10px] uppercase font-bold tracking-widest">History</span>
+</div>
+</div>
+</div>
+<!-- Variation C: Belum Ada Riwayat -->
+<div class="w-[390px] h-[844px] bg-surface flex flex-col mobile-frame flex-shrink-0">
+<!-- Top Nav -->
+<div class="flex justify-between items-center w-full px-6 py-4 bg-[#0e0e0e] pt-12 relative z-10">
+<span class="text-2xl font-black italic tracking-tighter text-primary uppercase font-headline">STADIUM PULSE</span>
+<div class="flex gap-4">
+<span class="material-symbols-outlined text-on-surface-variant">notifications</span>
+<span class="material-symbols-outlined text-on-surface-variant">account_circle</span>
+</div>
+</div>
+<!-- Content -->
+<div class="flex-1 flex flex-col items-center justify-center p-8 relative">
+<div class="absolute inset-0 stadium-glow opacity-40"></div>
+<div class="relative z-10 flex flex-col items-center text-center">
+<!-- Illustration -->
+<div class="w-32 h-32 mb-8 relative flex items-center justify-center">
+<span class="material-symbols-outlined text-8xl text-outline-variant" style="font-variation-settings: 'wght' 100;">history</span>
+<div class="absolute w-12 h-1 bg-primary blur-[2px] transform rotate-45 translate-x-2 -translate-y-2"></div>
+</div>
+<h2 class="font-headline text-3xl font-bold tracking-tight mb-4 text-on-surface">BELUM ADA RIWAYAT</h2>
+<p class="font-body text-base text-on-surface-variant max-w-xs mb-8">Mulai buat prediksimu sebelum kick-off pertama!</p>
+<button class="bg-primary text-surface-container-lowest font-bold py-4 px-8 rounded font-body text-lg hover:shadow-[0_0_20px_rgba(63,255,139,0.3)] transition-all">
+                        Lihat Jadwal Prediksi
+                    </button>
+</div>
+</div>
+<!-- Bottom Nav -->
+<div class="bg-[#131313]/95 backdrop-blur-md w-full flex justify-around items-center px-4 pb-8 pt-4 rounded-t-xl z-50">
+<div class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-2">
+<span class="material-symbols-outlined mb-1">home</span>
+<span class="font-headline text-[10px] uppercase font-bold tracking-widest">Home</span>
+</div>
+<div class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-2">
+<span class="material-symbols-outlined mb-1">query_stats</span>
+<span class="font-headline text-[10px] uppercase font-bold tracking-widest">Predict</span>
+</div>
+<div class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-2">
+<span class="material-symbols-outlined mb-1">leaderboard</span>
+<span class="font-headline text-[10px] uppercase font-bold tracking-widest">Ranks</span>
+</div>
+<div class="flex flex-col items-center justify-center text-primary bg-[#262626] rounded px-4 py-2">
+<span class="material-symbols-outlined mb-1">history</span>
+<span class="font-headline text-[10px] uppercase font-bold tracking-widest">History</span>
+</div>
+</div>
+</div>
+</div>
+</body></html>

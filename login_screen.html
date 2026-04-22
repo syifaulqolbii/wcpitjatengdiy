@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Predictor WC26 - Login</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;700;900&amp;family=Manrope:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "error": "#ff716c",
+                        "on-primary-fixed": "#004820",
+                        "primary-dim": "#24f07e",
+                        "inverse-primary": "#006e35",
+                        "on-secondary-container": "#e1ffeb",
+                        "surface-container-high": "#201f1f",
+                        "tertiary": "#7ae6ff",
+                        "on-primary-fixed-variant": "#006832",
+                        "secondary-dim": "#65ecae",
+                        "on-background": "#ffffff",
+                        "secondary-container": "#006c47",
+                        "tertiary-fixed-dim": "#00cdec",
+                        "primary-fixed-dim": "#24f07e",
+                        "primary-fixed": "#3fff8b",
+                        "surface-container-highest": "#262626",
+                        "on-error": "#490006",
+                        "error-container": "#9f0519",
+                        "surface-container": "#1a1919",
+                        "tertiary-dim": "#00cdec",
+                        "tertiary-fixed": "#00dcfd",
+                        "secondary-fixed-dim": "#65ecae",
+                        "on-tertiary-container": "#004955",
+                        "on-primary": "#005d2c",
+                        "on-secondary": "#005e3d",
+                        "background": "#0e0e0e",
+                        "surface-container-low": "#131313",
+                        "on-surface": "#ffffff",
+                        "primary-container": "#13ea79",
+                        "surface-variant": "#262626",
+                        "on-error-container": "#ffa8a3",
+                        "on-tertiary-fixed": "#00343d",
+                        "tertiary-container": "#00dcfd",
+                        "primary": "#3fff8b",
+                        "surface": "#0e0e0e",
+                        "secondary-fixed": "#74fbbb",
+                        "on-primary-container": "#004f24",
+                        "surface-bright": "#2c2c2c",
+                        "surface-dim": "#0e0e0e",
+                        "secondary": "#74fbbb",
+                        "inverse-on-surface": "#565555",
+                        "on-tertiary": "#005360",
+                        "on-tertiary-fixed-variant": "#005361",
+                        "on-surface-variant": "#adaaaa",
+                        "error-dim": "#d7383b",
+                        "surface-tint": "#3fff8b",
+                        "on-secondary-fixed": "#00492f",
+                        "outline-variant": "#484847",
+                        "inverse-surface": "#fcf9f8",
+                        "surface-container-lowest": "#000000",
+                        "outline": "#767575",
+                        "on-secondary-fixed-variant": "#006945"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "fontFamily": {
+                        "headline": ["Lexend", "sans-serif"],
+                        "body": ["Manrope", "sans-serif"],
+                        "label": ["Manrope", "sans-serif"]
+                    },
+                    "backgroundImage": {
+                        'diagonal-grid': 'repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(255, 255, 255, 0.03) 10px, rgba(255, 255, 255, 0.03) 11px)'
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body {
+            background-color: theme('colors.background');
+            color: theme('colors.on-background');
+            font-family: theme('fontFamily.body');
+        }
+        .bg-noise {
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.03'/%3E%3C/svg%3E");
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="min-h-screen flex flex-col items-center justify-center relative overflow-hidden bg-background">
+<!-- Background Texture & Gradient -->
+<div class="absolute inset-0 bg-diagonal-grid pointer-events-none"></div>
+<div class="absolute inset-0 bg-noise pointer-events-none mix-blend-overlay"></div>
+<div class="absolute top-0 left-0 w-full h-1/2 bg-gradient-to-br from-primary/10 to-transparent pointer-events-none opacity-50"></div>
+<!-- Main Content Container -->
+<main class="w-full max-w-md px-6 py-12 relative z-10 flex flex-col items-center">
+<!-- Logo & Wordmark Area (Scoreboard Style) -->
+<div class="mb-12 flex flex-col items-center text-center">
+<div class="w-20 h-20 mb-4 bg-surface-container-high rounded-full flex items-center justify-center border border-outline-variant/15 shadow-[0px_24px_48px_rgba(0,0,0,0.4)]">
+<span class="material-symbols-outlined text-5xl text-primary font-bold" style="font-variation-settings: 'FILL' 1;">
+                    sports_soccer
+                </span>
+</div>
+<h1 class="font-headline font-black text-5xl tracking-tighter text-on-background uppercase mb-2">
+                PREDICTOR <span class="text-primary block">WC26</span>
+</h1>
+<p class="font-label text-sm uppercase tracking-[0.2em] text-on-surface-variant font-bold">
+                Predict. Compete. Win. 🏆
+            </p>
+</div>
+<!-- Login Form Container (Glassmorphism) -->
+<div class="w-full bg-surface-container-low/80 backdrop-blur-md rounded-xl p-8 shadow-[0px_24px_48px_rgba(0,0,0,0.6)] border border-outline-variant/15">
+<form action="#" class="space-y-6" method="POST">
+<!-- Email Input -->
+<div>
+<label class="block font-label text-xs font-bold text-on-surface-variant mb-2 uppercase tracking-wider" for="email">Email Address</label>
+<div class="relative">
+<div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+<span class="material-symbols-outlined text-on-surface-variant text-lg">mail</span>
+</div>
+<input class="block w-full pl-10 bg-surface-container-highest border-transparent rounded text-on-surface font-body text-base focus:border-outline focus:ring-0 focus:bg-surface-container-highest transition-colors placeholder:text-on-surface-variant/50 py-3" id="email" name="email" placeholder="enter@email.com" required="" type="email"/>
+</div>
+</div>
+<!-- Password Input -->
+<div>
+<label class="block font-label text-xs font-bold text-on-surface-variant mb-2 uppercase tracking-wider" for="password">Password</label>
+<div class="relative">
+<div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+<span class="material-symbols-outlined text-on-surface-variant text-lg">lock</span>
+</div>
+<input class="block w-full pl-10 pr-10 bg-surface-container-highest border-transparent rounded text-on-surface font-body text-base focus:border-outline focus:ring-0 focus:bg-surface-container-highest transition-colors placeholder:text-on-surface-variant/50 py-3" id="password" name="password" placeholder="••••••••" required="" type="password"/>
+<button class="absolute inset-y-0 right-0 pr-3 flex items-center text-on-surface-variant hover:text-primary transition-colors focus:outline-none" type="button">
+<span class="material-symbols-outlined text-lg">visibility</span>
+</button>
+</div>
+<div class="flex justify-end mt-2">
+<a class="font-label text-xs text-on-surface-variant hover:text-primary transition-colors" href="#">Lupa password?</a>
+</div>
+</div>
+<!-- Submit Button -->
+<button class="w-full bg-primary text-on-primary font-headline font-bold uppercase text-lg py-4 rounded shadow-[0_0_15px_rgba(63,255,139,0.2)] hover:shadow-[0_0_25px_rgba(63,255,139,0.4)] transition-all active:scale-[0.98] mt-4 flex justify-center items-center gap-2" type="submit">
+                    MASUK
+                    <span class="material-symbols-outlined font-bold">arrow_forward</span>
+</button>
+</form>
+<!-- Quick Login / Social (Editorial Flair) -->
+<div class="mt-8 pt-6 border-t border-outline-variant/20 text-center">
+<p class="font-label text-xs text-on-surface-variant mb-4 uppercase tracking-widest">Or continue with</p>
+<div class="flex justify-center gap-4">
+<button class="w-12 h-12 bg-surface-container-highest rounded flex items-center justify-center hover:bg-surface-variant transition-colors group" type="button">
+<span class="material-symbols-outlined text-on-surface group-hover:text-primary transition-colors">g_mobiledata</span>
+</button>
+<button class="w-12 h-12 bg-surface-container-highest rounded flex items-center justify-center hover:bg-surface-variant transition-colors group" type="button">
+<span class="material-symbols-outlined text-on-surface group-hover:text-primary transition-colors">ios</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Decorative Elements -->
+<div class="absolute bottom-4 left-4 text-outline-variant/30 font-headline text-[10rem] font-black leading-none pointer-events-none select-none z-0 -rotate-12 translate-y-1/4 -translate-x-1/4">
+            W
+        </div>
+<div class="absolute top-4 right-4 text-outline-variant/30 font-headline text-[8rem] font-black leading-none pointer-events-none select-none z-0 rotate-12 -translate-y-1/4 translate-x-1/4">
+            26
+        </div>
+</main>
+</body></html>

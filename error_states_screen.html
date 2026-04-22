@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="id"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Predictor WC26 - Error States</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;700;900&amp;family=Manrope:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "primary": "#3fff8b",
+                        "on-primary": "#005d2c",
+                        "on-primary-fixed-variant": "#006832",
+                        "on-error-container": "#ffa8a3",
+                        "on-secondary-fixed": "#00492f",
+                        "inverse-primary": "#006e35",
+                        "secondary-fixed-dim": "#65ecae",
+                        "on-primary-container": "#004f24",
+                        "inverse-surface": "#fcf9f8",
+                        "primary-dim": "#24f07e",
+                        "inverse-on-surface": "#565555",
+                        "surface-container": "#1a1919",
+                        "error": "#ff716c",
+                        "primary-container": "#13ea79",
+                        "on-error": "#490006",
+                        "on-secondary-fixed-variant": "#006945",
+                        "secondary-container": "#006c47",
+                        "error-container": "#9f0519",
+                        "surface-dim": "#0e0e0e",
+                        "tertiary-fixed": "#00dcfd",
+                        "surface-container-lowest": "#000000",
+                        "on-tertiary-fixed": "#00343d",
+                        "on-background": "#ffffff",
+                        "on-tertiary": "#005360",
+                        "tertiary": "#7ae6ff",
+                        "outline": "#767575",
+                        "background": "#0e0e0e",
+                        "on-secondary-container": "#e1ffeb",
+                        "surface-tint": "#3fff8b",
+                        "primary-fixed-dim": "#24f07e",
+                        "surface": "#0e0e0e",
+                        "error-dim": "#d7383b",
+                        "surface-variant": "#262626",
+                        "secondary": "#74fbbb",
+                        "on-surface": "#ffffff",
+                        "on-secondary": "#005e3d",
+                        "surface-container-low": "#131313",
+                        "tertiary-dim": "#00cdec",
+                        "on-tertiary-fixed-variant": "#005361",
+                        "outline-variant": "#484847",
+                        "tertiary-container": "#00dcfd",
+                        "on-tertiary-container": "#004955",
+                        "surface-container-highest": "#262626",
+                        "on-surface-variant": "#adaaaa",
+                        "tertiary-fixed-dim": "#00cdec",
+                        "secondary-fixed": "#74fbbb",
+                        "surface-container-high": "#201f1f",
+                        "surface-bright": "#2c2c2c",
+                        "on-primary-fixed": "#004820",
+                        "secondary-dim": "#65ecae",
+                        "primary-fixed": "#3fff8b"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "fontFamily": {
+                        "headline": ["Lexend", "sans-serif"],
+                        "body": ["Manrope", "sans-serif"],
+                        "label": ["Manrope", "sans-serif"]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .pitch-pattern {
+            background-image: linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+            background-size: 40px 40px;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-surface-container-lowest text-on-background font-body min-h-screen flex items-center justify-center p-8">
+<div class="flex gap-8 flex-wrap justify-center w-full max-w-5xl">
+<!-- Variation A: 404 -->
+<div class="w-[390px] h-[844px] bg-background relative overflow-hidden rounded-[2rem] border-8 border-surface-container shadow-[0px_24px_48px_rgba(0,0,0,0.6)] flex flex-col justify-center px-6">
+<!-- Pitch Pattern Overlay -->
+<div class="absolute inset-0 pitch-pattern opacity-50 pointer-events-none"></div>
+<div class="relative z-10 flex flex-col items-center text-center">
+<h1 class="font-headline font-black text-9xl tracking-tighter text-primary-dim mb-4 leading-none" style="text-shadow: 0 0 40px rgba(63, 255, 139, 0.2);">404</h1>
+<h2 class="font-headline font-bold text-3xl mb-3">Laman Tidak Ditemukan</h2>
+<p class="font-body text-on-surface-variant text-sm mb-10 max-w-[280px]">
+                    Sepertinya kamu salah jalur. Yuk balik ke lapangan.
+                </p>
+<button class="w-full bg-primary text-on-primary font-headline font-bold uppercase tracking-widest py-4 rounded-lg hover:bg-primary-dim transition-colors duration-200 shadow-[0_0_20px_rgba(63,255,139,0.2)]">
+                    Kembali ke Dashboard
+                </button>
+</div>
+</div>
+<!-- Variation B: Session Expired -->
+<div class="w-[390px] h-[844px] bg-background relative overflow-hidden rounded-[2rem] border-8 border-surface-container shadow-[0px_24px_48px_rgba(0,0,0,0.6)] flex flex-col justify-center px-6">
+<div class="relative z-10 flex flex-col items-center text-center">
+<div class="mb-8 relative">
+<div class="absolute inset-0 bg-primary/10 rounded-full blur-xl w-32 h-32 -m-4"></div>
+<span class="material-symbols-outlined text-[100px] text-primary relative z-10 font-light" style="font-variation-settings: 'wght' 200;">lock</span>
+</div>
+<h2 class="font-headline font-bold text-3xl mb-3">Sesi Kamu Telah Berakhir</h2>
+<p class="font-body text-on-surface-variant text-sm mb-10 max-w-[280px]">
+                    Silakan login kembali untuk melanjutkan.
+                </p>
+<button class="w-full bg-primary text-on-primary font-headline font-bold uppercase tracking-widest py-4 rounded-lg hover:bg-primary-dim transition-colors duration-200 shadow-[0_0_20px_rgba(63,255,139,0.2)]">
+                    Login Ulang
+                </button>
+</div>
+</div>
+</div>
+</body></html>

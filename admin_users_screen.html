@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="id"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Predictor WC26 - User Management</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;500;700;900&amp;family=Manrope:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "tertiary-fixed-dim": "#00cdec",
+                        "error": "#ff716c",
+                        "on-primary-container": "#004f24",
+                        "tertiary-dim": "#00cdec",
+                        "surface-bright": "#2c2c2c",
+                        "secondary": "#74fbbb",
+                        "inverse-primary": "#006e35",
+                        "secondary-fixed": "#74fbbb",
+                        "on-secondary-fixed": "#00492f",
+                        "error-dim": "#d7383b",
+                        "on-tertiary-container": "#004955",
+                        "on-background": "#ffffff",
+                        "on-secondary-container": "#e1ffeb",
+                        "on-tertiary-fixed-variant": "#005361",
+                        "on-tertiary": "#005360",
+                        "on-secondary-fixed-variant": "#006945",
+                        "surface-tint": "#3fff8b",
+                        "secondary-container": "#006c47",
+                        "surface-variant": "#262626",
+                        "surface-dim": "#0e0e0e",
+                        "primary-container": "#13ea79",
+                        "outline": "#767575",
+                        "surface-container": "#1a1919",
+                        "on-primary-fixed": "#004820",
+                        "on-tertiary-fixed": "#00343d",
+                        "on-surface": "#ffffff",
+                        "on-error-container": "#ffa8a3",
+                        "on-error": "#490006",
+                        "tertiary": "#7ae6ff",
+                        "inverse-surface": "#fcf9f8",
+                        "tertiary-container": "#00dcfd",
+                        "primary": "#3fff8b",
+                        "primary-fixed-dim": "#24f07e",
+                        "primary-fixed": "#3fff8b",
+                        "outline-variant": "#484847",
+                        "inverse-on-surface": "#565555",
+                        "background": "#0e0e0e",
+                        "on-primary-fixed-variant": "#006832",
+                        "secondary-fixed-dim": "#65ecae",
+                        "on-surface-variant": "#adaaaa",
+                        "tertiary-fixed": "#00dcfd",
+                        "error-container": "#9f0519",
+                        "surface-container-low": "#131313",
+                        "surface-container-highest": "#262626",
+                        "secondary-dim": "#65ecae",
+                        "primary-dim": "#24f07e",
+                        "on-secondary": "#005e3d",
+                        "on-primary": "#005d2c",
+                        "surface-container-high": "#201f1f",
+                        "surface-container-lowest": "#000000",
+                        "surface": "#0e0e0e"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "fontFamily": {
+                        "headline": ["Lexend", "sans-serif"],
+                        "body": ["Manrope", "sans-serif"],
+                        "label": ["Manrope", "sans-serif"]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body {
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.03'/%3E%3C/svg%3E");
+            background-color: #0e0e0e;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body min-h-screen flex antialiased">
+<!-- JSON: SideNavBar -->
+<nav class="fixed left-0 top-0 h-full w-64 z-40 bg-[#0e0e0e] dark:bg-[#0e0e0e] bg-[#0e0e0e] border-r-0 flat no shadows flex flex-col h-full py-8">
+<div class="px-6 mb-12">
+<h1 class="text-2xl font-black text-[#3fff8b] italic tracking-tighter uppercase">PREDICTOR</h1>
+<p class="font-headline uppercase tracking-tighter text-sm text-[#adaaaa] mt-1">Admin Console</p>
+</div>
+<div class="flex-1 space-y-2">
+<a class="text-[#adaaaa] flex items-center px-6 py-4 hover:bg-[#131313] hover:text-[#3fff8b] hover:bg-[#201f1f] transition-all duration-200" href="#">
+<span class="material-symbols-outlined mr-4" style="font-variation-settings: 'FILL' 1;">dashboard</span>
+<span class="font-headline uppercase tracking-tighter text-sm">Dashboard</span>
+</a>
+<a class="text-[#adaaaa] flex items-center px-6 py-4 hover:bg-[#131313] hover:text-[#3fff8b] hover:bg-[#201f1f] transition-all duration-200" href="#">
+<span class="material-symbols-outlined mr-4" style="font-variation-settings: 'FILL' 1;">sports_soccer</span>
+<span class="font-headline uppercase tracking-tighter text-sm">Matches</span>
+</a>
+<!-- Active State -->
+<a class="text-[#3fff8b] font-bold border-l-4 border-[#3fff8b] bg-[#131313] flex items-center px-6 py-4 translate-x-1 transition-transform" href="#">
+<span class="material-symbols-outlined mr-4" style="font-variation-settings: 'FILL' 1;">group</span>
+<span class="font-headline uppercase tracking-tighter text-sm">Users</span>
+</a>
+</div>
+<div class="px-6 mt-auto">
+<button class="w-full bg-primary text-on-primary font-headline uppercase tracking-tighter text-sm py-3 px-4 rounded hover:bg-primary-dim transition-colors flex items-center justify-center">
+<span class="material-symbols-outlined mr-2">person_add</span>
+                Invite New User
+            </button>
+</div>
+</nav>
+<!-- Main Content Canvas -->
+<main class="ml-64 flex-1 flex flex-col min-h-screen relative">
+<!-- JSON: TopAppBar (Integrated as Page Header) -->
+<header class="flex justify-between items-center px-10 py-6 sticky top-0 z-30 bg-[#131313] dark:bg-[#131313] bg-[#131313] border-none shadow-2xl shadow-black/50">
+<div>
+<div class="flex items-center gap-4">
+<h2 class="font-lexend font-bold display-sm text-2xl uppercase tracking-tight">MANAJEMEN PENGGUNA</h2>
+<span class="bg-surface-variant text-on-surface-variant font-headline text-xs px-2 py-1 rounded tracking-widest uppercase border border-outline-variant/30">Admin View</span>
+</div>
+</div>
+<div class="flex items-center gap-6">
+<div class="relative">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant">search</span>
+<input class="bg-surface-container-highest border-none text-on-surface font-body text-sm rounded py-2 pl-10 pr-4 w-64 focus:ring-1 focus:ring-outline outline-none placeholder:text-outline" placeholder="Search Users..." type="text"/>
+</div>
+<div class="flex items-center gap-4 text-[#3fff8b]">
+<button class="hover:text-[#3fff8b] hover:bg-[#201f1f]/50 transition-colors p-2 rounded-full flex">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="hover:text-[#3fff8b] hover:bg-[#201f1f]/50 transition-colors p-2 rounded-full flex">
+<span class="material-symbols-outlined">settings</span>
+</button>
+</div>
+<div class="h-10 w-10 rounded-full bg-surface-container-highest overflow-hidden border border-outline-variant/20">
+<img alt="Admin User" class="w-full h-full object-cover" data-alt="close up portrait of a professional man in a dark environment with subtle rim lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDrVn9pjz16TGw09e1euZb1Ii7_qsllU-sZX3KR7AqYGba4YgJfUG3OZTazFVM1ZwSVNHAwX08-kKmr-2pHDu6nyxRkm2qNawBRdCLnkMmEemdbxsjQAZRyrrd4Yd5tPymtyscsvb8lLs0bKAtXj2VeWB6Xa7OKRf1hPpuNm0mzfcjoDlP47tQr81t9l0z1MTuy_U0CpfqksmZSEo6j-UhIICIgBM3omp3gmVAppWd4V65PA-5H3lAX1nw4_u9Tlv02oXic__BoHyc"/>
+</div>
+</div>
+</header>
+<!-- Page Content -->
+<div class="p-10 flex-1 flex flex-col">
+<!-- Context Header -->
+<div class="flex justify-between items-end mb-8">
+<div>
+<h3 class="font-headline text-4xl font-black tracking-tighter mb-2">PENGGUNA <span class="text-primary">PREDICTOR</span></h3>
+<div class="flex items-center gap-3">
+<span class="font-label text-sm text-on-surface-variant uppercase tracking-widest">Total Slots</span>
+<div class="flex items-center gap-2 bg-surface-container-high px-3 py-1 rounded">
+<span class="h-2 w-2 rounded-full bg-[#ffb300]"></span>
+<span class="font-headline text-sm font-bold text-[#ffb300]">30/30 Terisi</span>
+</div>
+</div>
+</div>
+<div class="group relative">
+<button class="flex items-center gap-2 bg-transparent border border-outline-variant text-outline-variant font-headline uppercase tracking-tighter text-sm py-2 px-4 rounded cursor-not-allowed" disabled="">
+<span class="material-symbols-outlined text-sm">link</span>
+                        Generate Invite Link
+                    </button>
+<!-- Tooltip -->
+<div class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-1 bg-surface-container-highest text-on-surface text-xs font-label rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap shadow-xl border border-outline-variant/20">
+                        Kuota penuh
+                    </div>
+</div>
+</div>
+<!-- Data Table Container -->
+<div class="bg-surface-container-low rounded-lg flex-1 border border-outline-variant/15 overflow-hidden flex flex-col relative">
+<!-- Decorative Layer -->
+<div class="absolute -right-20 -top-20 text-[200px] font-headline font-black text-surface-container-lowest opacity-50 select-none pointer-events-none leading-none">30</div>
+<!-- Table Header -->
+<div class="grid grid-cols-12 gap-4 p-4 border-b border-outline-variant/15 bg-surface-container-high/50 font-headline text-xs uppercase tracking-widest text-on-surface-variant relative z-10">
+<div class="col-span-1 pl-2">No</div>
+<div class="col-span-3">Nama</div>
+<div class="col-span-3">Email</div>
+<div class="col-span-2">Status</div>
+<div class="col-span-2">Bergabung</div>
+<div class="col-span-1 text-right pr-2">Aksi</div>
+</div>
+<!-- Table Body -->
+<div class="flex-1 overflow-y-auto relative z-10 font-body text-sm">
+<!-- Row 1 -->
+<div class="grid grid-cols-12 gap-4 p-4 items-center border-b border-outline-variant/5 hover:bg-surface-container-highest/50 border-l-2 border-l-transparent hover:border-l-primary transition-colors">
+<div class="col-span-1 pl-2 font-headline text-on-surface-variant">01</div>
+<div class="col-span-3 font-medium">Andi Prasetyo</div>
+<div class="col-span-3 text-on-surface-variant">andi.p@example.com</div>
+<div class="col-span-2">
+<span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded bg-primary-container/10 text-primary border border-primary/20 text-xs font-headline uppercase tracking-wider">
+<span class="w-1.5 h-1.5 rounded-full bg-primary"></span>
+                                Aktif
+                            </span>
+</div>
+<div class="col-span-2 text-on-surface-variant font-label text-xs uppercase tracking-wider">12 Agu 2023</div>
+<div class="col-span-1 flex justify-end gap-2 pr-2">
+<button class="text-on-surface-variant hover:text-on-surface transition-colors p-1" title="Reset Password">
+<span class="material-symbols-outlined text-[20px]">key</span>
+</button>
+<button class="text-error-dim hover:text-error transition-colors p-1" title="Hapus">
+<span class="material-symbols-outlined text-[20px]">delete</span>
+</button>
+</div>
+</div>
+<!-- Row 2 -->
+<div class="grid grid-cols-12 gap-4 p-4 items-center border-b border-outline-variant/5 hover:bg-surface-container-highest/50 border-l-2 border-l-transparent hover:border-l-primary transition-colors">
+<div class="col-span-1 pl-2 font-headline text-on-surface-variant">02</div>
+<div class="col-span-3 font-medium">Budi Santoso</div>
+<div class="col-span-3 text-on-surface-variant">budi.s@example.com</div>
+<div class="col-span-2">
+<span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded bg-surface-variant text-on-surface-variant border border-outline-variant/30 text-xs font-headline uppercase tracking-wider">
+<span class="w-1.5 h-1.5 rounded-full bg-outline"></span>
+                                Belum Login
+                            </span>
+</div>
+<div class="col-span-2 text-on-surface-variant font-label text-xs uppercase tracking-wider">15 Agu 2023</div>
+<div class="col-span-1 flex justify-end gap-2 pr-2">
+<button class="text-on-surface-variant hover:text-on-surface transition-colors p-1" title="Reset Password">
+<span class="material-symbols-outlined text-[20px]">key</span>
+</button>
+<button class="text-error-dim hover:text-error transition-colors p-1" title="Hapus">
+<span class="material-symbols-outlined text-[20px]">delete</span>
+</button>
+</div>
+</div>
+<!-- Row 3 -->
+<div class="grid grid-cols-12 gap-4 p-4 items-center border-b border-outline-variant/5 hover:bg-surface-container-highest/50 border-l-2 border-l-transparent hover:border-l-primary transition-colors">
+<div class="col-span-1 pl-2 font-headline text-on-surface-variant">03</div>
+<div class="col-span-3 font-medium">Citra Kirana</div>
+<div class="col-span-3 text-on-surface-variant">citra.k@example.com</div>
+<div class="col-span-2">
+<span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded bg-primary-container/10 text-primary border border-primary/20 text-xs font-headline uppercase tracking-wider">
+<span class="w-1.5 h-1.5 rounded-full bg-primary"></span>
+                                Aktif
+                            </span>
+</div>
+<div class="col-span-2 text-on-surface-variant font-label text-xs uppercase tracking-wider">18 Agu 2023</div>
+<div class="col-span-1 flex justify-end gap-2 pr-2">
+<button class="text-on-surface-variant hover:text-on-surface transition-colors p-1" title="Reset Password">
+<span class="material-symbols-outlined text-[20px]">key</span>
+</button>
+<button class="text-error-dim hover:text-error transition-colors p-1" title="Hapus">
+<span class="material-symbols-outlined text-[20px]">delete</span>
+</button>
+</div>
+</div>
+<!-- Row 4 -->
+<div class="grid grid-cols-12 gap-4 p-4 items-center border-b border-outline-variant/5 hover:bg-surface-container-highest/50 border-l-2 border-l-transparent hover:border-l-primary transition-colors">
+<div class="col-span-1 pl-2 font-headline text-on-surface-variant">04</div>
+<div class="col-span-3 font-medium">Dewi Lestari</div>
+<div class="col-span-3 text-on-surface-variant">dewi.l@example.com</div>
+<div class="col-span-2">
+<span class="inline-flex items-center gap-1.5 px-2 py-0.5 rounded bg-primary-container/10 text-primary border border-primary/20 text-xs font-headline uppercase tracking-wider">
+<span class="w-1.5 h-1.5 rounded-full bg-primary"></span>
+                                Aktif
+                            </span>
+</div>
+<div class="col-span-2 text-on-surface-variant font-label text-xs uppercase tracking-wider">20 Agu 2023</div>
+<div class="col-span-1 flex justify-end gap-2 pr-2">
+<button class="text-on-surface-variant hover:text-on-surface transition-colors p-1" title="Reset Password">
+<span class="material-symbols-outlined text-[20px]">key</span>
+</button>
+<button class="text-error-dim hover:text-error transition-colors p-1" title="Hapus">
+<span class="material-symbols-outlined text-[20px]">delete</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Table Footer / Pagination Placeholder -->
+<div class="p-4 border-t border-outline-variant/15 bg-surface-container-high/30 flex justify-between items-center relative z-10">
+<span class="font-label text-xs text-on-surface-variant uppercase tracking-wider">Showing 1-30 of 30 Users</span>
+<div class="flex gap-1">
+<button class="w-8 h-8 flex items-center justify-center rounded bg-surface-container-highest text-on-surface-variant hover:text-on-surface transition-colors" disabled=""><span class="material-symbols-outlined text-sm">chevron_left</span></button>
+<button class="w-8 h-8 flex items-center justify-center rounded bg-primary/10 text-primary border border-primary/20 font-headline text-xs">1</button>
+<button class="w-8 h-8 flex items-center justify-center rounded bg-surface-container-highest text-on-surface-variant hover:text-on-surface transition-colors" disabled=""><span class="material-symbols-outlined text-sm">chevron_right</span></button>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- Modal Overlay (Active State Demo) -->
+<div class="fixed inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-md">
+<!-- Ambient Light behind modal -->
+<div class="absolute w-96 h-96 bg-primary/10 rounded-full blur-[100px] pointer-events-none"></div>
+<div class="bg-surface-container-low border border-outline-variant/20 rounded-xl w-full max-w-md shadow-[0px_24px_48px_rgba(0,0,0,0.6)] relative overflow-hidden">
+<!-- Decorative Modal Header -->
+<div class="h-2 w-full bg-gradient-to-r from-primary to-primary-container absolute top-0 left-0"></div>
+<div class="p-8">
+<div class="flex justify-between items-start mb-6">
+<div>
+<h4 class="font-headline text-2xl font-bold tracking-tight">Undang Anggota Baru</h4>
+<p class="font-label text-sm text-on-surface-variant mt-1">Bagikan tautan ini kepada calon peserta.</p>
+</div>
+<button class="text-on-surface-variant hover:text-on-surface transition-colors">
+<span class="material-symbols-outlined">close</span>
+</button>
+</div>
+<div class="space-y-6">
+<div class="relative group">
+<label class="block font-label text-xs text-on-surface-variant uppercase tracking-widest mb-2">Tautan Undangan</label>
+<div class="flex items-center bg-surface-container-highest rounded border border-outline-variant/30 overflow-hidden focus-within:border-outline focus-within:ring-1 focus-within:ring-outline transition-all">
+<span class="material-symbols-outlined text-on-surface-variant px-3 text-sm">link</span>
+<input class="bg-transparent border-none text-on-surface font-body text-sm w-full py-3 pr-4 focus:ring-0 outline-none selection:bg-primary selection:text-on-primary" readonly="" type="text" value="predictorwc26.com/join/x82k91"/>
+</div>
+</div>
+<div class="flex items-center justify-between bg-surface-container-highest/50 p-4 rounded-lg border border-outline-variant/10">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary text-xl">schedule</span>
+<div>
+<p class="font-headline text-sm font-semibold">Link berlaku 24 jam.</p>
+<p class="font-label text-xs text-on-surface-variant">Sisa slot: 3</p>
+</div>
+</div>
+</div>
+<button class="w-full bg-primary text-on-primary font-headline uppercase tracking-tight font-bold py-4 rounded hover:bg-primary-dim transition-all shadow-[0_0_15px_rgba(63,255,139,0.15)] hover:shadow-[0_0_25px_rgba(63,255,139,0.3)] flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-sm">content_copy</span>
+                        Salin Link
+                    </button>
+</div>
+</div>
+</div>
+</div>
+</body></html>
