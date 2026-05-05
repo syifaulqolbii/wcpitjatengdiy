@@ -232,8 +232,8 @@ export default function AdminDashboardPage() {
                       return (
                         <tr key={match.id} className="hover:bg-secondary/30 transition-colors">
                           <td className="py-4 px-4 text-muted-foreground whitespace-nowrap">{matchTime}</td>
-                          <td className={`py-4 px-4 font-display font-black tracking-tight text-foreground text-base whitespace-nowrap ${isFinished ? 'opacity-60' : ''}`}>
-                            <CountryFlag flag={match.flagA} size="sm" className="mr-2" /> {match.teamA.substring(0,3).toUpperCase()}
+                          <td className={`py-4 px-4 font-display font-black tracking-tight text-foreground text-sm md:text-base ${isFinished ? 'opacity-60' : ''}`}>
+                            <CountryFlag flag={match.flagA} size="sm" className="mr-2" /> {match.teamA.toUpperCase()}
                             {isFinished || isLive ? (
                               <span className="text-muted-foreground text-sm font-bold px-3">
                                 {match.scoreA ?? '-'} : {match.scoreB ?? '-'}
@@ -241,7 +241,7 @@ export default function AdminDashboardPage() {
                             ) : (
                               <span className="text-muted-foreground text-xs font-normal px-3">vs</span>
                             )}
-                            {match.teamB.substring(0,3).toUpperCase()} <CountryFlag flag={match.flagB} size="sm" className="ml-2" />
+                            {match.teamB.toUpperCase()} <CountryFlag flag={match.flagB} size="sm" className="ml-2" />
                           </td>
                           <td className="py-4 px-4 text-muted-foreground font-display text-xs uppercase">{match.group}</td>
                           <td className="py-4 px-4">

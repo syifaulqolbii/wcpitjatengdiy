@@ -193,15 +193,15 @@ export default function ProfilePage() {
                       return (
                         <div key={pred.id} className="bg-card rounded-lg p-4 border border-border/50 flex flex-col gap-3">
                           <div className="flex justify-between items-center">
-                            <div className="flex items-center gap-2 w-1/3">
+                            <div className="flex items-center gap-2 w-1/3 min-w-0">
                               <Flag flag={match.flagA} size="sm" />
-                              <span className="font-display font-bold text-foreground uppercase truncate">{match.teamA.substring(0,3)}</span>
+                              <span className="font-display text-xs md:text-sm font-bold text-foreground uppercase truncate">{match.teamA}</span>
                             </div>
                             <div className="font-display font-black text-xl md:text-2xl tracking-tighter text-foreground bg-secondary/50 px-3 py-1 rounded border border-border/30">
                               {pred.predictedA} - {pred.predictedB}
                             </div>
-                            <div className="flex items-center gap-2 w-1/3 justify-end">
-                              <span className="font-display font-bold text-foreground uppercase truncate">{match.teamB.substring(0,3)}</span>
+                            <div className="flex items-center gap-2 w-1/3 justify-end min-w-0">
+                              <span className="font-display text-xs md:text-sm font-bold text-foreground uppercase truncate">{match.teamB}</span>
                               <Flag flag={match.flagB} size="sm" className="opacity-80" />
                             </div>
                           </div>

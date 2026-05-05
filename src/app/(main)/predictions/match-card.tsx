@@ -41,6 +41,9 @@ export function MatchCard({ match, prediction }: { match: Match; prediction?: Pr
   };
 
   const isSubmitting = submitMut.isPending || updateMut.isPending;
+  const compactTeamNameClass = "font-display text-sm md:text-xl font-bold text-muted-foreground uppercase leading-tight break-words max-w-28 md:max-w-40";
+  const lockedTeamNameClass = "font-display text-sm md:text-xl font-black text-muted-foreground tracking-tight uppercase leading-tight break-words max-w-28 md:max-w-40";
+  const activeTeamNameClass = "font-display text-base md:text-2xl font-black tracking-tight text-foreground uppercase leading-tight break-words max-w-32 md:max-w-48";
 
   if (isFinished) {
     const points = prediction?.points ?? 0;
@@ -60,9 +63,9 @@ export function MatchCard({ match, prediction }: { match: Match; prediction?: Pr
           </div>
           
           <div className="flex justify-between items-center w-full mb-4">
-            <div className="flex items-center gap-4 flex-1">
+            <div className="flex items-center gap-3 md:gap-4 flex-1 min-w-0">
               <Flag flag={match.flagA} size="md" className="opacity-80" />
-              <span className="font-display text-lg md:text-2xl font-bold text-muted-foreground uppercase">{match.teamA.substring(0,3)}</span>
+              <span className={compactTeamNameClass}>{match.teamA}</span>
             </div>
             
             <div className="flex items-center gap-2 md:gap-5 px-4 md:px-6 py-2 bg-secondary/50 rounded-lg shadow-inner border border-border/30">
@@ -71,8 +74,8 @@ export function MatchCard({ match, prediction }: { match: Match; prediction?: Pr
               <div className={`text-2xl md:text-3xl font-display font-black ${isWin ? 'text-primary' : 'text-foreground'}`}>{match.scoreB}</div>
             </div>
             
-            <div className="flex items-center gap-4 flex-1 justify-end">
-              <span className={`font-display text-lg md:text-2xl font-bold uppercase ${isWin ? 'text-primary drop-shadow-[0_0_10px_rgba(0,230,118,0.3)]' : 'text-muted-foreground'}`}>{match.teamB.substring(0,3)}</span>
+            <div className="flex items-center gap-3 md:gap-4 flex-1 justify-end min-w-0 text-right">
+              <span className={`${compactTeamNameClass} ${isWin ? 'text-primary drop-shadow-[0_0_10px_rgba(0,230,118,0.3)]' : 'text-muted-foreground'}`}>{match.teamB}</span>
               <Flag flag={match.flagB} size="md" />
             </div>
           </div>
@@ -80,7 +83,7 @@ export function MatchCard({ match, prediction }: { match: Match; prediction?: Pr
           {prediction ? (
              <div className="mt-2 pt-3 border-t border-border/50 flex justify-between items-center bg-secondary/30 -mx-5 px-5 -mb-5 pb-5">
               <span className="text-xs text-muted-foreground font-medium">Prediksimu</span>
-              <span className="text-sm font-display font-bold text-muted-foreground tracking-wider">{match.teamA.substring(0,3)} {prediction.predictedA} - {prediction.predictedB} {match.teamB.substring(0,3)}</span>
+              <span className="text-sm font-display font-bold text-muted-foreground tracking-wider text-right">{match.teamA} {prediction.predictedA} - {prediction.predictedB} {match.teamB}</span>
             </div>
           ) : (
             <div className="mt-2 pt-3 border-t border-border/50 flex justify-between items-center bg-secondary/30 -mx-5 px-5 -mb-5 pb-5">
@@ -108,7 +111,7 @@ export function MatchCard({ match, prediction }: { match: Match; prediction?: Pr
         <div className="flex justify-between items-center w-full z-10 relative opacity-60">
           <div className="flex flex-col items-center gap-2 flex-1 text-center">
             <Flag flag={match.flagA} size="lg" className="grayscale" />
-            <span className="font-display text-lg md:text-2xl font-black text-muted-foreground tracking-tight uppercase">{match.teamA.substring(0,3)}</span>
+            <span className={lockedTeamNameClass}>{match.teamA}</span>
           </div>
           
           <div className="flex items-center gap-2 md:gap-4">
@@ -119,7 +122,7 @@ export function MatchCard({ match, prediction }: { match: Match; prediction?: Pr
           
           <div className="flex flex-col items-center gap-2 flex-1 text-center">
             <Flag flag={match.flagB} size="lg" className="grayscale" />
-            <span className="font-display text-lg md:text-2xl font-black text-muted-foreground tracking-tight uppercase">{match.teamB.substring(0,3)}</span>
+            <span className={lockedTeamNameClass}>{match.teamB}</span>
           </div>
         </div>
       </div>
@@ -140,7 +143,7 @@ export function MatchCard({ match, prediction }: { match: Match; prediction?: Pr
       <div className="flex justify-between items-center w-full z-10 mb-8">
         <div className="flex flex-col items-center gap-3 flex-1 text-center">
           <Flag flag={match.flagA} size="xl" />
-          <span className="font-display text-lg md:text-3xl font-black tracking-tight text-foreground uppercase">{match.teamA.substring(0,3)}</span>
+          <span className={activeTeamNameClass}>{match.teamA}</span>
         </div>
         
         <div className="flex items-center gap-2 md:gap-4 bg-secondary/50 p-2 md:p-3 rounded-lg shadow-[inset_0_2px_10px_rgba(0,0,0,0.5)] border border-border/50">
@@ -165,7 +168,7 @@ export function MatchCard({ match, prediction }: { match: Match; prediction?: Pr
         
         <div className="flex flex-col items-center gap-3 flex-1 text-center">
           <Flag flag={match.flagB} size="xl" />
-          <span className="font-display text-lg md:text-3xl font-black tracking-tight text-foreground uppercase">{match.teamB.substring(0,3)}</span>
+          <span className={activeTeamNameClass}>{match.teamB}</span>
         </div>
       </div>
       

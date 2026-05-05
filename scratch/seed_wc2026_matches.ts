@@ -19,10 +19,10 @@ const matchValues = [
   { teamA: "Bosnia and Herzegovina", teamB: "Qatar", flagA: "🇧🇦", flagB: "🇶🇦", group: "Group B", kickoffTime: new Date("2026-06-24T19:00:00Z"), status: "upcoming" },
 
   { teamA: "Brazil", teamB: "Morocco", flagA: "🇧🇷", flagB: "🇲🇦", group: "Group C", kickoffTime: new Date("2026-06-13T22:00:00Z"), status: "upcoming" },
-  { teamA: "Haiti", teamB: "Scotland", flagA: "🇭🇹", flagB: "🏴", group: "Group C", kickoffTime: new Date("2026-06-14T01:00:00Z"), status: "upcoming" },
-  { teamA: "Scotland", teamB: "Morocco", flagA: "🏴", flagB: "🇲🇦", group: "Group C", kickoffTime: new Date("2026-06-19T22:00:00Z"), status: "upcoming" },
+  { teamA: "Haiti", teamB: "Scotland", flagA: "🇭🇹", flagB: "gb-sct", group: "Group C", kickoffTime: new Date("2026-06-14T01:00:00Z"), status: "upcoming" },
+  { teamA: "Scotland", teamB: "Morocco", flagA: "gb-sct", flagB: "🇲🇦", group: "Group C", kickoffTime: new Date("2026-06-19T22:00:00Z"), status: "upcoming" },
   { teamA: "Brazil", teamB: "Haiti", flagA: "🇧🇷", flagB: "🇭🇹", group: "Group C", kickoffTime: new Date("2026-06-20T00:30:00Z"), status: "upcoming" },
-  { teamA: "Scotland", teamB: "Brazil", flagA: "🏴", flagB: "🇧🇷", group: "Group C", kickoffTime: new Date("2026-06-24T22:00:00Z"), status: "upcoming" },
+  { teamA: "Scotland", teamB: "Brazil", flagA: "gb-sct", flagB: "🇧🇷", group: "Group C", kickoffTime: new Date("2026-06-24T22:00:00Z"), status: "upcoming" },
   { teamA: "Morocco", teamB: "Haiti", flagA: "🇲🇦", flagB: "🇭🇹", group: "Group C", kickoffTime: new Date("2026-06-24T22:00:00Z"), status: "upcoming" },
 
   { teamA: "United States", teamB: "Paraguay", flagA: "🇺🇸", flagB: "🇵🇾", group: "Group D", kickoffTime: new Date("2026-06-13T01:00:00Z"), status: "upcoming" },
@@ -81,11 +81,11 @@ const matchValues = [
   { teamA: "Colombia", teamB: "Portugal", flagA: "🇨🇴", flagB: "🇵🇹", group: "Group K", kickoffTime: new Date("2026-06-27T23:30:00Z"), status: "upcoming" },
   { teamA: "DR Congo", teamB: "Uzbekistan", flagA: "🇨🇩", flagB: "🇺🇿", group: "Group K", kickoffTime: new Date("2026-06-27T23:30:00Z"), status: "upcoming" },
 
-  { teamA: "England", teamB: "Croatia", flagA: "🏴", flagB: "🇭🇷", group: "Group L", kickoffTime: new Date("2026-06-17T20:00:00Z"), status: "upcoming" },
+  { teamA: "England", teamB: "Croatia", flagA: "gb-eng", flagB: "🇭🇷", group: "Group L", kickoffTime: new Date("2026-06-17T20:00:00Z"), status: "upcoming" },
   { teamA: "Ghana", teamB: "Panama", flagA: "🇬🇭", flagB: "🇵🇦", group: "Group L", kickoffTime: new Date("2026-06-17T23:00:00Z"), status: "upcoming" },
-  { teamA: "England", teamB: "Ghana", flagA: "🏴", flagB: "🇬🇭", group: "Group L", kickoffTime: new Date("2026-06-23T20:00:00Z"), status: "upcoming" },
+  { teamA: "England", teamB: "Ghana", flagA: "gb-eng", flagB: "🇬🇭", group: "Group L", kickoffTime: new Date("2026-06-23T20:00:00Z"), status: "upcoming" },
   { teamA: "Panama", teamB: "Croatia", flagA: "🇵🇦", flagB: "🇭🇷", group: "Group L", kickoffTime: new Date("2026-06-23T23:00:00Z"), status: "upcoming" },
-  { teamA: "Panama", teamB: "England", flagA: "🇵🇦", flagB: "🏴", group: "Group L", kickoffTime: new Date("2026-06-27T21:00:00Z"), status: "upcoming" },
+  { teamA: "Panama", teamB: "England", flagA: "🇵🇦", flagB: "gb-eng", group: "Group L", kickoffTime: new Date("2026-06-27T21:00:00Z"), status: "upcoming" },
   { teamA: "Croatia", teamB: "Ghana", flagA: "🇭🇷", flagB: "🇬🇭", group: "Group L", kickoffTime: new Date("2026-06-27T21:00:00Z"), status: "upcoming" },
 ];
 

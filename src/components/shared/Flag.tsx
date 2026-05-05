@@ -17,8 +17,18 @@ const sizeMap = {
 // Helper to convert emoji flag or country code to ISO 3166-1 alpha-2
 function getCountryCode(flag: string): string {
   if (!flag) return 'id'; // default
+
+  // flagcdn supports UK constituent country codes.
+  if (/^gb-(eng|sct|wls)$/i.test(flag)) {
+    return flag.toLowerCase();
+  }
+
+  // Emoji subdivision flags are not made from regional indicators.
+  if (flag === "\u{1F3F4}\u{E0067}\u{E0062}\u{E0065}\u{E006E}\u{E0067}\u{E007F}") return 'gb-eng';
+  if (flag === "\u{1F3F4}\u{E0067}\u{E0062}\u{E0073}\u{E0063}\u{E0074}\u{E007F}") return 'gb-sct';
+  if (flag === "\u{1F3F4}\u{E0067}\u{E0062}\u{E0077}\u{E006C}\u{E0073}\u{E007F}") return 'gb-wls';
   
-  // If it's already a 2-letter code
+  // If it's already a 2-letter country code
   if (flag.length === 2 && /^[a-zA-Z]+$/.test(flag)) {
     return flag.toLowerCase();
   }

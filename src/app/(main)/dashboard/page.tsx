@@ -284,18 +284,18 @@ export default function DashboardPage() {
                 <div key={match.id} className={`bg-card rounded-xl p-5 border border-border/50 flex items-center justify-between relative overflow-hidden transition-opacity ${points > 0 ? 'opacity-100' : 'opacity-80 hover:opacity-100'}`}>
                   <div className={`absolute left-0 top-0 bottom-0 w-1 ${points > 0 ? 'bg-primary' : 'bg-muted'}`} />
                   <div className="flex items-center gap-3 md:gap-6">
-                    <div className="flex flex-col items-center w-12 md:w-16">
+                    <div className="flex flex-col items-center w-20 md:w-28 text-center">
                       <Flag flag={match.flagA} size="md" className="mb-1" />
-                      <span className="font-display text-xs md:text-sm font-bold text-foreground uppercase">{match.teamA.substring(0, 3)}</span>
+                      <span className="font-display text-[10px] md:text-xs font-bold text-foreground uppercase leading-tight break-words">{match.teamA}</span>
                     </div>
                     <div className="flex items-center gap-2 md:gap-3 bg-secondary/30 px-3 md:px-4 py-2 rounded-lg font-display font-black text-xl md:text-2xl tracking-tighter">
                       <span className="text-foreground">{match.scoreA}</span>
                       <span className="text-muted-foreground text-lg">-</span>
                       <span className="text-muted-foreground">{match.scoreB}</span>
                     </div>
-                    <div className="flex flex-col items-center w-12 md:w-16">
+                    <div className="flex flex-col items-center w-20 md:w-28 text-center">
                       <Flag flag={match.flagB} size="md" className="mb-1 opacity-80" />
-                      <span className="font-display text-xs md:text-sm font-bold text-muted-foreground uppercase">{match.teamB.substring(0, 3)}</span>
+                      <span className="font-display text-[10px] md:text-xs font-bold text-muted-foreground uppercase leading-tight break-words">{match.teamB}</span>
                     </div>
                   </div>
                   {hasPrediction ? (

@@ -375,8 +375,8 @@ export default function AdminMatchesPage() {
               {modalType === 'input' ? (
                 <div className="flex items-center justify-center w-full gap-6 relative z-10">
                   <div className="flex flex-col items-center">
-                    <div className="font-display text-2xl font-black mb-4 tracking-tighter text-foreground flex items-center gap-2">
-                      <CountryFlag flag={selectedMatch?.flagA ?? ''} size="md" /> {selectedMatch?.teamA.substring(0,3).toUpperCase()}
+                    <div className="font-display text-lg md:text-2xl font-black mb-4 tracking-tighter text-foreground flex items-center gap-2 max-w-48 text-center leading-tight">
+                      <CountryFlag flag={selectedMatch?.flagA ?? ''} size="md" /> {selectedMatch?.teamA.toUpperCase()}
                     </div>
                     <input 
                       aria-label="Score Team A" 
@@ -393,8 +393,8 @@ export default function AdminMatchesPage() {
                   </div>
                   
                   <div className="flex flex-col items-center">
-                    <div className="font-display text-2xl font-black mb-4 tracking-tighter text-foreground flex items-center gap-2">
-                      {selectedMatch?.teamB.substring(0,3).toUpperCase()} <CountryFlag flag={selectedMatch?.flagB ?? ''} size="md" />
+                    <div className="font-display text-lg md:text-2xl font-black mb-4 tracking-tighter text-foreground flex items-center gap-2 max-w-48 text-center leading-tight">
+                      {selectedMatch?.teamB.toUpperCase()} <CountryFlag flag={selectedMatch?.flagB ?? ''} size="md" />
                     </div>
                     <input 
                       aria-label="Score Team B" 
