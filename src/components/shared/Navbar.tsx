@@ -7,6 +7,7 @@ import { cn } from "@/lib/utils";
 import { authClient } from "@/lib/auth-client";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
+import { BrandLogo } from "@/components/shared/BrandLogo";
 
 const NAV_LINKS = [
   { href: "/dashboard", label: "Dashboard", icon: Home },
@@ -33,11 +34,8 @@ export default function Navbar() {
   return (
     <nav className="hidden md:flex sticky top-0 z-50 w-full border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container mx-auto max-w-7xl flex h-16 items-center justify-between px-8">
-        {/* Logo */}
-        <Link href="/dashboard" className="flex items-center gap-2">
-          <span className="font-display font-bold text-2xl text-primary tracking-wider uppercase">
-            WC 2026
-          </span>
+        <Link href="/dashboard" className="flex items-center">
+          <BrandLogo compact className="w-44" />
         </Link>
 
         {/* Desktop Nav */}

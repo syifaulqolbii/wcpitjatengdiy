@@ -2,13 +2,14 @@
 
 import { useState, useEffect } from "react";
 import { authClient } from "@/lib/auth-client";
-import { Trophy, Mail, Lock, Eye, EyeOff, ArrowRight, User, CheckCircle2 } from "lucide-react";
+import { Mail, Lock, Eye, EyeOff, ArrowRight, User, CheckCircle2 } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
+import { BrandLogo } from "@/components/shared/BrandLogo";
 
 const loginSchema = z.object({
   name: z.string().optional(),
@@ -113,13 +114,10 @@ export default function LoginPage() {
 
   return (
     <>
-      {/* Logo & Wordmark Area */}
       <div className="mb-6 flex flex-col items-center text-center">
-        <div className="w-16 h-16 mb-4 bg-card rounded-full flex items-center justify-center border border-border/50 shadow-[0px_24px_48px_rgba(0,0,0,0.4)]">
-          <Trophy className="h-8 w-8 text-primary" />
-        </div>
-        <h1 className="font-display font-black text-4xl tracking-tighter text-foreground uppercase mb-2">
-          PREDICTOR <span className="text-primary block">WC26</span>
+        <BrandLogo className="mb-4 w-full justify-center px-4" />
+        <h1 className="font-display font-black text-3xl tracking-tighter text-foreground uppercase mb-2">
+          WC 2026 Predictor
         </h1>
         <p className="font-sans text-sm uppercase tracking-[0.2em] text-muted-foreground font-bold">
           Predict. Compete. Win. 🏆

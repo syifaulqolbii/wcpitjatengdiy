@@ -6,6 +6,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import { LayoutDashboard, Swords, Users, LineChart, Settings, LogOut } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { authClient } from '@/lib/auth-client';
+import { BrandLogo } from '@/components/shared/BrandLogo';
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -42,7 +43,9 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       {/* SideNavBar */}
       <nav aria-label="Main Navigation" className="fixed left-0 top-0 h-full flex flex-col p-6 space-y-8 bg-secondary/20 w-64 border-r border-border/50 z-20">
         <div className="mb-4">
-          <h1 className="text-primary font-black text-xl tracking-tight leading-none mb-1 font-display">STADIUM PULSE</h1>
+          <Link href="/dashboard" aria-label="Kembali ke dashboard user" className="mb-3 block w-44">
+            <BrandLogo compact />
+          </Link>
           <p className="text-muted-foreground text-xs font-display uppercase tracking-widest">ADMIN CONSOLE</p>
         </div>
         
