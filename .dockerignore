@@ -1,33 +1,9 @@
-# Dependencies
-node_modules
-npm-debug.log*
-
-# Next.js build output
-.next
-
-# Git
 .git
 .gitignore
-
-# IDE
-.vscode
-.idea
-*.swp
-*.swo
-
-# OS
-.DS_Store
-Thumbs.db
-
-# Env files (secrets)
-.env
-.env.local
-.env*.local
-
-# Stitch design HTML exports
-*.html
-
-# Misc
-*.md
-*.zip
-stitch_*
+node_modules
+.next
+.env*
+!.env.example
+README.md
+deploy.sh
+setup-vps.sh
