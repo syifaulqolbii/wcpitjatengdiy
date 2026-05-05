@@ -6,20 +6,20 @@ echo "🚀 Deploying WC26 Predictor..."
 git pull origin main
 
 # Stop container lama
-docker compose down
+docker compose --env-file .env.production down
 
 # Build image baru
-docker compose build --no-cache
+docker compose --env-file .env.production build --no-cache
 
 # Start containers
-docker compose up -d
+docker compose --env-file .env.production up -d
 
 # Tunggu DB ready
 echo "Waiting for database..."
 sleep 15
 
 # Jalankan migration
-docker compose exec app npx drizzle-kit migrate
+docker compose --env-file .env.production exec app npx drizzle-kit migrate
 
 echo "Deploy selesai!"
 echo "🌐 App running di port 3000"
