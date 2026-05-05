@@ -4,6 +4,8 @@ services:
       context: .
       args:
         DATABASE_URL: ${DATABASE_URL}
+        BETTER_AUTH_SECRET: ${BETTER_AUTH_SECRET}
+        BETTER_AUTH_URL: ${BETTER_AUTH_URL}
     container_name: wcp_app
     restart: unless-stopped
     ports:
