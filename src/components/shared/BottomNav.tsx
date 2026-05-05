@@ -2,7 +2,8 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, Target, Trophy, User } from "lucide-react";
+import { Home, Target, Trophy, User, Shield } from "lucide-react";
+import { authClient } from "@/lib/auth-client";
 import { cn } from "@/lib/utils";
 
 const NAV_LINKS = [
@@ -14,6 +15,8 @@ const NAV_LINKS = [
 
 export default function BottomNav() {
   const pathname = usePathname();
+  const { data: session } = authClient.useSession();
+  const isAdmin = session?.user?.role === "admin";
 
   return (
     <nav className="md:hidden fixed bottom-0 left-0 z-50 w-full border-t border-border bg-background pb-2 pt-2">
@@ -36,6 +39,18 @@ export default function BottomNav() {
             </Link>
           );
         })}
+        {isAdmin && (
+          <Link
+            href="/admin/dashboard"
+            className={cn(
+              "flex flex-col items-center justify-center w-full h-full gap-1 transition-colors",
+              pathname.startsWith("/admin") ? "text-primary" : "text-muted-foreground hover:text-foreground"
+            )}
+          >
+            <Shield className={cn("h-5 w-5", pathname.startsWith("/admin") && "fill-primary/20")} />
+            <span className="text-[10px] font-medium">Admin</span>
+          </Link>
+        )}
       </div>
     </nav>
   );

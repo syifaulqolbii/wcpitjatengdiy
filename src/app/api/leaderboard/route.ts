@@ -1,0 +1,90 @@
+import { NextRequest } from "next/server";
+import { db } from "@/db";
+import { leaderboardSnapshots, predictions, users } from "@/db/schema";
+import { eq, sql, sum, count, desc, isNotNull } from "drizzle-orm";
+import { ok, requireAuth, handleError } from "@/lib/api-helpers";
+
+// ─── GET /api/leaderboard ─────────────────────────────────────
+// Auth: required (all roles)
+// Aggregate query:
+//   - SUM(points) → totalPoints
+//   - COUNT(*) WHERE points = 5 → perfectScores
+//   - COUNT(*) WHERE points IS NOT NULL → totalPredicted
+// Sorted by totalPoints DESC, then perfectScores DESC
+// Rank is computed in-memory after the query
+export async function GET(req: NextRequest) {
+  try {
+    await requireAuth(req);
+
+    const rows = await db
+      .select({
+        userId: predictions.userId,
+        name: users.name,
+        totalPoints: sum(predictions.points).mapWith(Number),
+        perfectScores: count(
+          sql`CASE WHEN ${predictions.points} = 5 THEN 1 END`
+        ).mapWith(Number),
+        correctResults: count(
+          sql`CASE WHEN ${predictions.points} = 2 THEN 1 END`
+        ).mapWith(Number),
+        totalPredicted: count(predictions.id).mapWith(Number),
+      })
+      .from(predictions)
+      .innerJoin(users, eq(predictions.userId, users.id))
+      .where(isNotNull(predictions.points))
+      .groupBy(predictions.userId, users.name)
+      .orderBy(
+        desc(sum(predictions.points)),
+        desc(
+          count(sql`CASE WHEN ${predictions.points} = 5 THEN 1 END`)
+        )
+      );
+
+    const latestSnapshots = await db
+      .select({
+        userId: leaderboardSnapshots.userId,
+        rank: leaderboardSnapshots.rank,
+      })
+      .from(leaderboardSnapshots)
+      .where(
+        sql`${leaderboardSnapshots.id} IN (
+          SELECT DISTINCT ON (user_id) id
+          FROM leaderboard_snapshots
+          ORDER BY user_id, snapshot_at DESC
+        )`
+      );
+
+    const snapshotRankByUserId = new Map(
+      latestSnapshots.map((snapshot) => [snapshot.userId, snapshot.rank])
+    );
+
+    // Compute rank in-memory (handles tied ranks with same rank number)
+    let currentRank = 1;
+    const leaderboard = rows.map((row, index) => {
+      if (
+        index > 0 &&
+        (row.totalPoints !== rows[index - 1].totalPoints ||
+          row.perfectScores !== rows[index - 1].perfectScores)
+      ) {
+        currentRank = index + 1;
+      }
+
+      return {
+        rank: currentRank,
+        userId: row.userId,
+        name: row.name,
+        totalPoints: row.totalPoints ?? 0,
+        perfectScores: row.perfectScores ?? 0,
+        correctResults: row.correctResults ?? 0,
+        totalPredicted: row.totalPredicted ?? 0,
+        rankChange: snapshotRankByUserId.has(row.userId)
+          ? snapshotRankByUserId.get(row.userId)! - currentRank
+          : null,
+      };
+    });
+
+    return ok(leaderboard);
+  } catch (error) {
+    return handleError(error);
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "version": "7",
+  "dialect": "postgresql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1776934768435,
+      "tag": "0000_plain_ego",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1777458169546,
+      "tag": "0001_kind_wilson_fisk",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1777794141753,
+      "tag": "0002_mean_killraven",
+      "breakpoints": true
+    }
+  ]
+}

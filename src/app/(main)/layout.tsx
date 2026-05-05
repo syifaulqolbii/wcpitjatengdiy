@@ -1,5 +1,6 @@
 import Navbar from "@/components/shared/Navbar";
 import BottomNav from "@/components/shared/BottomNav";
+import { AutoChampionModal } from "@/components/predictions/AutoChampionModal";
 
 export default function MainLayout({
   children,
@@ -19,6 +20,7 @@ export default function MainLayout({
 
       {/* Bottom Navigation for Mobile */}
       <BottomNav />
+      <AutoChampionModal />
     </div>
   );
 }

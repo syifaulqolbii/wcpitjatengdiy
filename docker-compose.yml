@@ -1,0 +1,48 @@
+version: "3.9"
+
+services:
+  # ─── PostgreSQL Database ──────────────────────────────────────
+  db:
+    image: postgres:16-alpine
+    container_name: wc26_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: predictor_wc26
+      POSTGRES_USER: wc26_admin
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-wcp_!tjtd1y@26}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U wc26_admin -d predictor_wc26"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ─── Next.js App ──────────────────────────────────────────────
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: wc26_app
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      DATABASE_URL: postgresql://wc26_admin:${POSTGRES_PASSWORD:-wcp_!tjtd1y@26}@db:5432/predictor_wc26
+      BETTER_AUTH_SECRET: ${BETTER_AUTH_SECRET:-change-this-to-a-random-secret-min-32-chars}
+      BETTER_AUTH_URL: ${BETTER_AUTH_URL:-http://localhost:3000}
+      NEXT_PUBLIC_APP_URL: ${NEXT_PUBLIC_APP_URL:-http://localhost:3000}
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  postgres_data:
+    driver: local
+
+networks:
+  default:
+    name: wc26_network
+    driver: bridge

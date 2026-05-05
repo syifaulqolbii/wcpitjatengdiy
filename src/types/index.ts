@@ -27,6 +27,7 @@ export interface Prediction {
   predictedB: number;
   points: number | null;
   submittedAt: Date;
+  match?: Match;
 }
 
 export interface LeaderboardEntry {
@@ -35,4 +36,7 @@ export interface LeaderboardEntry {
   name: string;
   totalPoints: number;
   perfectScores: number;
+  correctResults: number;
+  totalPredicted: number;
+  rankChange: number | null;
 }

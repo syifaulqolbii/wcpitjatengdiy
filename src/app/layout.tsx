@@ -2,7 +2,8 @@ import type { Metadata } from "next";
 import { Manrope, Lexend } from "next/font/google";
 import "./globals.css";
 import { cn } from "@/lib/utils";
-
+import QueryProvider from "@/components/providers/query-provider";
+import { Toaster } from "sonner";
 const manrope = Manrope({
   subsets: ["latin"],
   variable: "--font-sans",
@@ -27,7 +28,10 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning className={`${manrope.variable} ${lexend.variable}`}>
       <body className={cn("min-h-screen bg-background font-sans antialiased")}>
-        {children}
+        <QueryProvider>
+          {children}
+          <Toaster position="top-center" richColors />
+        </QueryProvider>
       </body>
     </html>
   );
