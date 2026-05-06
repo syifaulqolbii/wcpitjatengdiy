@@ -12,6 +12,8 @@ services:
       - "3000:3000"
     env_file:
       - .env.production
+    environment:
+      BETTER_AUTH_INTERNAL_URL: http://localhost:3000
     depends_on:
       db:
         condition: service_healthy

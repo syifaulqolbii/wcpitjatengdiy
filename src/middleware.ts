@@ -24,7 +24,7 @@ export async function middleware(request: NextRequest) {
   const { data: session } = await betterFetch<Session>(
     "/api/auth/get-session",
     {
-      baseURL: request.nextUrl.origin,
+      baseURL: process.env.BETTER_AUTH_INTERNAL_URL ?? request.nextUrl.origin,
       headers: {
         // Pass the cookie so Better Auth knows who we are
         cookie: request.headers.get("cookie") || "",
