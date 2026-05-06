@@ -18,4 +18,4 @@ sudo systemctl enable nginx
 
 echo "Nginx configured!"
 echo "Jalankan berikutnya:"
-echo "sudo certbot --nginx -d wcp.itjateng.id"
+echo "sudo certbot --nginx -d wcp.it-jaya.id"
