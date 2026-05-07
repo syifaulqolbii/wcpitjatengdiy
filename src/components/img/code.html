@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>PREDICTOR WC26 | STADIUM PULSE</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;700;800;900&amp;family=Manrope:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "surface-container-highest": "#262626",
+                    "on-background": "#ffffff",
+                    "on-tertiary-fixed": "#00343d",
+                    "on-secondary-container": "#e1ffeb",
+                    "error-container": "#9f0519",
+                    "error-dim": "#d7383b",
+                    "on-secondary-fixed": "#00492f",
+                    "secondary": "#74fbbb",
+                    "primary-fixed": "#3fff8b",
+                    "inverse-on-surface": "#565555",
+                    "on-secondary": "#005e3d",
+                    "on-secondary-fixed-variant": "#006945",
+                    "surface-container": "#1a1919",
+                    "on-error-container": "#ffa8a3",
+                    "secondary-fixed": "#74fbbb",
+                    "on-error": "#490006",
+                    "on-surface-variant": "#adaaaa",
+                    "primary-fixed-dim": "#24f07e",
+                    "primary-container": "#13ea79",
+                    "tertiary-container": "#00dcfd",
+                    "inverse-surface": "#fcf9f8",
+                    "on-primary-container": "#004f24",
+                    "surface-container-high": "#201f1f",
+                    "error": "#ff716c",
+                    "on-primary-fixed-variant": "#006832",
+                    "on-tertiary": "#005360",
+                    "tertiary-fixed-dim": "#00cdec",
+                    "primary-dim": "#24f07e",
+                    "on-tertiary-fixed-variant": "#005361",
+                    "on-primary-fixed": "#004820",
+                    "surface-dim": "#0e0e0e",
+                    "surface-tint": "#3fff8b",
+                    "secondary-container": "#006c47",
+                    "surface-container-low": "#131313",
+                    "on-primary": "#005d2c",
+                    "background": "#0e0e0e",
+                    "on-tertiary-container": "#004955",
+                    "surface-bright": "#2c2c2c",
+                    "outline-variant": "#484847",
+                    "tertiary": "#7ae6ff",
+                    "surface-variant": "#262626",
+                    "secondary-fixed-dim": "#65ecae",
+                    "surface-container-lowest": "#000000",
+                    "secondary-dim": "#65ecae",
+                    "tertiary-fixed": "#00dcfd",
+                    "on-surface": "#ffffff",
+                    "inverse-primary": "#006e35",
+                    "primary": "#3fff8b",
+                    "tertiary-dim": "#00cdec",
+                    "surface": "#0e0e0e",
+                    "outline": "#767575"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.125rem",
+                    "lg": "0.25rem",
+                    "xl": "0.5rem",
+                    "full": "0.75rem"
+            },
+            "fontFamily": {
+                    "headline": ["Lexend"],
+                    "display": ["Lexend"],
+                    "body": ["Manrope"],
+                    "label": ["Manrope"]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .halftone-bg {
+            background-image: radial-gradient(circle at center, #3fff8b 1px, transparent 1px);
+            background-size: 24px 24px;
+            opacity: 0.1;
+            mask-image: linear-gradient(to bottom, black, transparent);
+        }
+        .diagonal-skew {
+            clip-path: polygon(0 0, 100% 0, 100% 85%, 0% 100%);
+        }
+        .glass-panel {
+            background: rgba(38, 38, 38, 0.6);
+            backdrop-filter: blur(20px);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-background font-body selection:bg-primary selection:text-on-primary">
+<!-- Top Navigation Anchor -->
+<header class="fixed top-0 left-0 right-0 z-50 bg-surface/80 backdrop-blur-md">
+<div class="flex justify-between items-center w-full px-6 py-8 max-w-7xl mx-auto">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary text-3xl" data-weight="fill">sports_soccer</span>
+<span class="text-headline-lg font-headline font-black tracking-tighter text-primary dark:text-primary uppercase">PREDICTOR WC26</span>
+</div>
+<nav class="hidden md:flex gap-8 items-center">
+<a class="text-primary font-bold border-b-2 border-primary pb-1 transition-all duration-300" href="#">HOME</a>
+<a class="text-on-surface-variant font-medium hover:text-primary transition-all duration-300" href="#rules">RULES</a>
+<a class="text-on-surface-variant font-medium hover:text-primary transition-all duration-300" href="#leaderboard">LEADERBOARD</a>
+<a class="bg-primary text-on-primary px-6 py-2 font-bold tracking-tight hover:shadow-[0_0_20px_rgba(63,255,139,0.4)] transition-all" href="#">JOIN THE PULSE</a>
+</nav>
+</div>
+</header>
+<!-- Section 1: Hero -->
+<section class="relative min-h-screen flex flex-col justify-center items-center overflow-hidden px-6 pt-24">
+<div class="absolute inset-0 halftone-bg -rotate-12 scale-150"></div>
+<div class="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-primary/5 to-transparent pointer-events-none"></div>
+<div class="relative z-10 text-center max-w-5xl">
+<span class="inline-block bg-surface-container-highest px-4 py-1 mb-8 rounded-lg border border-primary/20 text-primary font-bold tracking-[0.2em] text-xs">
+                🏆 PRIVATE PREDICTION GAME
+            </span>
+<h1 class="font-headline font-black text-6xl md:text-[120px] leading-[0.9] tracking-tighter uppercase mb-6 drop-shadow-2xl">
+                STADIUM <br/> <span class="text-primary">PULSE</span>
+</h1>
+<p class="font-headline text-xl md:text-3xl tracking-[0.5em] font-light mb-12 text-on-surface-variant">
+                PREDICT. COMPETE. WIN.
+            </p>
+<!-- Countdown Timer -->
+<div class="flex gap-4 md:gap-8 justify-center mb-16">
+<div class="flex flex-col items-center">
+<div class="w-16 h-20 md:w-24 md:h-28 bg-primary flex items-center justify-center rounded-lg shadow-lg">
+<span class="text-on-primary font-headline text-3xl md:text-5xl font-black">74</span>
+</div>
+<span class="text-label-sm font-bold tracking-widest mt-2 opacity-60">DAYS</span>
+</div>
+<div class="flex flex-col items-center">
+<div class="w-16 h-20 md:w-24 md:h-28 bg-primary flex items-center justify-center rounded-lg shadow-lg">
+<span class="text-on-primary font-headline text-3xl md:text-5xl font-black">12</span>
+</div>
+<span class="text-label-sm font-bold tracking-widest mt-2 opacity-60">HOURS</span>
+</div>
+<div class="flex flex-col items-center">
+<div class="w-16 h-20 md:w-24 md:h-28 bg-primary flex items-center justify-center rounded-lg shadow-lg">
+<span class="text-on-primary font-headline text-3xl md:text-5xl font-black">45</span>
+</div>
+<span class="text-label-sm font-bold tracking-widest mt-2 opacity-60">MIN</span>
+</div>
+<div class="flex flex-col items-center">
+<div class="w-16 h-20 md:w-24 md:h-28 bg-primary flex items-center justify-center rounded-lg shadow-lg">
+<span class="text-on-primary font-headline text-3xl md:text-5xl font-black">08</span>
+</div>
+<span class="text-label-sm font-bold tracking-widest mt-2 opacity-60">SEC</span>
+</div>
+</div>
+<div class="flex flex-col md:flex-row gap-4 justify-center items-center">
+<p class="font-headline font-bold text-lg mr-4 tracking-widest">11 JUNI 2026 — MEXICO CITY</p>
+<div class="flex gap-4">
+<button class="bg-primary text-on-primary px-10 py-4 font-black text-lg hover:scale-105 transition-all">MASUK</button>
+<button class="border-2 border-primary text-primary px-10 py-4 font-black text-lg hover:bg-primary/10 transition-all">DAFTAR DENGAN KODE</button>
+</div>
+</div>
+</div>
+<div class="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center animate-bounce opacity-50">
+<span class="text-label-sm tracking-[0.3em] mb-2 font-bold">SCROLL</span>
+<span class="material-symbols-outlined">expand_more</span>
+</div>
+</section>
+<!-- Section 2: Cara Main -->
+<section class="py-32 px-6 bg-surface-container-low relative overflow-hidden" id="rules">
+<div class="max-w-7xl mx-auto relative z-10">
+<h2 class="font-headline font-black text-5xl md:text-8xl tracking-tighter mb-20 uppercase">CARA <span class="text-primary">MAIN</span></h2>
+<div class="grid md:grid-cols-3 gap-8">
+<!-- Card 1 -->
+<div class="group relative bg-surface-container-high p-10 rounded-lg overflow-hidden h-80 flex flex-col justify-end">
+<span class="absolute top-[-20%] right-[-5%] text-[200px] font-black text-on-surface opacity-5 select-none transition-all group-hover:opacity-10">01</span>
+<div class="mb-6">
+<span class="material-symbols-outlined text-primary text-5xl" style="font-variation-settings: 'FILL' 1;">lock</span>
+</div>
+<h3 class="font-headline font-bold text-2xl uppercase">DAFTAR &amp; MASUK</h3>
+<p class="text-on-surface-variant mt-2">Dapatkan kode akses eksklusif dari komunitas Anda dan buat profil pemain.</p>
+</div>
+<!-- Card 2 -->
+<div class="group relative bg-surface-container-high p-10 rounded-lg overflow-hidden h-80 flex flex-col justify-end border-b-4 border-primary/20">
+<span class="absolute top-[-20%] right-[-5%] text-[200px] font-black text-on-surface opacity-5 select-none transition-all group-hover:opacity-10">02</span>
+<div class="mb-6">
+<span class="material-symbols-outlined text-primary text-5xl" style="font-variation-settings: 'FILL' 1;">sports_soccer</span>
+</div>
+<h3 class="font-headline font-bold text-2xl uppercase">BUAT PREDIKSI</h3>
+<p class="text-on-surface-variant mt-2">Tebak skor pertandingan sebelum peluit kick-off berbunyi.</p>
+</div>
+<!-- Card 3 -->
+<div class="group relative bg-surface-container-high p-10 rounded-lg overflow-hidden h-80 flex flex-col justify-end">
+<span class="absolute top-[-20%] right-[-5%] text-[200px] font-black text-on-surface opacity-5 select-none transition-all group-hover:opacity-10">03</span>
+<div class="mb-6">
+<span class="material-symbols-outlined text-primary text-5xl" style="font-variation-settings: 'FILL' 1;">emoji_events</span>
+</div>
+<h3 class="font-headline font-bold text-2xl uppercase">KUMPULKAN POIN</h3>
+<p class="text-on-surface-variant mt-2">Dapatkan poin dari akurasi tebakan dan panjat tangga klasemen.</p>
+</div>
+</div>
+</div>
+</section>
+<!-- Section 3: Sistem Poin -->
+<section class="py-32 px-6 bg-surface">
+<div class="max-w-7xl mx-auto">
+<h2 class="font-headline font-black text-5xl md:text-8xl tracking-tighter mb-20 uppercase text-right">SISTEM <span class="text-primary">POIN</span></h2>
+<div class="grid md:grid-cols-3 gap-8 items-start">
+<!-- Perfect Score -->
+<div class="bg-gradient-to-br from-primary/20 to-surface-container-high p-12 border border-primary/30 rounded-lg text-center shadow-[0_0_50px_rgba(63,255,139,0.1)]">
+<h4 class="font-headline font-bold text-on-surface-variant mb-4 uppercase tracking-widest">PERFECT SCORE</h4>
+<div class="font-display font-black text-8xl text-primary mb-6">5</div>
+<p class="text-label-md font-bold mb-4 uppercase tracking-widest">POINTS</p>
+<div class="bg-surface-container-lowest py-3 px-4 rounded-lg inline-block text-sm text-on-surface-variant italic">
+                        "Tebak 2-1 -&gt; Hasil 2-1"
+                    </div>
+</div>
+<!-- Correct Result -->
+<div class="bg-gradient-to-br from-tertiary/20 to-surface-container-high p-12 border border-tertiary/30 rounded-lg text-center mt-12 md:mt-0">
+<h4 class="font-headline font-bold text-on-surface-variant mb-4 uppercase tracking-widest">CORRECT RESULT</h4>
+<div class="font-display font-black text-8xl text-tertiary mb-6">2</div>
+<p class="text-label-md font-bold mb-4 uppercase tracking-widest">POINTS</p>
+<div class="bg-surface-container-lowest py-3 px-4 rounded-lg inline-block text-sm text-on-surface-variant italic">
+                        "Tebak 1-0 -&gt; Hasil 2-1"
+                    </div>
+</div>
+<!-- Tebak Juara -->
+<div class="bg-gradient-to-br from-secondary/20 to-surface-container-high p-12 border border-secondary/30 rounded-lg text-center">
+<h4 class="font-headline font-bold text-on-surface-variant mb-4 uppercase tracking-widest">TEBAK JUARA</h4>
+<div class="font-display font-black text-8xl text-secondary mb-6">+30</div>
+<p class="text-label-md font-bold mb-4 uppercase tracking-widest">BONUS POINTS</p>
+<div class="bg-surface-container-lowest py-3 px-4 rounded-lg inline-block text-sm text-on-surface-variant italic">
+                        Prediksi Juara Turnamen
+                    </div>
+</div>
+</div>
+</div>
+</section>
+<!-- Section 4: Leaderboard Preview -->
+<section class="py-32 px-6 bg-surface-container-lowest" id="leaderboard">
+<div class="max-w-7xl mx-auto">
+<div class="flex flex-col md:flex-row justify-between items-end mb-16 gap-6">
+<div>
+<span class="inline-flex items-center gap-2 bg-error text-on-error px-3 py-1 rounded-full text-[10px] font-black mb-4 uppercase tracking-tighter">
+<span class="w-1.5 h-1.5 bg-on-error rounded-full animate-pulse"></span> REAL-TIME
+                    </span>
+<h2 class="font-headline font-black text-5xl md:text-8xl tracking-tighter uppercase">LEADER<span class="text-primary">BOARD</span></h2>
+</div>
+<p class="text-on-surface-variant max-w-sm text-right font-medium">Buktikan bahwa analisis sepak bola Anda bukan sekadar keberuntungan.</p>
+</div>
+<!-- Podium -->
+<div class="flex flex-col md:flex-row items-end justify-center gap-4 mb-16">
+<!-- Rank 2 -->
+<div class="w-full md:w-1/4 bg-surface-container p-6 rounded-t-xl text-center order-2 md:order-1 h-48 flex flex-col justify-center items-center">
+<div class="w-12 h-12 bg-surface-container-highest rounded-full flex items-center justify-center mb-4 border border-on-surface-variant/20">BS</div>
+<p class="font-headline font-bold text-xl uppercase">BS RANK 2</p>
+<p class="text-primary font-black text-2xl">48 PTS</p>
+</div>
+<!-- Rank 1 -->
+<div class="w-full md:w-1/3 bg-surface-container-high p-8 rounded-t-xl text-center order-1 md:order-2 h-64 flex flex-col justify-center items-center border-t-8 border-primary relative overflow-hidden shadow-[0_-20px_50px_rgba(63,255,139,0.1)]">
+<span class="material-symbols-outlined text-primary text-5xl absolute -top-1 left-1/2 -translate-x-1/2 opacity-20 scale-150">crown</span>
+<div class="w-20 h-20 bg-primary/20 rounded-full flex items-center justify-center mb-4 border-2 border-primary">
+<span class="material-symbols-outlined text-primary text-4xl" data-weight="fill">workspace_premium</span>
+</div>
+<p class="font-headline font-bold text-3xl uppercase tracking-tighter">AW RANK 1</p>
+<p class="text-primary font-black text-4xl">52 PTS</p>
+</div>
+<!-- Rank 3 -->
+<div class="w-full md:w-1/4 bg-surface-container p-6 rounded-t-xl text-center order-3 md:order-3 h-40 flex flex-col justify-center items-center">
+<div class="w-12 h-12 bg-surface-container-highest rounded-full flex items-center justify-center mb-4 border border-on-surface-variant/20">CR</div>
+<p class="font-headline font-bold text-xl uppercase">CR RANK 3</p>
+<p class="text-primary font-black text-2xl">45 PTS</p>
+</div>
+</div>
+<!-- List -->
+<div class="space-y-2">
+<div class="flex items-center justify-between p-6 bg-surface-container rounded-lg hover:bg-surface-container-high transition-colors">
+<div class="flex items-center gap-6">
+<span class="font-headline font-black text-on-surface-variant w-8">04</span>
+<span class="font-headline font-bold uppercase">DIKA PRATAMA</span>
+</div>
+<span class="font-display font-black text-xl">42 PTS</span>
+</div>
+<div class="flex items-center justify-between p-6 bg-primary text-on-primary rounded-lg shadow-lg transform scale-[1.02]">
+<div class="flex items-center gap-6">
+<span class="font-headline font-black w-8">05</span>
+<div class="flex flex-col">
+<span class="font-headline font-black uppercase text-xl">POSISI KAMU</span>
+<span class="text-[10px] font-black uppercase tracking-widest opacity-80">STADIUM WARRIOR</span>
+</div>
+</div>
+<span class="font-display font-black text-3xl">39 PTS</span>
+</div>
+<div class="flex items-center justify-between p-6 bg-surface-container rounded-lg hover:bg-surface-container-high transition-colors">
+<div class="flex items-center gap-6">
+<span class="font-headline font-black text-on-surface-variant w-8">06</span>
+<span class="font-headline font-bold uppercase">ANDRI SETIAWAN</span>
+</div>
+<span class="font-display font-black text-xl">37 PTS</span>
+</div>
+<div class="flex items-center justify-between p-6 bg-surface-container rounded-lg hover:bg-surface-container-high transition-colors">
+<div class="flex items-center gap-6">
+<span class="font-headline font-black text-on-surface-variant w-8">07</span>
+<span class="font-headline font-bold uppercase">YOGA RAMADHAN</span>
+</div>
+<span class="font-display font-black text-xl">35 PTS</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Section 5: Final CTA -->
+<section class="bg-primary text-on-primary py-24 px-6 relative overflow-hidden">
+<div class="absolute inset-0 halftone-bg opacity-30 mix-blend-overlay"></div>
+<div class="max-w-7xl mx-auto relative z-10 flex flex-col md:flex-row justify-between items-center gap-12">
+<div>
+<h2 class="font-headline font-black text-6xl md:text-8xl tracking-tighter uppercase leading-[0.8] mb-4">SIAP <br/> BERSAING?</h2>
+<p class="font-headline font-bold text-2xl uppercase tracking-widest">Turnamen dimulai 11 Juni 2026.</p>
+</div>
+<div class="flex flex-col md:flex-row gap-4 w-full md:w-auto">
+<button class="bg-background text-on-background px-12 py-6 font-black text-xl hover:scale-105 transition-all uppercase shadow-2xl">DAFTAR SEKARANG</button>
+<button class="border-4 border-background text-background px-12 py-6 font-black text-xl hover:bg-background/10 transition-all uppercase">SUDAH PUNYA AKUN? MASUK</button>
+</div>
+</div>
+</section>
+<!-- Footer -->
+<footer class="bg-surface-container-lowest py-20 px-8">
+<div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-12">
+<div class="text-center md:text-left">
+<span class="text-headline-md font-headline font-black text-on-surface block mb-2 uppercase">STADIUM PULSE</span>
+<p class="font-body text-label-sm tracking-widest text-on-surface-variant uppercase">© 2026 IT JATENG DIY · PRIVATE COMMUNITY GAME</p>
+<p class="font-body text-[10px] tracking-widest text-on-surface-variant/40 mt-4 uppercase">ENGINEERED FOR THE STADIUM PULSE.</p>
+</div>
+<div class="flex gap-10">
+<a class="text-on-surface-variant font-body text-label-sm tracking-widest hover:text-primary transition-colors duration-200 uppercase" href="#">RULES</a>
+<a class="text-on-surface-variant font-body text-label-sm tracking-widest hover:text-primary transition-colors duration-200 uppercase" href="#">LEADERBOARD</a>
+<a class="text-on-surface-variant font-body text-label-sm tracking-widest hover:text-primary transition-colors duration-200 uppercase" href="#">PRIVACY</a>
+<a class="text-on-surface-variant font-body text-label-sm tracking-widest hover:text-primary transition-colors duration-200 uppercase" href="#">TERMS</a>
+</div>
+</div>
+</footer>
+</body></html>
