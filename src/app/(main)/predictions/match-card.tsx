@@ -41,9 +41,9 @@ export function MatchCard({ match, prediction }: { match: Match; prediction?: Pr
   };
 
   const isSubmitting = submitMut.isPending || updateMut.isPending;
-  const compactTeamNameClass = "font-display text-sm md:text-xl font-bold text-muted-foreground uppercase leading-tight break-words max-w-28 md:max-w-40";
-  const lockedTeamNameClass = "font-display text-sm md:text-xl font-black text-muted-foreground tracking-tight uppercase leading-tight break-words max-w-28 md:max-w-40";
-  const activeTeamNameClass = "font-display text-base md:text-2xl font-black tracking-tight text-foreground uppercase leading-tight break-words max-w-32 md:max-w-48";
+  const compactTeamNameClass = "min-w-0 max-w-full font-display text-xs md:text-xl font-bold text-muted-foreground uppercase leading-tight break-words";
+  const lockedTeamNameClass = "min-w-0 max-w-full font-display text-xs md:text-xl font-black text-muted-foreground tracking-tight uppercase leading-tight break-words";
+  const activeTeamNameClass = "min-w-0 max-w-full font-display text-sm md:text-2xl font-black tracking-tight text-foreground uppercase leading-tight break-words";
 
   if (isFinished) {
     const points = prediction?.points ?? 0;
@@ -62,21 +62,21 @@ export function MatchCard({ match, prediction }: { match: Match; prediction?: Pr
             </div>
           </div>
           
-          <div className="flex justify-between items-center w-full mb-4">
-            <div className="flex items-center gap-3 md:gap-4 flex-1 min-w-0">
-              <Flag flag={match.flagA} size="md" className="opacity-80" />
+          <div className="grid w-full grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-2 md:gap-4 mb-4">
+            <div className="flex items-center gap-2 md:gap-4 min-w-0">
+              <Flag flag={match.flagA} size="md" className="w-7 shrink-0 opacity-80 md:w-12" />
               <span className={compactTeamNameClass}>{match.teamA}</span>
             </div>
             
-            <div className="flex items-center gap-2 md:gap-5 px-4 md:px-6 py-2 bg-secondary/50 rounded-lg shadow-inner border border-border/30">
+            <div className="flex items-center gap-2 md:gap-5 px-3 md:px-6 py-2 bg-secondary/50 rounded-lg shadow-inner border border-border/30">
               <div className={`text-2xl md:text-3xl font-display font-black ${isWin ? 'text-muted-foreground' : 'text-foreground'}`}>{match.scoreA}</div>
               <span className="text-border font-bold text-sm">—</span>
               <div className={`text-2xl md:text-3xl font-display font-black ${isWin ? 'text-primary' : 'text-foreground'}`}>{match.scoreB}</div>
             </div>
             
-            <div className="flex items-center gap-3 md:gap-4 flex-1 justify-end min-w-0 text-right">
+            <div className="flex items-center gap-2 md:gap-4 justify-end min-w-0 text-right">
               <span className={`${compactTeamNameClass} ${isWin ? 'text-primary drop-shadow-[0_0_10px_rgba(0,230,118,0.3)]' : 'text-muted-foreground'}`}>{match.teamB}</span>
-              <Flag flag={match.flagB} size="md" />
+              <Flag flag={match.flagB} size="md" className="w-7 shrink-0 md:w-12" />
             </div>
           </div>
           
@@ -108,20 +108,20 @@ export function MatchCard({ match, prediction }: { match: Match; prediction?: Pr
           </div>
         </div>
         
-        <div className="flex justify-between items-center w-full z-10 relative opacity-60">
-          <div className="flex flex-col items-center gap-2 flex-1 text-center">
-            <Flag flag={match.flagA} size="lg" className="grayscale" />
+        <div className="grid w-full grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-start gap-2 md:gap-4 z-10 relative opacity-60">
+          <div className="flex min-w-0 flex-col items-center gap-2 text-center">
+            <Flag flag={match.flagA} size="lg" className="w-14 shrink-0 grayscale md:w-20" />
             <span className={lockedTeamNameClass}>{match.teamA}</span>
           </div>
           
-          <div className="flex items-center gap-2 md:gap-4">
-            <div className="w-12 h-14 md:w-14 md:h-16 bg-secondary/80 rounded-md flex items-center justify-center text-2xl md:text-3xl font-display font-black text-muted-foreground border border-border/50">{prediction?.predictedA ?? '-'}</div>
+          <div className="flex items-center gap-1.5 md:gap-4">
+            <div className="w-10 h-12 md:w-14 md:h-16 bg-secondary/80 rounded-md flex items-center justify-center text-2xl md:text-3xl font-display font-black text-muted-foreground border border-border/50">{prediction?.predictedA ?? '-'}</div>
             <span className="text-muted-foreground/40 font-black text-lg md:text-xl">:</span>
-            <div className="w-12 h-14 md:w-14 md:h-16 bg-secondary/80 rounded-md flex items-center justify-center text-2xl md:text-3xl font-display font-black text-muted-foreground border border-border/50">{prediction?.predictedB ?? '-'}</div>
+            <div className="w-10 h-12 md:w-14 md:h-16 bg-secondary/80 rounded-md flex items-center justify-center text-2xl md:text-3xl font-display font-black text-muted-foreground border border-border/50">{prediction?.predictedB ?? '-'}</div>
           </div>
           
-          <div className="flex flex-col items-center gap-2 flex-1 text-center">
-            <Flag flag={match.flagB} size="lg" className="grayscale" />
+          <div className="flex min-w-0 flex-col items-center gap-2 text-center">
+            <Flag flag={match.flagB} size="lg" className="w-14 shrink-0 grayscale md:w-20" />
             <span className={lockedTeamNameClass}>{match.teamB}</span>
           </div>
         </div>
@@ -140,20 +140,20 @@ export function MatchCard({ match, prediction }: { match: Match; prediction?: Pr
         </div>
       </div>
       
-      <div className="flex justify-between items-center w-full z-10 mb-8">
-        <div className="flex flex-col items-center gap-3 flex-1 text-center">
-          <Flag flag={match.flagA} size="xl" />
+      <div className="grid w-full grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-start gap-2 md:gap-6 z-10 mb-8">
+        <div className="flex min-w-0 flex-col items-center gap-3 text-center">
+          <Flag flag={match.flagA} size="xl" className="w-16 shrink-0 md:w-36" />
           <span className={activeTeamNameClass}>{match.teamA}</span>
         </div>
         
-        <div className="flex items-center gap-2 md:gap-4 bg-secondary/50 p-2 md:p-3 rounded-lg shadow-[inset_0_2px_10px_rgba(0,0,0,0.5)] border border-border/50">
+        <div className="flex items-center gap-1 md:gap-4 bg-secondary/50 p-1.5 md:p-3 rounded-lg shadow-[inset_0_2px_10px_rgba(0,0,0,0.5)] border border-border/50">
           <input 
             type="number" 
             placeholder="-" 
             value={predictedA}
             onChange={(e) => setPredictedA(e.target.value)}
             min="0"
-            className="w-12 h-16 md:w-16 md:h-20 bg-transparent rounded text-center text-3xl md:text-4xl font-display font-black text-foreground border-none focus:ring-0 focus:outline focus:outline-primary/50 focus:outline-offset-0 focus:bg-secondary transition-colors placeholder:text-muted-foreground/30 [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none" 
+            className="w-9 h-14 md:w-16 md:h-20 bg-transparent rounded text-center text-2xl md:text-4xl font-display font-black text-foreground border-none focus:ring-0 focus:outline focus:outline-primary/50 focus:outline-offset-0 focus:bg-secondary transition-colors placeholder:text-muted-foreground/30 [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none" 
           />
           <span className="text-muted-foreground/50 font-black text-lg md:text-xl">:</span>
           <input 
@@ -162,12 +162,12 @@ export function MatchCard({ match, prediction }: { match: Match; prediction?: Pr
             value={predictedB}
             onChange={(e) => setPredictedB(e.target.value)}
             min="0"
-            className="w-12 h-16 md:w-16 md:h-20 bg-transparent rounded text-center text-3xl md:text-4xl font-display font-black text-foreground border-none focus:ring-0 focus:outline focus:outline-primary/50 focus:outline-offset-0 focus:bg-secondary transition-colors placeholder:text-muted-foreground/30 [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none" 
+            className="w-9 h-14 md:w-16 md:h-20 bg-transparent rounded text-center text-2xl md:text-4xl font-display font-black text-foreground border-none focus:ring-0 focus:outline focus:outline-primary/50 focus:outline-offset-0 focus:bg-secondary transition-colors placeholder:text-muted-foreground/30 [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none" 
           />
         </div>
         
-        <div className="flex flex-col items-center gap-3 flex-1 text-center">
-          <Flag flag={match.flagB} size="xl" />
+        <div className="flex min-w-0 flex-col items-center gap-3 text-center">
+          <Flag flag={match.flagB} size="xl" className="w-16 shrink-0 md:w-36" />
           <span className={activeTeamNameClass}>{match.teamB}</span>
         </div>
       </div>

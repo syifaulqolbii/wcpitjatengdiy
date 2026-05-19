@@ -214,21 +214,21 @@ export default function DashboardPage() {
               </span>
             </div>
 
-            <div className="flex items-center justify-center w-full max-w-2xl gap-4 md:gap-12">
-              <div className="flex flex-col items-center flex-1 text-center">
-                <Flag flag={heroMatch.flagA} size="xl" className="mb-2" />
-                <span className="font-display font-bold text-sm md:text-xl text-foreground uppercase tracking-tight">{heroMatch.teamA}</span>
+            <div className="grid w-full max-w-2xl grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-start gap-2 md:gap-12">
+              <div className="flex min-w-0 flex-col items-center text-center">
+                <Flag flag={heroMatch.flagA} size="xl" className="mb-2 w-16 shrink-0 md:w-36" />
+                <span className="max-w-full break-words font-display text-sm font-bold uppercase leading-tight tracking-tight text-foreground md:text-xl">{heroMatch.teamA}</span>
               </div>
 
-              <div className="flex items-center gap-4 px-4 py-2 bg-card/80 backdrop-blur-md rounded-xl border border-border/50 shadow-xl">
-                <span className="font-display font-black text-5xl md:text-7xl text-primary tracking-tighter">{heroMatch.scoreA ?? '-'}</span>
+              <div className="flex items-center gap-2 rounded-xl border border-border/50 bg-card/80 px-3 py-2 shadow-xl backdrop-blur-md md:gap-4 md:px-4">
+                <span className="font-display text-4xl font-black tracking-tighter text-primary md:text-7xl">{heroMatch.scoreA ?? '-'}</span>
                 <span className="font-display font-bold text-2xl text-muted-foreground">-</span>
-                <span className="font-display font-black text-5xl md:text-7xl text-foreground tracking-tighter">{heroMatch.scoreB ?? '-'}</span>
+                <span className="font-display text-4xl font-black tracking-tighter text-foreground md:text-7xl">{heroMatch.scoreB ?? '-'}</span>
               </div>
 
-              <div className="flex flex-col items-center flex-1 text-center">
-                <Flag flag={heroMatch.flagB} size="xl" className="mb-2 opacity-80" />
-                <span className="font-display font-bold text-sm md:text-xl text-muted-foreground uppercase tracking-tight">{heroMatch.teamB}</span>
+              <div className="flex min-w-0 flex-col items-center text-center">
+                <Flag flag={heroMatch.flagB} size="xl" className="mb-2 w-16 shrink-0 opacity-80 md:w-36" />
+                <span className="max-w-full break-words font-display text-sm font-bold uppercase leading-tight tracking-tight text-muted-foreground md:text-xl">{heroMatch.teamB}</span>
               </div>
             </div>
 
@@ -283,19 +283,19 @@ export default function DashboardPage() {
               return (
                 <div key={match.id} className={`bg-card rounded-xl p-5 border border-border/50 flex items-center justify-between relative overflow-hidden transition-opacity ${points > 0 ? 'opacity-100' : 'opacity-80 hover:opacity-100'}`}>
                   <div className={`absolute left-0 top-0 bottom-0 w-1 ${points > 0 ? 'bg-primary' : 'bg-muted'}`} />
-                  <div className="flex items-center gap-3 md:gap-6">
-                    <div className="flex flex-col items-center w-20 md:w-28 text-center">
-                      <Flag flag={match.flagA} size="md" className="mb-1" />
-                      <span className="font-display text-[10px] md:text-xs font-bold text-foreground uppercase leading-tight break-words">{match.teamA}</span>
+                  <div className="grid min-w-0 flex-1 grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-2 md:gap-6">
+                    <div className="flex min-w-0 flex-col items-center text-center">
+                      <Flag flag={match.flagA} size="md" className="mb-1 w-8 shrink-0 md:w-12" />
+                      <span className="max-w-full break-words font-display text-[10px] font-bold uppercase leading-tight text-foreground md:text-xs">{match.teamA}</span>
                     </div>
                     <div className="flex items-center gap-2 md:gap-3 bg-secondary/30 px-3 md:px-4 py-2 rounded-lg font-display font-black text-xl md:text-2xl tracking-tighter">
                       <span className="text-foreground">{match.scoreA}</span>
                       <span className="text-muted-foreground text-lg">-</span>
                       <span className="text-muted-foreground">{match.scoreB}</span>
                     </div>
-                    <div className="flex flex-col items-center w-20 md:w-28 text-center">
-                      <Flag flag={match.flagB} size="md" className="mb-1 opacity-80" />
-                      <span className="font-display text-[10px] md:text-xs font-bold text-muted-foreground uppercase leading-tight break-words">{match.teamB}</span>
+                    <div className="flex min-w-0 flex-col items-center text-center">
+                      <Flag flag={match.flagB} size="md" className="mb-1 w-8 shrink-0 opacity-80 md:w-12" />
+                      <span className="max-w-full break-words font-display text-[10px] font-bold uppercase leading-tight text-muted-foreground md:text-xs">{match.teamB}</span>
                     </div>
                   </div>
                   {hasPrediction ? (
