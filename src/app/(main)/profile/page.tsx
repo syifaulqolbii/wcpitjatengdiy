@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useMemo } from 'react';
-import { Star, Check, X, ChevronRight, LogOut, Loader2 } from 'lucide-react';
+import { Star, Check, X, ChevronRight, LogOut, Loader2, Camera, Trash2 } from 'lucide-react';
 import { authClient } from '@/lib/auth-client';
 import { useLeaderboard } from '@/hooks/useLeaderboard';
 import { usePredictions } from '@/hooks/usePredictions';
@@ -15,6 +15,7 @@ export default function ProfilePage() {
   const router = useRouter();
   const { data: session, isPending: isSessionLoading } = authClient.useSession();
   const userId = session?.user?.id;
+  const userImage = (session?.user as { image?: string | null } | undefined)?.image;
   
   const { data: leaderboard, isLoading: isLeaderboardLoading } = useLeaderboard();
   const { data: predictions, isLoading: isPredictionsLoading } = usePredictions();
@@ -23,6 +24,7 @@ export default function ProfilePage() {
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [isSubmittingPassword, setIsSubmittingPassword] = useState(false);
+  const [isUpdatingPhoto, setIsUpdatingPhoto] = useState(false);
 
   const userStats = useMemo(() => {
     if (!leaderboard || !userId) return null;
@@ -48,7 +50,7 @@ export default function ProfilePage() {
         const dateStr = formatInTimeZone(new Date(pred.match.kickoffTime), tz, 'dd MMM yyyy');
         if (!groups[dateStr]) groups[dateStr] = [];
         groups[dateStr].push(pred);
-      } catch(e) {
+      } catch {
         const dateStr = 'Unknown Date';
         if (!groups[dateStr]) groups[dateStr] = [];
         groups[dateStr].push(pred);
@@ -61,7 +63,7 @@ export default function ProfilePage() {
     try {
       await authClient.signOut();
       router.push('/login');
-    } catch (error) {
+    } catch {
       toast.error('Gagal logout');
     }
   };
@@ -88,10 +90,82 @@ export default function ProfilePage() {
         setCurrentPassword('');
         setNewPassword('');
       }
-    } catch (error) {
+    } catch {
       toast.error('Terjadi kesalahan saat mengganti password. Silakan coba lagi.');
     } finally {
       setIsSubmittingPassword(false);
+    }
+  };
+
+  const resizeImage = (file: File) => new Promise<string>((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      const image = new Image();
+      image.onload = () => {
+        const canvas = document.createElement('canvas');
+        const size = 256;
+        canvas.width = size;
+        canvas.height = size;
+        const context = canvas.getContext('2d');
+        if (!context) {
+          reject(new Error('Canvas tidak tersedia'));
+          return;
+        }
+        const scale = Math.max(size / image.width, size / image.height);
+        const width = image.width * scale;
+        const height = image.height * scale;
+        context.drawImage(image, (size - width) / 2, (size - height) / 2, width, height);
+        resolve(canvas.toDataURL('image/jpeg', 0.82));
+      };
+      image.onerror = () => reject(new Error('File gambar tidak valid'));
+      image.src = reader.result as string;
+    };
+    reader.onerror = () => reject(new Error('Gagal membaca file'));
+    reader.readAsDataURL(file);
+  });
+
+  const handlePhotoChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    event.target.value = '';
+    if (!file) return;
+    if (!file.type.startsWith('image/')) {
+      toast.error('File harus berupa gambar');
+      return;
+    }
+    if (file.size > 3 * 1024 * 1024) {
+      toast.error('Ukuran gambar maksimal 3MB');
+      return;
+    }
+
+    setIsUpdatingPhoto(true);
+    try {
+      const image = await resizeImage(file);
+      const res = await authClient.updateUser({ image });
+      if (res.error) {
+        toast.error(res.error.message || 'Gagal memperbarui foto profil');
+      } else {
+        toast.success('Foto profil berhasil diperbarui');
+      }
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : 'Gagal memperbarui foto profil');
+    } finally {
+      setIsUpdatingPhoto(false);
+    }
+  };
+
+  const handleRemovePhoto = async () => {
+    setIsUpdatingPhoto(true);
+    try {
+      const res = await authClient.updateUser({ image: null });
+      if (res.error) {
+        toast.error(res.error.message || 'Gagal menghapus foto profil');
+      } else {
+        toast.success('Foto profil dihapus');
+      }
+    } catch {
+      toast.error('Gagal menghapus foto profil');
+    } finally {
+      setIsUpdatingPhoto(false);
     }
   };
 
@@ -131,9 +205,39 @@ export default function ProfilePage() {
             {/* Diagonal Grid Background Accent */}
             <div className="absolute inset-0 opacity-10 pointer-events-none" style={{ backgroundImage: 'linear-gradient(45deg, #00E676 25%, transparent 25%, transparent 50%, #00E676 50%, #00E676 75%, transparent 75%, transparent)', backgroundSize: '8px 8px' }}></div>
             
-            <div className="relative z-10 mb-4">
-              <div className="w-24 h-24 rounded-full bg-background border-4 border-primary flex items-center justify-center shadow-[0_0_20px_rgba(0,230,118,0.3)]">
-                <span className="font-display font-black text-4xl text-primary tracking-tighter">{session?.user?.name ? getInitials(session.user.name) : 'U'}</span>
+            <div className="relative z-10 mb-4 flex flex-col items-center gap-3">
+              <div className="relative h-24 w-24 overflow-hidden rounded-full border-4 border-primary bg-background shadow-[0_0_20px_rgba(0,230,118,0.3)]">
+                {userImage ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={userImage} alt={session?.user?.name || 'Foto profil'} className="h-full w-full object-cover" />
+                ) : (
+                  <div className="flex h-full w-full items-center justify-center">
+                    <span className="font-display text-4xl font-black tracking-tighter text-primary">{session?.user?.name ? getInitials(session.user.name) : 'U'}</span>
+                  </div>
+                )}
+                {isUpdatingPhoto && (
+                  <div className="absolute inset-0 flex items-center justify-center bg-background/70 backdrop-blur-sm">
+                    <Loader2 className="h-6 w-6 animate-spin text-primary" />
+                  </div>
+                )}
+              </div>
+              <div className="flex items-center gap-2">
+                <label className="inline-flex cursor-pointer items-center gap-2 rounded-md border border-primary/30 bg-primary/10 px-3 py-2 text-xs font-bold uppercase tracking-wider text-primary transition-colors hover:bg-primary/20">
+                  <Camera className="h-4 w-4" />
+                  Ganti Foto
+                  <input type="file" accept="image/*" className="sr-only" onChange={handlePhotoChange} disabled={isUpdatingPhoto} />
+                </label>
+                {userImage && (
+                  <button
+                    type="button"
+                    onClick={handleRemovePhoto}
+                    disabled={isUpdatingPhoto}
+                    className="inline-flex items-center gap-2 rounded-md border border-border/50 bg-secondary/50 px-3 py-2 text-xs font-bold uppercase tracking-wider text-muted-foreground transition-colors hover:text-destructive disabled:opacity-60"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                    Hapus
+                  </button>
+                )}
               </div>
             </div>
             
