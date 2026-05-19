@@ -1,6 +1,6 @@
 import { NextRequest } from "next/server";
 import { db } from "@/db";
-import { matches, predictions } from "@/db/schema";
+import { matches, predictions, users } from "@/db/schema";
 import { eq, and } from "drizzle-orm";
 import {
   ok,
@@ -30,10 +30,13 @@ export async function GET(req: NextRequest) {
     const { searchParams } = req.nextUrl;
     const matchId = searchParams.get("matchId");
     const userIdParam = searchParams.get("userId");
+    const allUsers = searchParams.get("allUsers") === "true";
 
     const conditions = [];
     
-    if (userIdParam && session.user.role === 'admin') {
+    if (allUsers && session.user.role === 'admin') {
+      // Admin detail views can inspect every user's prediction for a match.
+    } else if (userIdParam && session.user.role === 'admin') {
       conditions.push(eq(predictions.userId, userIdParam));
     } else {
       conditions.push(eq(predictions.userId, session.user.id));
@@ -54,6 +57,11 @@ export async function GET(req: NextRequest) {
         predictedB: predictions.predictedB,
         points: predictions.points,
         submittedAt: predictions.submittedAt,
+        user: {
+          id: users.id,
+          name: users.name,
+          email: users.email,
+        },
         // Match fields (joined)
         match: {
           id: matches.id,
@@ -70,6 +78,7 @@ export async function GET(req: NextRequest) {
       })
       .from(predictions)
       .innerJoin(matches, eq(predictions.matchId, matches.id))
+      .innerJoin(users, eq(predictions.userId, users.id))
       .where(and(...conditions))
       .orderBy(matches.kickoffTime);
 

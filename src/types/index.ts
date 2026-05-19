@@ -28,6 +28,7 @@ export interface Prediction {
   points: number | null;
   submittedAt: Date;
   match?: Match;
+  user?: Pick<User, 'id' | 'name' | 'email'>;
 }
 
 export interface LeaderboardEntry {

@@ -18,6 +18,14 @@ export function useUserPredictions(userId?: string) {
   });
 }
 
+export function useMatchPredictions(matchId?: string) {
+  return useQuery({
+    queryKey: ['predictions', 'match', matchId, 'all-users'],
+    queryFn: () => apiGet<Prediction[]>(`/api/predictions?matchId=${matchId}&allUsers=true`),
+    enabled: !!matchId,
+  });
+}
+
 export function useSubmitPrediction() {
   const queryClient = useQueryClient();
 
@@ -33,7 +41,7 @@ export function useSubmitPrediction() {
       const previousMatch = queryClient.getQueryData(['matches', newPrediction.matchId]);
       
       // Update match cache optimistically if it exists
-      queryClient.setQueryData(['matches', newPrediction.matchId], (old: any) => {
+      queryClient.setQueryData(['matches', newPrediction.matchId], (old: Prediction | undefined) => {
         if (!old) return old;
         return {
           ...old,
@@ -72,12 +80,6 @@ export function useUpdatePrediction() {
   return useMutation({
     mutationFn: ({ id, ...data }: { id: string; predictedA: number; predictedB: number }) => 
       apiPut<Prediction>(`/api/predictions/${id}`, data),
-    onMutate: async (updatedPrediction) => {
-      // Find the matchId if not provided directly
-      // Since we are updating, we just invalidate on success, but we can do optimistic update if we knew matchId.
-      // Usually matchId is not needed for PUT /api/predictions/:id, but for cache it is.
-      // We'll just rely on invalidation for now or optimistic update on the predictions list.
-    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['predictions'] });
       queryClient.invalidateQueries({ queryKey: ['matches'] });

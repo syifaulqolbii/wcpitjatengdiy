@@ -1,8 +1,9 @@
 "use client";
 
 import React, { useState } from 'react';
-import { PlusSquare, Edit, Trash2, Flag as LucideFlag, Zap, X, Loader2, Save } from 'lucide-react';
+import { PlusSquare, Edit, Trash2, Flag as LucideFlag, Zap, X, Loader2, Save, Eye } from 'lucide-react';
 import { useMatches, useUpdateMatch, useDeleteMatch, useCreateMatch } from '@/hooks/useMatches';
+import { useMatchPredictions } from '@/hooks/usePredictions';
 import { Match } from '@/types';
 import { Flag as CountryFlag } from '@/components/shared/Flag';
 import { formatInTimeZone } from 'date-fns-tz';
@@ -23,12 +24,32 @@ export default function AdminMatchesPage() {
   });
 
   const [isCalcModalOpen, setIsCalcModalOpen] = useState(false);
+  const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
   const [calcProgress, setCalcProgress] = useState({ current: 0, total: 0, isCalculating: false });
 
   const { data: matches, isLoading } = useMatches();
   const updateMatch = useUpdateMatch();
   const deleteMatch = useDeleteMatch();
   const createMatch = useCreateMatch();
+  const { data: matchPredictions, isLoading: isPredictionsLoading } = useMatchPredictions(
+    isDetailModalOpen ? selectedMatch?.id : undefined
+  );
+
+  const handleOpenDetailModal = (match: Match) => {
+    setSelectedMatch(match);
+    setIsDetailModalOpen(true);
+  };
+
+  const handleCloseDetailModal = () => {
+    setIsDetailModalOpen(false);
+    setSelectedMatch(null);
+  };
+
+  const getPredictionOutcome = (predictedA: number, predictedB: number, match: Match) => {
+    if (predictedA > predictedB) return `${match.teamA} menang`;
+    if (predictedB > predictedA) return `${match.teamB} menang`;
+    return 'Seri';
+  };
 
   const handleOpenInputModal = (match: Match) => {
     setSelectedMatch(match);
@@ -81,7 +102,7 @@ export default function AdminMatchesPage() {
         scoreB: b,
       });
       handleCloseModal();
-    } catch (error) {
+    } catch {
       // Error handled by hook
     }
   };
@@ -94,7 +115,7 @@ export default function AdminMatchesPage() {
         await updateMatch.mutateAsync({ id: selectedMatch.id, ...formData });
       }
       handleCloseModal();
-    } catch (error) {
+    } catch {
       // Handled by hook
     }
   };
@@ -109,7 +130,7 @@ export default function AdminMatchesPage() {
         if (selectedMatch?.id === targetMatch.id) {
           handleCloseModal();
         }
-      } catch (error) {
+      } catch {
         // Handled by hook
       }
     }
@@ -255,6 +276,13 @@ export default function AdminMatchesPage() {
                         </td>
                         <td className="py-5 px-6 text-right">
                           <div className="flex justify-end space-x-2">
+                            <button
+                              onClick={() => handleOpenDetailModal(match)}
+                              className="p-2 text-cyan-300 hover:text-cyan-200 transition-colors rounded bg-background flex items-center justify-center border border-cyan-300/30"
+                              title="Detail Prediksi"
+                            >
+                              <Eye className="w-4 h-4" />
+                            </button>
                             <button 
                               onClick={() => handleOpenInputModal(match)}
                               className="p-2 text-primary hover:text-primary transition-colors rounded bg-secondary/80 flex items-center justify-center border border-primary/20 shadow-[0_0_8px_rgba(0,230,118,0.2)]" 
@@ -350,6 +378,87 @@ export default function AdminMatchesPage() {
                  </p>
                </>
              )}
+          </div>
+        </div>
+      )}
+
+      {/* MODAL OVERLAY: DETAIL PREDIKSI */}
+      {isDetailModalOpen && selectedMatch && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          <div className="absolute inset-0 bg-background/80 backdrop-blur-md" onClick={handleCloseDetailModal}></div>
+
+          <div className="relative flex max-h-[90vh] w-full max-w-3xl flex-col overflow-hidden rounded-xl border border-border/50 bg-card shadow-[0_24px_48px_rgba(0,0,0,0.6)]">
+            <div className="flex items-center justify-between border-b border-border/50 bg-secondary/30 px-8 py-6">
+              <div>
+                <h3 className="font-display text-xl font-bold uppercase tracking-wider text-foreground">Detail Prediksi</h3>
+                <div className="mt-2 flex items-center gap-3 text-sm text-muted-foreground">
+                  <CountryFlag flag={selectedMatch.flagA} size="sm" />
+                  <span className="font-display font-bold uppercase text-foreground">{selectedMatch.teamA}</span>
+                  <span>vs</span>
+                  <span className="font-display font-bold uppercase text-foreground">{selectedMatch.teamB}</span>
+                  <CountryFlag flag={selectedMatch.flagB} size="sm" />
+                </div>
+              </div>
+              <button onClick={handleCloseDetailModal} className="text-muted-foreground transition-colors hover:text-foreground">
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+
+            <div className="overflow-y-auto p-8">
+              {isPredictionsLoading ? (
+                <div className="space-y-3">
+                  <Skeleton className="h-14 w-full" />
+                  <Skeleton className="h-14 w-full" />
+                  <Skeleton className="h-14 w-full" />
+                </div>
+              ) : !matchPredictions || matchPredictions.length === 0 ? (
+                <div className="rounded-lg border border-border/50 bg-background/40 p-8 text-center">
+                  <p className="font-display text-sm font-bold uppercase tracking-widest text-muted-foreground">Belum ada prediksi untuk match ini.</p>
+                </div>
+              ) : (
+                <div className="overflow-hidden rounded-lg border border-border/50">
+                  <table className="w-full text-left text-sm">
+                    <thead className="bg-secondary/50 text-xs uppercase tracking-widest text-muted-foreground">
+                      <tr>
+                        <th className="px-4 py-3 font-medium">User</th>
+                        <th className="px-4 py-3 text-center font-medium">Prediksi</th>
+                        <th className="px-4 py-3 font-medium">Outcome</th>
+                        <th className="px-4 py-3 text-center font-medium">Poin</th>
+                        <th className="px-4 py-3 text-right font-medium">Submit</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-border/40">
+                      {matchPredictions.map((prediction) => (
+                        <tr key={prediction.id} className="bg-card/40">
+                          <td className="px-4 py-4">
+                            <div className="font-display font-bold uppercase text-foreground">{prediction.user?.name ?? 'Unknown User'}</div>
+                            <div className="text-xs text-muted-foreground">{prediction.user?.email}</div>
+                          </td>
+                          <td className="px-4 py-4 text-center">
+                            <span className="inline-flex items-center rounded-md bg-secondary px-3 py-1 font-display text-base font-black text-foreground">
+                              {prediction.predictedA} : {prediction.predictedB}
+                            </span>
+                          </td>
+                          <td className="px-4 py-4">
+                            <span className="inline-flex rounded-full border border-cyan-300/30 bg-cyan-300/10 px-3 py-1 text-xs font-bold text-cyan-200">
+                              {getPredictionOutcome(prediction.predictedA, prediction.predictedB, selectedMatch)}
+                            </span>
+                          </td>
+                          <td className="px-4 py-4 text-center">
+                            <span className={prediction.points && prediction.points > 0 ? 'font-display font-black text-primary' : 'font-display font-bold text-muted-foreground'}>
+                              {prediction.points ?? '-'} pts
+                            </span>
+                          </td>
+                          <td className="px-4 py-4 text-right text-xs text-muted-foreground">
+                            {formatInTimeZone(new Date(prediction.submittedAt), Intl.DateTimeFormat().resolvedOptions().timeZone, 'dd MMM yyyy HH:mm')}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       )}
