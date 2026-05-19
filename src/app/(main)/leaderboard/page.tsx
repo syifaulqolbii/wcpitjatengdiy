@@ -7,6 +7,7 @@ import { authClient } from '@/lib/auth-client';
 import { Skeleton } from '@/components/ui/skeleton';
 import EmptyState from '@/components/shared/EmptyState';
 import { RankChangeBadge } from '@/components/leaderboard/RankChangeBadge';
+import { UserAvatar } from '@/components/shared/UserAvatar';
 
 export default function LeaderboardPage() {
   const { data: session } = authClient.useSession();
@@ -56,14 +57,6 @@ export default function LeaderboardPage() {
   // The rest
   const rest = leaderboard.slice(3);
 
-  // Format name
-  const getInitials = (name: string) => {
-    if (!name) return 'U';
-    const parts = name.split(' ');
-    if (parts.length >= 2) return `${parts[0][0]}${parts[1][0]}`.toUpperCase();
-    return name.substring(0, 2).toUpperCase();
-  };
-
   const getShortName = (name: string) => {
     if (!name) return 'User';
     const parts = name.split(' ');
@@ -80,9 +73,7 @@ export default function LeaderboardPage() {
             <h1 className="text-4xl md:text-6xl font-display font-black tracking-tighter uppercase leading-none shadow-sm text-foreground">
                 KLASEMEN
             </h1>
-            <div className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-card border border-border/50 flex items-center justify-center overflow-hidden">
-                <span className="font-display font-bold text-lg text-primary">{userId && session?.user?.name ? session.user.name[0].toUpperCase() : 'B'}</span>
-            </div>
+            <UserAvatar name={session?.user?.name} image={(session?.user as { image?: string | null } | undefined)?.image} className="h-10 w-10 border border-border/50 bg-card md:h-12 md:w-12" textClassName="text-lg text-primary" />
         </div>
         <p className="font-sans text-muted-foreground text-xs md:text-sm tracking-wide">Update otomatis setiap 30 detik</p>
       </section>
@@ -95,9 +86,7 @@ export default function LeaderboardPage() {
           {/* Rank 2 */}
           {rank2 && (
             <div className="flex flex-col items-center w-[30%] translate-y-4">
-              <div className={`w-14 h-14 md:w-16 md:h-16 rounded-full bg-card border-2 border-slate-300 flex items-center justify-center mb-2 shadow-[0_0_15px_rgba(203,213,225,0.2)] relative z-20 ${rank2.userId === userId ? 'ring-2 ring-primary ring-offset-2 ring-offset-background' : ''}`}>
-                <span className="font-display font-bold text-lg md:text-xl text-slate-300">{getInitials(rank2.name)}</span>
-              </div>
+              <UserAvatar name={rank2.name} image={rank2.image} className={`w-14 h-14 md:w-16 md:h-16 bg-card border-2 border-slate-300 mb-2 shadow-[0_0_15px_rgba(203,213,225,0.2)] relative z-20 ${rank2.userId === userId ? 'ring-2 ring-primary ring-offset-2 ring-offset-background' : ''}`} textClassName="text-lg md:text-xl text-slate-300" />
               <div className="bg-secondary/40 w-full rounded-t-lg border-t border-slate-400/20 flex flex-col items-center pt-3 pb-4 h-32 md:h-40 relative overflow-hidden">
                 <div className="absolute inset-0 bg-gradient-to-b from-slate-400/5 to-transparent"></div>
                 <span className="font-display font-bold text-3xl md:text-4xl text-slate-300 relative z-10 opacity-40">2</span>
@@ -117,9 +106,7 @@ export default function LeaderboardPage() {
                 <div className="absolute -top-4 md:-top-5 left-1/2 -translate-x-1/2 text-yellow-400 drop-shadow-[0_0_8px_rgba(250,204,21,0.5)] z-20">
                   <Star className="w-6 h-6 md:w-8 md:h-8 fill-yellow-400 text-yellow-400" />
                 </div>
-                <div className={`w-16 h-16 md:w-20 md:h-20 rounded-full bg-card border-2 border-yellow-400 flex items-center justify-center mb-2 shadow-[0_0_20px_rgba(250,204,21,0.3)] relative z-10 bg-background ${rank1.userId === userId ? 'ring-2 ring-primary ring-offset-2 ring-offset-background' : ''}`}>
-                  <span className="font-display font-bold text-xl md:text-2xl text-yellow-400">{getInitials(rank1.name)}</span>
-                </div>
+                <UserAvatar name={rank1.name} image={rank1.image} className={`w-16 h-16 md:w-20 md:h-20 bg-card border-2 border-yellow-400 mb-2 shadow-[0_0_20px_rgba(250,204,21,0.3)] relative z-10 ${rank1.userId === userId ? 'ring-2 ring-primary ring-offset-2 ring-offset-background' : ''}`} textClassName="text-xl md:text-2xl text-yellow-400" />
               </div>
               <div className="bg-secondary/60 w-full rounded-t-lg border-t border-yellow-400/30 flex flex-col items-center pt-2 pb-6 h-40 md:h-48 relative overflow-hidden shadow-[0_-10px_30px_rgba(0,0,0,0.5)]">
                 <div className="absolute inset-0 bg-gradient-to-b from-yellow-400/10 to-transparent"></div>
@@ -136,9 +123,7 @@ export default function LeaderboardPage() {
           {/* Rank 3 */}
           {rank3 && (
             <div className="flex flex-col items-center w-[30%] translate-y-8">
-              <div className={`w-12 h-12 md:w-14 md:h-14 rounded-full bg-card border-2 border-amber-600 flex items-center justify-center mb-2 shadow-[0_0_15px_rgba(217,119,6,0.2)] relative z-20 ${rank3.userId === userId ? 'ring-2 ring-primary ring-offset-2 ring-offset-background' : ''}`}>
-                <span className="font-display font-bold text-base md:text-lg text-amber-600">{getInitials(rank3.name)}</span>
-              </div>
+              <UserAvatar name={rank3.name} image={rank3.image} className={`w-12 h-12 md:w-14 md:h-14 bg-card border-2 border-amber-600 mb-2 shadow-[0_0_15px_rgba(217,119,6,0.2)] relative z-20 ${rank3.userId === userId ? 'ring-2 ring-primary ring-offset-2 ring-offset-background' : ''}`} textClassName="text-base md:text-lg text-amber-600" />
               <div className="bg-secondary/20 w-full rounded-t-lg border-t border-amber-600/20 flex flex-col items-center pt-3 pb-3 h-28 md:h-32 relative overflow-hidden">
                 <div className="absolute inset-0 bg-gradient-to-b from-amber-600/5 to-transparent"></div>
                 <span className="font-display font-bold text-2xl md:text-3xl text-amber-600 relative z-10 opacity-40">3</span>
@@ -177,6 +162,7 @@ export default function LeaderboardPage() {
                 <RankChangeBadge rankChange={entry.rankChange} />
                 {isTied && !isCurrentUser && <Minus className="w-3 h-3 md:w-4 md:h-4 text-muted-foreground" />}
               </div>
+              <UserAvatar name={entry.name} image={entry.image} className="h-10 w-10 border border-border/50 bg-secondary md:h-12 md:w-12" textClassName="text-sm text-primary md:text-base" />
               
               <div className="flex-1 min-w-0 relative z-10">
                 <div className="flex items-center gap-2">

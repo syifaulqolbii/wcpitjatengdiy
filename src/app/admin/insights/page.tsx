@@ -9,6 +9,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Search, Trophy, Download, ChevronDown, Award } from 'lucide-react';
 import { LeaderboardEntry } from '@/types';
 import { format } from 'date-fns';
+import { UserAvatar } from '@/components/shared/UserAvatar';
 
 // ─── PlayerCard Component ───
 // Mem-fetch prediksinya sendiri untuk kalkulasi 5 match terakhir
@@ -57,9 +58,7 @@ function PlayerCard({
     >
       <div className="flex justify-between items-start mb-6">
         <div className="flex items-center gap-4">
-          <div className="w-12 h-12 rounded-full bg-secondary flex items-center justify-center text-foreground font-display font-black text-xl border border-border/50 uppercase">
-            {entry.name.substring(0, 2)}
-          </div>
+          <UserAvatar name={entry.name} image={entry.image} className="h-12 w-12 border border-border/50 bg-secondary" textClassName="text-xl font-black text-foreground" />
           <div>
             <h3 className="font-display font-bold text-lg text-foreground">{entry.name}</h3>
             <p className="font-sans text-xs text-muted-foreground">User ID: {entry.userId.substring(0,8)}...</p>
@@ -308,9 +307,7 @@ export default function AdminUserInsightPage() {
             <div className="relative bg-secondary/30 p-8 pb-6 flex flex-col items-center text-center border-b border-border/50">
               <div className="absolute inset-0 bg-gradient-to-br from-primary/10 to-transparent opacity-50 pointer-events-none"></div>
               
-              <div className="w-24 h-24 rounded-full bg-background flex items-center justify-center text-foreground font-display font-black text-4xl mb-4 relative z-10 border-4 border-primary/20 uppercase shadow-[0_0_20px_rgba(0,0,0,0.3)]">
-                {selectedUser.name.substring(0, 2)}
-              </div>
+              <UserAvatar name={selectedUser.name} image={selectedUser.image} className="mb-4 h-24 w-24 border-4 border-primary/20 bg-background shadow-[0_0_20px_rgba(0,0,0,0.3)] relative z-10" textClassName="text-4xl font-black text-foreground" />
               
               <h3 className="font-display font-bold text-2xl text-foreground relative z-10">{selectedUser.name}</h3>
               <p className="font-sans text-xs text-muted-foreground mb-4 relative z-10">ID: {selectedUser.userId.substring(0,12)}...</p>

@@ -20,6 +20,7 @@ export async function GET(req: NextRequest) {
       .select({
         userId: predictions.userId,
         name: users.name,
+        image: users.image,
         totalPoints: sum(predictions.points).mapWith(Number),
         perfectScores: count(
           sql`CASE WHEN ${predictions.points} = 5 THEN 1 END`
@@ -32,7 +33,7 @@ export async function GET(req: NextRequest) {
       .from(predictions)
       .innerJoin(users, eq(predictions.userId, users.id))
       .where(isNotNull(predictions.points))
-      .groupBy(predictions.userId, users.name)
+      .groupBy(predictions.userId, users.name, users.image)
       .orderBy(
         desc(sum(predictions.points)),
         desc(
@@ -73,6 +74,7 @@ export async function GET(req: NextRequest) {
         rank: currentRank,
         userId: row.userId,
         name: row.name,
+        image: row.image,
         totalPoints: row.totalPoints ?? 0,
         perfectScores: row.perfectScores ?? 0,
         correctResults: row.correctResults ?? 0,

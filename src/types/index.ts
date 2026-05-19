@@ -35,6 +35,7 @@ export interface LeaderboardEntry {
   rank: number;
   userId: string;
   name: string;
+  image: string | null;
   totalPoints: number;
   perfectScores: number;
   correctResults: number;
