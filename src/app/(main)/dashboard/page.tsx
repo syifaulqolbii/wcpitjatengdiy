@@ -264,7 +264,7 @@ export default function DashboardPage() {
       <section>
         <div className="flex items-center justify-between mb-6">
           <h2 className="font-display font-black text-xl md:text-2xl tracking-tight text-foreground uppercase">Hasil Terakhir</h2>
-          <a className="text-primary text-sm font-bold uppercase tracking-wider hover:text-primary/80 transition-colors" href="/dashboard/predictions">Lihat Semua</a>
+          <a className="text-primary text-sm font-bold uppercase tracking-wider hover:text-primary/80 transition-colors" href="/dashboard/results">Lihat Semua</a>
         </div>
 
         {isFinishedLoading || isPredictionsLoading || isSessionLoading ? (

@@ -1,20 +1,19 @@
 import { NextRequest } from "next/server";
 import { db } from "@/db";
 import { leaderboardSnapshots, predictions, users } from "@/db/schema";
-import { eq, sql, sum, count, desc, isNotNull } from "drizzle-orm";
+import { eq, sql, sum, count, desc, isNotNull, and } from "drizzle-orm";
 import { ok, requireAuth, handleError } from "@/lib/api-helpers";
 
-// ─── GET /api/leaderboard ─────────────────────────────────────
-// Auth: required (all roles)
-// Aggregate query:
-//   - SUM(points) → totalPoints
-//   - COUNT(*) WHERE points = 5 → perfectScores
-//   - COUNT(*) WHERE points IS NOT NULL → totalPredicted
-// Sorted by totalPoints DESC, then perfectScores DESC
-// Rank is computed in-memory after the query
 export async function GET(req: NextRequest) {
   try {
     await requireAuth(req);
+
+    const groupId = req.nextUrl.searchParams.get('groupId') ?? null;
+
+    const baseWhere = isNotNull(predictions.points);
+    const whereClause = groupId
+      ? and(baseWhere, eq(users.groupId, groupId))
+      : baseWhere;
 
     const rows = await db
       .select({
@@ -32,13 +31,11 @@ export async function GET(req: NextRequest) {
       })
       .from(predictions)
       .innerJoin(users, eq(predictions.userId, users.id))
-      .where(isNotNull(predictions.points))
+      .where(whereClause)
       .groupBy(predictions.userId, users.name, users.image)
       .orderBy(
         desc(sum(predictions.points)),
-        desc(
-          count(sql`CASE WHEN ${predictions.points} = 5 THEN 1 END`)
-        )
+        desc(count(sql`CASE WHEN ${predictions.points} = 5 THEN 1 END`))
       );
 
     const latestSnapshots = await db
@@ -59,7 +56,6 @@ export async function GET(req: NextRequest) {
       latestSnapshots.map((snapshot) => [snapshot.userId, snapshot.rank])
     );
 
-    // Compute rank in-memory (handles tied ranks with same rank number)
     let currentRank = 1;
     const leaderboard = rows.map((row, index) => {
       if (

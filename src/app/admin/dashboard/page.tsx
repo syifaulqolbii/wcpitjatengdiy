@@ -7,12 +7,13 @@ import { usePredictions } from '@/hooks/usePredictions';
 import { useLeaderboard } from '@/hooks/useLeaderboard';
 import { useUsers } from '@/hooks/useUsers';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Zap, Loader2, Edit, Flag as LucideFlag, X, MemoryStick, Filter, TrendingUp, Users, Swords, PieChart } from 'lucide-react';
+import { Zap, Loader2, Edit, Flag as LucideFlag, X, MemoryStick, Filter, TrendingUp, Users, Swords, PieChart, Trophy } from 'lucide-react';
 import { formatInTimeZone } from 'date-fns-tz';
 import { toast } from 'sonner';
 import { Match } from '@/types';
 import Link from 'next/link';
 import { Flag as CountryFlag } from '@/components/shared/Flag';
+import { useAllTournamentPredictions } from '@/hooks/useTournamentPrediction';
 
 export default function AdminDashboardPage() {
   const { data: session } = authClient.useSession();
@@ -21,6 +22,7 @@ export default function AdminDashboardPage() {
   const { data: matches, isLoading: isMatchesLoading } = useMatches();
   const { data: predictions, isLoading: isPredictionsLoading } = usePredictions();
   const { data: leaderboard, isLoading: isLeaderboardLoading } = useLeaderboard();
+  const { data: championPredictions, isLoading: isChampionLoading } = useAllTournamentPredictions();
 
   const [isCalcModalOpen, setIsCalcModalOpen] = useState(false);
   const [matchToCalc, setMatchToCalc] = useState<Match | null>(null);
@@ -70,6 +72,19 @@ export default function AdminDashboardPage() {
     setMatchToCalc(match);
     setIsCalcModalOpen(true);
   };
+
+  // Champion Predictions Summary
+  const championDistribution = React.useMemo(() => {
+    if (!championPredictions?.predictions) return [];
+    const countMap: Record<string, { team: string; flag: string; count: number }> = {};
+    for (const p of championPredictions.predictions) {
+      if (!countMap[p.predictedWinner]) {
+        countMap[p.predictedWinner] = { team: p.predictedWinner, flag: p.predictedWinnerFlag, count: 0 };
+      }
+      countMap[p.predictedWinner].count++;
+    }
+    return Object.values(countMap).sort((a, b) => b.count - a.count);
+  }, [championPredictions]);
 
   // Activity Feed Placeholder
   const activityFeed = [
@@ -308,6 +323,104 @@ export default function AdminDashboardPage() {
               <span className="block font-display text-2xl font-black text-foreground">12%</span>
               <span className="block font-sans text-xs text-muted-foreground">CPU Usage</span>
             </div>
+          </section>
+
+          {/* Prediksi Juara Section */}
+          <section className="bg-card/50 border border-border/50 rounded-xl p-6">
+            <div className="flex justify-between items-center mb-6 border-b border-border/50 pb-4">
+              <div className="flex items-center gap-3">
+                <Trophy className="w-5 h-5 text-primary" />
+                <h3 className="font-display text-xl font-bold text-foreground tracking-tight uppercase">PREDIKSI JUARA</h3>
+              </div>
+              {!isChampionLoading && championPredictions && (
+                <div className="flex items-center gap-2">
+                  <span className="font-display text-sm font-bold text-primary">{championPredictions.stats.submitted}</span>
+                  <span className="font-sans text-xs text-muted-foreground">/ {championPredictions.stats.total} user sudah memilih</span>
+                </div>
+              )}
+            </div>
+
+            {isChampionLoading ? (
+              <div className="space-y-3">
+                <Skeleton className="h-10 w-full bg-muted/50" />
+                <Skeleton className="h-10 w-full bg-muted/50" />
+                <Skeleton className="h-10 w-full bg-muted/50" />
+              </div>
+            ) : !championPredictions || championPredictions.predictions.length === 0 ? (
+              <div className="text-center py-8 text-muted-foreground font-sans text-sm">
+                Belum ada user yang memilih juara.
+              </div>
+            ) : (
+              <div className="space-y-6">
+                {/* Top Picks Distribution */}
+                <div>
+                  <h4 className="font-display text-xs font-bold text-muted-foreground uppercase tracking-widest mb-4">Distribusi Pilihan</h4>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    {championDistribution.map((item) => (
+                      <div key={item.team} className="flex items-center justify-between bg-secondary/50 border border-border/30 rounded-lg px-4 py-3">
+                        <div className="flex items-center gap-3">
+                          <CountryFlag flag={item.flag} size="sm" className="w-6" />
+                          <span className="font-display text-sm font-bold text-foreground">{item.team}</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <div className="h-2 rounded-full bg-primary/30 w-16 overflow-hidden">
+                            <div
+                              className="h-full bg-primary rounded-full"
+                              style={{ width: `${(item.count / championPredictions.stats.submitted) * 100}%` }}
+                            ></div>
+                          </div>
+                          <span className="font-display text-xs font-bold text-primary min-w-[2rem] text-right">{item.count}</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Detail Per User */}
+                <div>
+                  <h4 className="font-display text-xs font-bold text-muted-foreground uppercase tracking-widest mb-4">Detail Per User</h4>
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-left border-collapse">
+                      <thead>
+                        <tr className="text-muted-foreground font-display font-bold text-[10px] uppercase tracking-wider border-b border-border/50">
+                          <th className="pb-3 px-3 font-medium">No</th>
+                          <th className="pb-3 px-3 font-medium">User</th>
+                          <th className="pb-3 px-3 font-medium">Pilihan Juara</th>
+                          <th className="pb-3 px-3 font-medium">Waktu Submit</th>
+                          <th className="pb-3 px-3 font-medium text-right">Poin</th>
+                        </tr>
+                      </thead>
+                      <tbody className="font-sans text-sm divide-y divide-border/30">
+                        {championPredictions.predictions.map((pred, idx) => (
+                          <tr key={pred.id} className="hover:bg-secondary/30 transition-colors">
+                            <td className="py-3 px-3 font-display text-muted-foreground text-xs">{String(idx + 1).padStart(2, '0')}</td>
+                            <td className="py-3 px-3 font-medium text-foreground">{pred.userName}</td>
+                            <td className="py-3 px-3">
+                              <div className="flex items-center gap-2">
+                                <CountryFlag flag={pred.predictedWinnerFlag} size="sm" className="w-5" />
+                                <span className="font-display text-sm font-bold text-foreground">{pred.predictedWinner}</span>
+                              </div>
+                            </td>
+                            <td className="py-3 px-3 text-muted-foreground text-xs">
+                              {formatInTimeZone(new Date(pred.submittedAt), Intl.DateTimeFormat().resolvedOptions().timeZone, 'dd MMM yyyy, HH:mm')}
+                            </td>
+                            <td className="py-3 px-3 text-right">
+                              {pred.points !== null ? (
+                                <span className={`font-display font-bold text-sm ${pred.points > 0 ? 'text-primary' : 'text-destructive'}`}>
+                                  {pred.points > 0 ? '+' : ''}{pred.points}
+                                </span>
+                              ) : (
+                                <span className="text-muted-foreground text-xs">—</span>
+                              )}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            )}
           </section>
         </div>
 

@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { authClient } from '@/lib/auth-client';
+import { apiPut } from '@/lib/api';
 import { toast } from 'sonner';
 
 export function useUsers() {
@@ -50,6 +51,25 @@ export function useDeleteUser() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['users'] });
       toast.success('User removed successfully');
+    },
+    onError: (error) => {
+      toast.error(error.message);
+    },
+  });
+}
+
+export function useRecoverUserAccount() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ userId, email, password }: { userId: string; email?: string; password?: string }) =>
+      apiPut<{ success: boolean; userId: string; email: string; emailChanged: boolean; passwordChanged: boolean }>(
+        `/api/admin/users/${userId}/recovery`,
+        { email, password }
+      ),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['users'] });
+      toast.success('Akun berhasil dipulihkan');
     },
     onError: (error) => {
       toast.error(error.message);

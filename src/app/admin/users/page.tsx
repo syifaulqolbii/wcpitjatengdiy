@@ -1,21 +1,33 @@
 "use client";
 
 import React, { useState } from 'react';
-import { Search, Bell, Settings, Link as LinkIcon, Key, Trash2, ChevronLeft, ChevronRight, X, Copy, Clock, Shield } from 'lucide-react';
-import { useUsers, useUpdateUserRole, useDeleteUser } from '@/hooks/useUsers';
+import { Search, Bell, Settings, Link as LinkIcon, Key, Trash2, X, Copy, Clock, Shield, UsersRound } from 'lucide-react';
+import { useUsers, useUpdateUserRole, useDeleteUser, useRecoverUserAccount } from '@/hooks/useUsers';
 import { useLeaderboard } from '@/hooks/useLeaderboard';
+import { useGroups, useAssignUserToGroup } from '@/hooks/useGroups';
 import { Skeleton } from '@/components/ui/skeleton';
 import { format } from 'date-fns';
+import { toast } from 'sonner';
 
 export default function AdminUsersPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [recoverUser, setRecoverUser] = useState<{ id: string; name: string; email: string } | null>(null);
+  const [recoveryEmail, setRecoveryEmail] = useState('');
+  const [temporaryPassword, setTemporaryPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
 
   const { data: usersData, isLoading: isUsersLoading } = useUsers();
   const { data: leaderboard } = useLeaderboard();
-  
+  const { data: groupsData } = useGroups();
+
   const updateRole = useUpdateUserRole();
   const deleteUser = useDeleteUser();
+  const recoverAccount = useRecoverUserAccount();
+  const assignUserToGroup = useAssignUserToGroup();
+
+  const [assignGroupUser, setAssignGroupUser] = useState<{ id: string; name: string; groupId?: string | null } | null>(null);
+  const [selectedGroupId, setSelectedGroupId] = useState('');
 
   const handleRoleChange = (userId: string, currentRole: string) => {
     const newRole = currentRole === 'admin' ? 'user' : 'admin';
@@ -30,11 +42,66 @@ export default function AdminUsersPage() {
     }
   };
 
+  const openRecoveryModal = (user: { id: string; name: string; email: string }) => {
+    setRecoverUser(user);
+    setRecoveryEmail(user.email);
+    setTemporaryPassword('');
+    setConfirmPassword('');
+  };
+
+  const closeRecoveryModal = () => {
+    setRecoverUser(null);
+    setRecoveryEmail('');
+    setTemporaryPassword('');
+    setConfirmPassword('');
+  };
+
+  const handleRecoverAccount = async () => {    if (!recoverUser) return;
+
+    const nextEmail = recoveryEmail.trim().toLowerCase();
+    const emailChanged = nextEmail !== recoverUser.email.toLowerCase();
+    const passwordChanged = temporaryPassword.length > 0;
+
+    if (!emailChanged && !passwordChanged) {
+      toast.error('Ubah email atau isi password sementara dulu');
+      return;
+    }
+
+    if (!nextEmail || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(nextEmail)) {
+      toast.error('Format email tidak valid');
+      return;
+    }
+
+    if (passwordChanged && temporaryPassword.length < 8) {
+      toast.error('Password minimal 8 karakter');
+      return;
+    }
+
+    if (passwordChanged && temporaryPassword !== confirmPassword) {
+      toast.error('Konfirmasi password tidak sama');
+      return;
+    }
+
+    await recoverAccount.mutateAsync({
+      userId: recoverUser.id,
+      email: emailChanged ? nextEmail : undefined,
+      password: passwordChanged ? temporaryPassword : undefined,
+    });
+    closeRecoveryModal();
+  };
+
   const users = usersData?.users || [];
-  const filteredUsers = users.filter(u => 
-    u.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
+  const filteredUsers = users.filter(u =>
+    u.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
     u.email.toLowerCase().includes(searchQuery.toLowerCase())
   );
+
+  const handleAssignGroup = async () => {
+    if (!assignGroupUser || !selectedGroupId) { toast.error('Pilih grup terlebih dahulu'); return; }
+    await assignUserToGroup.mutateAsync({ groupId: selectedGroupId, userId: assignGroupUser.id });
+    setAssignGroupUser(null);
+    setSelectedGroupId('');
+  };
 
   return (
     <>
@@ -151,16 +218,30 @@ export default function AdminUsersPage() {
                       {format(new Date(user.createdAt), 'dd MMM yyyy')}
                     </div>
                     <div className="col-span-1 flex justify-end gap-2 pr-2">
-                      <button 
+                      <button
+                        onClick={() => { setAssignGroupUser({ id: user.id, name: user.name, groupId: (user as { groupId?: string | null }).groupId }); setSelectedGroupId(''); }}
+                        className="text-muted-foreground hover:text-primary transition-colors p-1"
+                        title="Assign Grup"
+                      >
+                        <UsersRound className="w-5 h-5" />
+                      </button>
+                      <button
+                        onClick={() => openRecoveryModal(user)}
+                        className="text-muted-foreground hover:text-primary transition-colors p-1"
+                        title="Pulihkan Akun"
+                      >
+                        <Key className="w-5 h-5" />
+                      </button>
+                      <button
                         onClick={() => handleRoleChange(user.id, user.role || 'user')}
-                        className="text-muted-foreground hover:text-foreground transition-colors p-1" 
+                        className="text-muted-foreground hover:text-foreground transition-colors p-1"
                         title="Ubah Role (Admin/User)"
                       >
                         <Shield className="w-5 h-5" />
                       </button>
-                      <button 
+                      <button
                         onClick={() => handleDelete(user.id)}
-                        className="text-destructive/80 hover:text-destructive transition-colors p-1" 
+                        className="text-destructive/80 hover:text-destructive transition-colors p-1"
                         title="Hapus User"
                       >
                         <Trash2 className="w-5 h-5" />
@@ -234,6 +315,139 @@ export default function AdminUsersPage() {
                   <Copy className="w-4 h-4" />
                   Salin Link
                 </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal Overlay: Account Recovery */}
+      {recoverUser && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-md">
+          <div className="absolute w-96 h-96 bg-primary/10 rounded-full blur-[100px] pointer-events-none"></div>
+
+          <div className="bg-card border border-border/50 rounded-xl w-full max-w-lg shadow-[0px_24px_48px_rgba(0,0,0,0.6)] relative overflow-hidden">
+            <div className="h-2 w-full bg-gradient-to-r from-primary to-emerald-700 absolute top-0 left-0"></div>
+
+            <div className="p-8">
+              <div className="flex justify-between items-start mb-6">
+                <div>
+                  <h4 className="font-display text-2xl font-bold tracking-tight text-foreground">Pulihkan Akun</h4>
+                  <p className="font-sans text-sm text-muted-foreground mt-1">Bantu user masuk lagi tanpa membuat akun baru.</p>
+                </div>
+                <button onClick={closeRecoveryModal} className="text-muted-foreground hover:text-foreground transition-colors">
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+
+              <div className="space-y-5">
+                <div className="bg-secondary/50 p-4 rounded-lg border border-border/30">
+                  <p className="font-display text-sm font-semibold text-foreground">{recoverUser.name}</p>
+                  <p className="font-sans text-xs text-muted-foreground mt-1">{recoverUser.email}</p>
+                  <p className="font-mono text-[10px] text-muted-foreground/70 mt-2 break-all">ID: {recoverUser.id}</p>
+                </div>
+
+                <div className="rounded-lg border border-primary/30 bg-primary/10 p-4 text-sm text-muted-foreground">
+                  Recovery ini mempertahankan userId yang sama, jadi prediksi dan poin user tidak hilang. Jangan hapus dan buat ulang user untuk kasus lupa login.
+                </div>
+
+                <div>
+                  <label className="block font-sans text-xs text-muted-foreground uppercase tracking-widest mb-2">Email / Login Baru</label>
+                  <input
+                    className="w-full bg-secondary border border-border/50 rounded px-4 py-3 text-foreground font-sans text-sm focus:ring-1 focus:ring-primary outline-none"
+                    type="email"
+                    value={recoveryEmail}
+                    onChange={(e) => setRecoveryEmail(e.target.value)}
+                    placeholder="nama@wc.local"
+                  />
+                </div>
+
+                <div>
+                  <label className="block font-sans text-xs text-muted-foreground uppercase tracking-widest mb-2">Password Sementara</label>
+                  <input
+                    className="w-full bg-secondary border border-border/50 rounded px-4 py-3 text-foreground font-sans text-sm focus:ring-1 focus:ring-primary outline-none"
+                    type="password"
+                    value={temporaryPassword}
+                    onChange={(e) => setTemporaryPassword(e.target.value)}
+                    placeholder="Kosongkan jika hanya ubah email"
+                  />
+                </div>
+
+                <div>
+                  <label className="block font-sans text-xs text-muted-foreground uppercase tracking-widest mb-2">Konfirmasi Password</label>
+                  <input
+                    className="w-full bg-secondary border border-border/50 rounded px-4 py-3 text-foreground font-sans text-sm focus:ring-1 focus:ring-primary outline-none"
+                    type="password"
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    placeholder="Ulangi password sementara"
+                  />
+                </div>
+
+                <div className="flex gap-3 pt-2">
+                  <button
+                    onClick={closeRecoveryModal}
+                    disabled={recoverAccount.isPending}
+                    className="flex-1 border border-border text-muted-foreground font-display uppercase tracking-tight font-bold py-4 rounded hover:bg-secondary/50 transition-colors disabled:opacity-50"
+                  >
+                    Batal
+                  </button>
+                  <button
+                    onClick={handleRecoverAccount}
+                    disabled={recoverAccount.isPending}
+                    className="flex-1 bg-primary text-background font-display uppercase tracking-tight font-bold py-4 rounded hover:bg-primary/90 transition-all shadow-[0_0_15px_rgba(0,230,118,0.15)] hover:shadow-[0_0_25px_rgba(0,230,118,0.3)] disabled:opacity-50 disabled:hover:shadow-none"
+                  >
+                    {recoverAccount.isPending ? 'Memulihkan...' : 'Pulihkan Akun'}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal: Assign Grup */}
+      {assignGroupUser && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-md">
+          <div className="absolute w-96 h-96 bg-primary/10 rounded-full blur-[100px] pointer-events-none"></div>
+          <div className="bg-card border border-border/50 rounded-xl w-full max-w-md shadow-[0px_24px_48px_rgba(0,0,0,0.6)] relative overflow-hidden">
+            <div className="h-2 w-full bg-gradient-to-r from-primary to-emerald-700 absolute top-0 left-0"></div>
+            <div className="p-8">
+              <div className="flex justify-between items-start mb-6">
+                <div>
+                  <h4 className="font-display text-2xl font-bold tracking-tight text-foreground">Assign Grup</h4>
+                  <p className="font-sans text-sm text-muted-foreground mt-1">Pilih grup untuk <span className="text-foreground font-semibold">{assignGroupUser.name}</span>.</p>
+                </div>
+                <button onClick={() => setAssignGroupUser(null)} className="text-muted-foreground hover:text-foreground transition-colors">
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+              <div className="space-y-4">
+                <div>
+                  <label className="block font-sans text-xs text-muted-foreground uppercase tracking-widest mb-2">Pilih Grup</label>
+                  <select
+                    value={selectedGroupId}
+                    onChange={(e) => setSelectedGroupId(e.target.value)}
+                    className="w-full bg-secondary border border-border/50 rounded px-4 py-3 text-foreground font-sans text-sm focus:ring-1 focus:ring-primary outline-none"
+                  >
+                    <option value="">-- Pilih grup --</option>
+                    {groupsData?.map(g => (
+                      <option key={g.id} value={g.id}>{g.name} ({g.inviteCode})</option>
+                    ))}
+                  </select>
+                </div>
+                <div className="flex gap-3 pt-2">
+                  <button onClick={() => setAssignGroupUser(null)} className="flex-1 border border-border text-muted-foreground font-display uppercase tracking-tight font-bold py-3 rounded hover:bg-secondary/50 transition-colors">
+                    Batal
+                  </button>
+                  <button
+                    onClick={handleAssignGroup}
+                    disabled={!selectedGroupId || assignUserToGroup.isPending}
+                    className="flex-1 bg-primary text-background font-display uppercase tracking-tight font-bold py-3 rounded hover:bg-primary/90 transition-all disabled:opacity-50"
+                  >
+                    {assignUserToGroup.isPending ? 'Menyimpan...' : 'Assign'}
+                  </button>
+                </div>
               </div>
             </div>
           </div>

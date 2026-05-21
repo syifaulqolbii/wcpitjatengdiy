@@ -8,6 +8,14 @@ import {
   boolean,
 } from "drizzle-orm/pg-core";
 
+// ─── Groups ───────────────────────────────────────────────────
+export const groups = pgTable("groups", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  name: text("name").notNull(),
+  inviteCode: text("invite_code").notNull().unique(),
+  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+});
+
 // ─── Users ────────────────────────────────────────────────────
 // Managed by Better Auth — extended with admin plugin fields
 export const users = pgTable("users", {
@@ -17,6 +25,7 @@ export const users = pgTable("users", {
   emailVerified: boolean("email_verified").default(false).notNull(),
   image: text("image"),
   role: text("role").default("player").notNull(), // 'player' | 'admin'
+  groupId: uuid("group_id").references(() => groups.id, { onDelete: "set null" }),
   // Better Auth admin plugin fields
   banned: boolean("banned").default(false),
   banReason: text("ban_reason"),
@@ -144,6 +153,8 @@ export const leaderboardSnapshots = pgTable('leaderboard_snapshots', {
 // ─── Type Exports ────────────────────────────────────────────
 export type User = typeof users.$inferSelect;
 export type NewUser = typeof users.$inferInsert;
+export type Group = typeof groups.$inferSelect;
+export type NewGroup = typeof groups.$inferInsert;
 export type Match = typeof matches.$inferSelect;
 export type NewMatch = typeof matches.$inferInsert;
 export type Prediction = typeof predictions.$inferSelect;

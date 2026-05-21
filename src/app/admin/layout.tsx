@@ -3,7 +3,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { LayoutDashboard, Swords, Users, LineChart, Settings, LogOut } from 'lucide-react';
+import { LayoutDashboard, Swords, Users, LineChart, Settings, LogOut, UsersRound } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { authClient } from '@/lib/auth-client';
 import { BrandLogo } from '@/components/shared/BrandLogo';
@@ -53,6 +53,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           <NavLink href="/admin/dashboard" icon={LayoutDashboard}>Dashboard</NavLink>
           <NavLink href="/admin/matches" icon={Swords}>Match Management</NavLink>
           <NavLink href="/admin/users" icon={Users}>User Management</NavLink>
+          <NavLink href="/admin/groups" icon={UsersRound}>Group Management</NavLink>
           <NavLink href="/admin/insights" icon={LineChart}>User Insights</NavLink>
           <NavLink href="/admin/system-settings" icon={Settings}>System Settings</NavLink>
         </ul>
