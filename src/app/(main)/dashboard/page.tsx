@@ -11,7 +11,7 @@ import { cn } from '@/lib/utils';
 import { Flag } from '@/components/shared/Flag';
 import { useTournamentPrediction } from '@/hooks/useTournamentPrediction';
 import { ChampionPickModal } from '@/components/predictions/ChampionPickModal';
-import { Trophy, Clock, AlertCircle, CheckCircle2 } from 'lucide-react';
+import { Trophy, Clock, AlertCircle, CheckCircle2, Lock, ArrowRight } from 'lucide-react';
 
 export default function DashboardPage() {
   const { data: session, isPending: isSessionLoading } = authClient.useSession();
@@ -40,6 +40,20 @@ export default function DashboardPage() {
     : [];
 
   const getPrediction = (matchId: string) => predictions?.find((p) => p.matchId === matchId);
+
+  const getCountdownLabel = (kickoffTime: Date | string) => {
+    const diff = new Date(kickoffTime).getTime() - Date.now();
+    if (diff <= 0) return 'Kickoff sudah dimulai';
+
+    const minutes = Math.floor(diff / 60000);
+    const days = Math.floor(minutes / 1440);
+    const hours = Math.floor((minutes % 1440) / 60);
+    const remainingMinutes = minutes % 60;
+
+    if (days > 0) return `${days} hari ${hours} jam lagi`;
+    if (hours > 0) return `${hours} jam ${remainingMinutes} menit lagi`;
+    return `${Math.max(remainingMinutes, 1)} menit lagi`;
+  };
 
   return (
     <div className="space-y-8 relative z-10">
@@ -234,22 +248,61 @@ export default function DashboardPage() {
 
             {(() => {
               if (isPredictionsLoading || isSessionLoading) {
-                return <Skeleton className="h-24 w-full max-w-md mt-8 rounded-lg bg-background/40" />;
+                return <Skeleton className="h-28 w-full max-w-xl mt-8 rounded-lg bg-background/40" />;
               }
+
               const prediction = getPrediction(heroMatch.id);
-              return prediction ? (
-                <div className="mt-8 w-full max-w-md bg-background/60 backdrop-blur-md rounded-lg p-4 border border-border/50 flex flex-col items-center">
-                  <span className="text-xs text-muted-foreground font-bold uppercase tracking-widest mb-2">Your Prediction</span>
-                  <div className="flex gap-4 items-center">
-                    <span className="font-display font-black text-xl text-foreground">{prediction.predictedA}</span>
-                    <span className="text-muted-foreground">-</span>
-                    <span className="font-display font-black text-xl text-foreground">{prediction.predictedB}</span>
+              const lockTime = new Date(heroMatch.kickoffTime).getTime() - 15 * 60 * 1000;
+              const isLocked = isLive || lockTime <= Date.now();
+              const countdownLabel = isLive ? 'Pertandingan sedang berlangsung' : getCountdownLabel(heroMatch.kickoffTime);
+
+              if (prediction) {
+                return (
+                  <div className="mt-8 w-full max-w-xl bg-background/60 backdrop-blur-md rounded-lg p-4 border border-primary/30 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                    <div className="flex items-center gap-3">
+                      <CheckCircle2 className="h-6 w-6 text-primary shrink-0" />
+                      <div>
+                        <span className="text-xs text-primary font-bold uppercase tracking-widest">Prediksi Tersimpan</span>
+                        <div className="mt-1 flex items-center gap-3">
+                          <span className="font-display font-black text-xl text-foreground">{prediction.predictedA}</span>
+                          <span className="text-muted-foreground">-</span>
+                          <span className="font-display font-black text-xl text-foreground">{prediction.predictedB}</span>
+                        </div>
+                      </div>
+                    </div>
+                    <a href="/predictions" className="inline-flex items-center justify-center gap-2 rounded-md border border-border/50 bg-card px-4 py-2 text-xs font-bold uppercase tracking-widest text-foreground transition-colors hover:bg-secondary">
+                      {isLocked ? 'Lihat Detail' : 'Ubah Prediksi'}
+                      <ArrowRight className="h-4 w-4" />
+                    </a>
                   </div>
-                </div>
-              ) : (
-                <div className="mt-8 w-full max-w-md bg-background/60 backdrop-blur-md rounded-lg p-4 border border-border/50 flex flex-col items-center">
-                  <span className="text-xs text-muted-foreground font-bold uppercase tracking-widest mb-2">Belum ada prediksi</span>
-                  <a href="/predictions" className="text-primary text-xs font-bold uppercase tracking-widest hover:underline mt-1">Prediksi Sekarang</a>
+                );
+              }
+
+              if (isLocked) {
+                return (
+                  <div className="mt-8 w-full max-w-xl bg-background/60 backdrop-blur-md rounded-lg p-4 border border-border/50 flex items-center gap-3">
+                    <Lock className="h-6 w-6 text-muted-foreground shrink-0" />
+                    <div>
+                      <span className="text-xs text-muted-foreground font-bold uppercase tracking-widest">Prediksi Terkunci</span>
+                      <p className="mt-1 text-sm text-muted-foreground">Kamu belum submit prediksi untuk match ini.</p>
+                    </div>
+                  </div>
+                );
+              }
+
+              return (
+                <div className="mt-8 w-full max-w-xl bg-primary/10 backdrop-blur-md rounded-lg p-4 border border-primary/30 flex flex-col md:flex-row md:items-center md:justify-between gap-4 shadow-[0_0_20px_rgba(0,230,118,0.1)]">
+                  <div className="flex items-center gap-3">
+                    <AlertCircle className="h-6 w-6 text-primary shrink-0" />
+                    <div>
+                      <span className="text-xs text-primary font-bold uppercase tracking-widest">Belum Ada Prediksi</span>
+                      <p className="mt-1 text-sm text-muted-foreground">Deadline: 15 menit sebelum kickoff · {countdownLabel}</p>
+                    </div>
+                  </div>
+                  <a href="/predictions?filter=open" className="inline-flex items-center justify-center gap-2 rounded-md bg-primary px-4 py-2 text-xs font-bold uppercase tracking-widest text-background transition-colors hover:bg-primary/90">
+                    Prediksi Sekarang
+                    <ArrowRight className="h-4 w-4" />
+                  </a>
                 </div>
               );
             })()}

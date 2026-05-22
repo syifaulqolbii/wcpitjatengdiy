@@ -1,14 +1,17 @@
 "use client";
 
-import React, { useState, useMemo } from 'react';
+import React, { Suspense, useState, useMemo } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { useMatches } from '@/hooks/useMatches';
 import { usePredictions } from '@/hooks/usePredictions';
 import { MatchCard } from './match-card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { formatInTimeZone } from 'date-fns-tz';
 
-export default function PredictionsPage() {
-  const [filter, setFilter] = useState<'all' | 'open' | 'finished'>('all');
+function PredictionsPageContent() {
+  const searchParams = useSearchParams();
+  const initialFilter = searchParams.get('filter') === 'open' ? 'open' : 'all';
+  const [filter, setFilter] = useState<'all' | 'open' | 'finished'>(initialFilter);
   const { data: matches, isLoading: isMatchesLoading } = useMatches();
   const { data: predictions, isLoading: isPredictionsLoading } = usePredictions();
 
@@ -105,5 +108,13 @@ export default function PredictionsPage() {
         )}
       </section>
     </div>
+  );
+}
+
+export default function PredictionsPage() {
+  return (
+    <Suspense fallback={null}>
+      <PredictionsPageContent />
+    </Suspense>
   );
 }

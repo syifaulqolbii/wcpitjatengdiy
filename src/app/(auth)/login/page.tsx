@@ -2,7 +2,7 @@
 
 import { Suspense, useState, useEffect } from "react";
 import { authClient } from "@/lib/auth-client";
-import { Mail, Lock, Eye, EyeOff, ArrowRight, User, CheckCircle2 } from "lucide-react";
+import { Mail, Lock, Eye, EyeOff, ArrowRight, User, CheckCircle2, X } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -28,6 +28,7 @@ function LoginPageContent() {
   
   const [isRegister, setIsRegister] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [isForgotPasswordOpen, setIsForgotPasswordOpen] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
 
   useEffect(() => {
@@ -237,9 +238,13 @@ function LoginPageContent() {
             )}
             {!isRegister && (
                <div className="flex justify-end mt-2">
-                 <a className="font-sans text-xs text-muted-foreground hover:text-primary transition-colors" href="#">
+                 <button
+                   type="button"
+                   onClick={() => setIsForgotPasswordOpen(true)}
+                   className="font-sans text-xs text-muted-foreground hover:text-primary transition-colors"
+                 >
                    Lupa password?
-                 </a>
+                 </button>
                </div>
             )}
           </div>
@@ -293,6 +298,42 @@ function LoginPageContent() {
         </form>
 
       </div>
+
+      {isForgotPasswordOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 px-4 backdrop-blur-md">
+          <div className="absolute h-72 w-72 rounded-full bg-primary/10 blur-[90px] pointer-events-none"></div>
+          <div className="relative w-full max-w-sm overflow-hidden rounded-xl border border-border/50 bg-card shadow-[0px_24px_48px_rgba(0,0,0,0.6)]">
+            <div className="absolute left-0 top-0 h-1 w-full bg-gradient-to-r from-primary to-emerald-700"></div>
+            <div className="p-6">
+              <div className="mb-4 flex items-start justify-between gap-4">
+                <div>
+                  <h2 className="font-display text-2xl font-bold tracking-tight text-foreground">Lupa Password</h2>
+                  <p className="mt-1 font-sans text-sm text-muted-foreground">Bantuan login akun WCP.</p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setIsForgotPasswordOpen(false)}
+                  className="text-muted-foreground transition-colors hover:text-foreground"
+                >
+                  <X className="h-5 w-5" />
+                </button>
+              </div>
+
+              <div className="rounded-lg border border-primary/30 bg-primary/10 p-4 text-sm leading-relaxed text-muted-foreground">
+                Jika lupa password login, silakan hubungi Admin WCP IT Jateng DIY.
+              </div>
+
+              <button
+                type="button"
+                onClick={() => setIsForgotPasswordOpen(false)}
+                className="mt-5 w-full rounded-md bg-primary py-3 font-display text-sm font-bold uppercase tracking-tight text-primary-foreground transition-colors hover:bg-primary/90"
+              >
+                Mengerti
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 }
