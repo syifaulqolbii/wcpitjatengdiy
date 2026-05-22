@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Manrope, Lexend } from "next/font/google";
 import "./globals.css";
 import { cn } from "@/lib/utils";
@@ -16,8 +16,29 @@ const lexend = Lexend({
 });
 
 export const metadata: Metadata = {
-  title: "World Cup 2026 Predictor",
-  description: "Private World Cup 2026 Prediction App for IT Jateng DIY",
+  title: "WCP IT Jateng DIY",
+  description: "World Cup 2026 Prediction App for IT Jateng DIY",
+  manifest: "/manifest.webmanifest",
+  applicationName: "WCP IT Jateng DIY",
+  appleWebApp: {
+    capable: true,
+    title: "WCP",
+    statusBarStyle: "black-translucent",
+  },
+  formatDetection: {
+    telephone: false,
+  },
+  icons: {
+    icon: [
+      { url: "/icon-192.png", sizes: "192x192", type: "image/png" },
+      { url: "/icon-512.png", sizes: "512x512", type: "image/png" },
+    ],
+    apple: [{ url: "/icon-192.png", sizes: "192x192", type: "image/png" }],
+  },
+};
+
+export const viewport: Viewport = {
+  themeColor: "#00E676",
 };
 
 export default function RootLayout({
