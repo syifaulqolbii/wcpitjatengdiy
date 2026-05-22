@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useMemo } from 'react';
-import { Star, Check, X, ChevronRight, LogOut, Loader2, Camera, Trash2 } from 'lucide-react';
+import { Star, Check, X, ChevronRight, LogOut, Loader2, Camera, Trash2, Heart, Copy } from 'lucide-react';
 import { authClient } from '@/lib/auth-client';
 import { useLeaderboard } from '@/hooks/useLeaderboard';
 import { usePredictions } from '@/hooks/usePredictions';
@@ -25,6 +25,7 @@ export default function ProfilePage() {
   const [newPassword, setNewPassword] = useState('');
   const [isSubmittingPassword, setIsSubmittingPassword] = useState(false);
   const [isUpdatingPhoto, setIsUpdatingPhoto] = useState(false);
+  const [isDonationOpen, setIsDonationOpen] = useState(false);
 
   const userStats = useMemo(() => {
     if (!leaderboard || !userId) return null;
@@ -167,6 +168,11 @@ export default function ProfilePage() {
     } finally {
       setIsUpdatingPhoto(false);
     }
+  };
+
+  const handleCopyDonationNumber = async () => {
+    await navigator.clipboard.writeText('085156085641');
+    toast.success('Nomor LinkAja disalin');
   };
 
   const getInitials = (name: string) => {
@@ -381,6 +387,31 @@ export default function ProfilePage() {
           </div>
         </section>
 
+        {/* Support Donation */}
+        <section>
+          <div className="rounded-lg border border-primary/30 bg-primary/10 p-5 shadow-[0_0_18px_rgba(0,230,118,0.08)]">
+            <div className="flex items-start gap-4">
+              <div className="rounded-full bg-primary/20 p-3 text-primary">
+                <Heart className="h-5 w-5" />
+              </div>
+              <div className="min-w-0 flex-1">
+                <h3 className="font-display text-lg font-bold uppercase tracking-tight text-foreground">Dukung WCP IT Jateng DIY</h3>
+                <p className="mt-1 font-sans text-sm leading-relaxed text-muted-foreground">
+                  Jika aplikasi ini membantu, kamu bisa ikut support biaya maintenance aplikasi dan server seikhlasnya.
+                </p>
+                <button
+                  type="button"
+                  onClick={() => setIsDonationOpen(true)}
+                  className="mt-4 inline-flex items-center gap-2 rounded-md bg-primary px-4 py-2 font-display text-xs font-bold uppercase tracking-wider text-background transition-colors hover:bg-primary/90"
+                >
+                  Donasi via LinkAja
+                  <ChevronRight className="h-4 w-4" />
+                </button>
+              </div>
+            </div>
+          </div>
+        </section>
+
         {/* Logout Button */}
         <div className="mt-4 pb-8">
           <button 
@@ -391,8 +422,55 @@ export default function ProfilePage() {
             Keluar
           </button>
         </div>
-        
+
       </div>
+
+      {isDonationOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 px-4 backdrop-blur-md">
+          <div className="absolute h-80 w-80 rounded-full bg-primary/10 blur-[100px] pointer-events-none"></div>
+          <div className="relative w-full max-w-sm overflow-hidden rounded-xl border border-border/50 bg-card shadow-[0px_24px_48px_rgba(0,0,0,0.6)]">
+            <div className="absolute left-0 top-0 h-1 w-full bg-gradient-to-r from-primary to-emerald-700"></div>
+            <div className="p-6">
+              <div className="mb-5 flex items-start justify-between gap-4">
+                <div>
+                  <h3 className="font-display text-2xl font-bold tracking-tight text-foreground">Donasi LinkAja</h3>
+                  <p className="mt-1 font-sans text-sm text-muted-foreground">Support maintenance WCP IT Jateng DIY.</p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setIsDonationOpen(false)}
+                  className="text-muted-foreground transition-colors hover:text-foreground"
+                >
+                  <X className="h-5 w-5" />
+                </button>
+              </div>
+
+              <div className="rounded-lg border border-primary/30 bg-primary/10 p-4 text-center">
+                <p className="font-sans text-xs font-bold uppercase tracking-widest text-muted-foreground">Nomor LinkAja</p>
+                <p className="mt-2 font-display text-3xl font-black tracking-tight text-primary">085156085641</p>
+              </div>
+
+              <div className="mt-5 flex gap-3">
+                <button
+                  type="button"
+                  onClick={() => setIsDonationOpen(false)}
+                  className="flex-1 rounded-md border border-border px-4 py-3 font-display text-xs font-bold uppercase tracking-wider text-muted-foreground transition-colors hover:bg-secondary/50"
+                >
+                  Tutup
+                </button>
+                <button
+                  type="button"
+                  onClick={handleCopyDonationNumber}
+                  className="flex-1 inline-flex items-center justify-center gap-2 rounded-md bg-primary px-4 py-3 font-display text-xs font-bold uppercase tracking-wider text-background transition-colors hover:bg-primary/90"
+                >
+                  <Copy className="h-4 w-4" />
+                  Salin
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
