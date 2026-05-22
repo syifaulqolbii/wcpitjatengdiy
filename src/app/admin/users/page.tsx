@@ -91,6 +91,7 @@ export default function AdminUsersPage() {
   };
 
   const users = usersData?.users || [];
+  const groupsById = new Map(groupsData?.map(group => [group.id, group]));
   const filteredUsers = users.filter(u =>
     u.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
     u.email.toLowerCase().includes(searchQuery.toLowerCase())
@@ -172,10 +173,11 @@ export default function AdminUsersPage() {
           {/* Table Header */}
           <div className="grid grid-cols-12 gap-4 p-4 border-b border-border/50 bg-secondary/30 font-display text-xs uppercase tracking-widest text-muted-foreground relative z-10">
             <div className="col-span-1 pl-2">No</div>
-            <div className="col-span-3">Nama</div>
+            <div className="col-span-2">Nama</div>
             <div className="col-span-3">Email</div>
+            <div className="col-span-2">Grup</div>
             <div className="col-span-2">Poin & Role</div>
-            <div className="col-span-2">Bergabung</div>
+            <div className="col-span-1">Bergabung</div>
             <div className="col-span-1 text-right pr-2">Aksi</div>
           </div>
 
@@ -194,14 +196,25 @@ export default function AdminUsersPage() {
                 const isAdmin = user.role === 'admin';
                 const userStats = leaderboard?.find(l => l.userId === user.id);
                 const points = userStats?.totalPoints ?? 0;
+                const groupId = (user as { groupId?: string | null }).groupId;
+                const group = groupId ? groupsById.get(groupId) : null;
 
                 return (
                   <div key={user.id} className="grid grid-cols-12 gap-4 p-4 items-center border-b border-border/30 hover:bg-secondary/40 border-l-2 border-l-transparent hover:border-l-primary transition-colors">
                     <div className="col-span-1 pl-2 font-display text-muted-foreground">
                       {String(index + 1).padStart(2, '0')}
                     </div>
-                    <div className="col-span-3 font-medium text-foreground truncate pr-2">{user.name}</div>
+                    <div className="col-span-2 font-medium text-foreground truncate pr-2">{user.name}</div>
                     <div className="col-span-3 text-muted-foreground truncate pr-2">{user.email}</div>
+                    <div className="col-span-2 text-muted-foreground truncate pr-2">
+                      {group ? (
+                        <span className="inline-flex items-center px-2 py-1 rounded bg-primary/10 text-primary border border-primary/20 text-xs font-display uppercase tracking-wider">
+                          {group.name}
+                        </span>
+                      ) : (
+                        <span className="text-xs uppercase tracking-wider">Belum ada</span>
+                      )}
+                    </div>
                     <div className="col-span-2 flex items-center gap-3">
                       <span className="font-display font-bold text-primary">{points} pts</span>
                       {isAdmin ? (
@@ -214,7 +227,7 @@ export default function AdminUsersPage() {
                         </span>
                       )}
                     </div>
-                    <div className="col-span-2 text-muted-foreground font-sans text-xs uppercase tracking-wider">
+                    <div className="col-span-1 text-muted-foreground font-sans text-xs uppercase tracking-wider">
                       {format(new Date(user.createdAt), 'dd MMM yyyy')}
                     </div>
                     <div className="col-span-1 flex justify-end gap-2 pr-2">
