@@ -79,9 +79,12 @@ export function useAssignUserToGroup() {
   return useMutation({
     mutationFn: ({ groupId, userId }: { groupId: string; userId: string }) =>
       apiPost<{ success: boolean }>(`/api/admin/groups/${groupId}/members`, { userId }),
-    onSuccess: () => {
+    onSuccess: (_data, variables) => {
       queryClient.invalidateQueries({ queryKey: ['groups'] });
+      queryClient.invalidateQueries({ queryKey: ['groups', variables.groupId, 'members'] });
       queryClient.invalidateQueries({ queryKey: ['users'] });
+      queryClient.invalidateQueries({ queryKey: ['me', 'group'] });
+      queryClient.invalidateQueries({ queryKey: ['leaderboard'] });
       toast.success('User berhasil ditambahkan ke grup');
     },
     onError: (error) => toast.error(error.message),
@@ -102,9 +105,12 @@ export function useRemoveUserFromGroup() {
         if (json.error) throw new Error(json.error.message);
         return json.data;
       }),
-    onSuccess: () => {
+    onSuccess: (_data, variables) => {
       queryClient.invalidateQueries({ queryKey: ['groups'] });
+      queryClient.invalidateQueries({ queryKey: ['groups', variables.groupId, 'members'] });
       queryClient.invalidateQueries({ queryKey: ['users'] });
+      queryClient.invalidateQueries({ queryKey: ['me', 'group'] });
+      queryClient.invalidateQueries({ queryKey: ['leaderboard'] });
       toast.success('User berhasil dikeluarkan dari grup');
     },
     onError: (error: Error) => toast.error(error.message),

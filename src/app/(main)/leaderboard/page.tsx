@@ -4,6 +4,7 @@ import React from 'react';
 import { Star, Minus, Users } from 'lucide-react';
 import { useLeaderboard } from '@/hooks/useLeaderboard';
 import { authClient } from '@/lib/auth-client';
+import { useMyGroup } from '@/hooks/useMyGroup';
 import { Skeleton } from '@/components/ui/skeleton';
 import EmptyState from '@/components/shared/EmptyState';
 import { RankChangeBadge } from '@/components/leaderboard/RankChangeBadge';
@@ -12,12 +13,13 @@ import { UserAvatar } from '@/components/shared/UserAvatar';
 export default function LeaderboardPage() {
   const { data: session } = authClient.useSession();
   const userId = session?.user?.id;
-  const groupId = (session?.user as { groupId?: string | null } | undefined)?.groupId ?? undefined;
-  const groupName = (session?.user as { groupName?: string | null } | undefined)?.groupName ?? null;
+  const { data: myGroup, isLoading: isGroupLoading } = useMyGroup();
+  const groupId = myGroup?.groupId ?? undefined;
+  const groupName = myGroup?.groupName ?? null;
 
-  const { data: leaderboard, isLoading } = useLeaderboard(groupId);
+  const { data: leaderboard, isLoading } = useLeaderboard(groupId, !isGroupLoading && !!groupId);
 
-  if (isLoading) {
+  if (isGroupLoading || isLoading) {
     return (
       <div className="relative z-10 max-w-3xl mx-auto px-4 md:px-0 pb-10 overflow-x-hidden md:overflow-x-visible">
         <section className="pt-4 md:pt-8 pb-4 relative">

@@ -91,7 +91,6 @@ export default function AdminUsersPage() {
   };
 
   const users = usersData?.users || [];
-  const groupsById = new Map(groupsData?.map(group => [group.id, group]));
   const filteredUsers = users.filter(u =>
     u.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
     u.email.toLowerCase().includes(searchQuery.toLowerCase())
@@ -167,22 +166,23 @@ export default function AdminUsersPage() {
         </div>
 
         {/* Data Table Container */}
-        <div className="bg-card rounded-lg flex-1 border border-border/50 overflow-hidden flex flex-col relative">
+        <div className="bg-card rounded-lg flex-1 border border-border/50 overflow-hidden flex flex-col relative min-w-0">
           <div className="absolute -right-20 -top-20 text-[200px] font-display font-black text-secondary opacity-50 select-none pointer-events-none leading-none">30</div>
           
+          <div className="overflow-x-auto relative z-10">
           {/* Table Header */}
-          <div className="grid grid-cols-12 gap-4 p-4 border-b border-border/50 bg-secondary/30 font-display text-xs uppercase tracking-widest text-muted-foreground relative z-10">
-            <div className="col-span-1 pl-2">No</div>
-            <div className="col-span-2">Nama</div>
-            <div className="col-span-3">Email</div>
-            <div className="col-span-2">Grup</div>
-            <div className="col-span-2">Poin & Role</div>
-            <div className="col-span-1">Bergabung</div>
-            <div className="col-span-1 text-right pr-2">Aksi</div>
+          <div className="grid min-w-[980px] grid-cols-[56px_minmax(140px,1.4fr)_minmax(220px,1.8fr)_minmax(140px,1fr)_minmax(170px,1.2fr)_120px_140px] gap-4 p-4 border-b border-border/50 bg-secondary/30 font-display text-xs uppercase tracking-widest text-muted-foreground">
+            <div className="pl-2">No</div>
+            <div>Nama</div>
+            <div>Email</div>
+            <div>Grup</div>
+            <div>Poin & Role</div>
+            <div>Bergabung</div>
+            <div className="text-right pr-2">Aksi</div>
           </div>
 
           {/* Table Body */}
-          <div className="flex-1 overflow-y-auto relative z-10 font-sans text-sm">
+          <div className="flex-1 font-sans text-sm">
             {isUsersLoading ? (
                <div className="p-4 flex flex-col gap-4">
                   <Skeleton className="h-12 w-full" />
@@ -196,26 +196,25 @@ export default function AdminUsersPage() {
                 const isAdmin = user.role === 'admin';
                 const userStats = leaderboard?.find(l => l.userId === user.id);
                 const points = userStats?.totalPoints ?? 0;
-                const groupId = (user as { groupId?: string | null }).groupId;
-                const group = groupId ? groupsById.get(groupId) : null;
+                const groupName = user.groupName;
 
                 return (
-                  <div key={user.id} className="grid grid-cols-12 gap-4 p-4 items-center border-b border-border/30 hover:bg-secondary/40 border-l-2 border-l-transparent hover:border-l-primary transition-colors">
-                    <div className="col-span-1 pl-2 font-display text-muted-foreground">
+                  <div key={user.id} className="grid min-w-[980px] grid-cols-[56px_minmax(140px,1.4fr)_minmax(220px,1.8fr)_minmax(140px,1fr)_minmax(170px,1.2fr)_120px_140px] gap-4 p-4 items-center border-b border-border/30 hover:bg-secondary/40 border-l-2 border-l-transparent hover:border-l-primary transition-colors">
+                    <div className="pl-2 font-display text-muted-foreground">
                       {String(index + 1).padStart(2, '0')}
                     </div>
-                    <div className="col-span-2 font-medium text-foreground truncate pr-2">{user.name}</div>
-                    <div className="col-span-3 text-muted-foreground truncate pr-2">{user.email}</div>
-                    <div className="col-span-2 text-muted-foreground truncate pr-2">
-                      {group ? (
-                        <span className="inline-flex items-center px-2 py-1 rounded bg-primary/10 text-primary border border-primary/20 text-xs font-display uppercase tracking-wider">
-                          {group.name}
+                    <div className="font-medium text-foreground truncate pr-2">{user.name}</div>
+                    <div className="text-muted-foreground truncate pr-2">{user.email}</div>
+                    <div className="text-muted-foreground truncate pr-2">
+                      {groupName ? (
+                        <span className="inline-flex max-w-full items-center px-2 py-1 rounded bg-primary/10 text-primary border border-primary/20 text-xs font-display uppercase tracking-wider truncate">
+                          {groupName}
                         </span>
                       ) : (
                         <span className="text-xs uppercase tracking-wider">Belum ada</span>
                       )}
                     </div>
-                    <div className="col-span-2 flex items-center gap-3">
+                    <div className="flex items-center gap-2 min-w-0">
                       <span className="font-display font-bold text-primary">{points} pts</span>
                       {isAdmin ? (
                         <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-primary/20 text-primary border border-primary/30 text-[10px] font-display uppercase tracking-wider">
@@ -227,10 +226,10 @@ export default function AdminUsersPage() {
                         </span>
                       )}
                     </div>
-                    <div className="col-span-1 text-muted-foreground font-sans text-xs uppercase tracking-wider">
+                    <div className="text-muted-foreground font-sans text-xs uppercase tracking-wider">
                       {format(new Date(user.createdAt), 'dd MMM yyyy')}
                     </div>
-                    <div className="col-span-1 flex justify-end gap-2 pr-2">
+                    <div className="flex justify-end gap-2 pr-2">
                       <button
                         onClick={() => { setAssignGroupUser({ id: user.id, name: user.name, groupId: (user as { groupId?: string | null }).groupId }); setSelectedGroupId(''); }}
                         className="text-muted-foreground hover:text-primary transition-colors p-1"
@@ -264,6 +263,7 @@ export default function AdminUsersPage() {
                 );
               })
             )}
+          </div>
           </div>
 
           {/* Table Footer */}

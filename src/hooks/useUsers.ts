@@ -1,17 +1,29 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { authClient } from '@/lib/auth-client';
-import { apiPut } from '@/lib/api';
+import { apiGet, apiPut } from '@/lib/api';
 import { toast } from 'sonner';
+
+type AdminUser = {
+  id: string;
+  name: string;
+  email: string;
+  image: string | null;
+  role: string;
+  groupId: string | null;
+  groupName: string | null;
+  createdAt: string;
+};
+
+type UsersResult = AdminUser[] & { users: AdminUser[] };
 
 export function useUsers() {
   return useQuery({
     queryKey: ['users'],
     queryFn: async () => {
-      const res = await authClient.admin.listUsers({ query: { limit: 100 } });
-      if (res.error) {
-        throw new Error(res.error.message || 'Failed to fetch users');
-      }
-      return res.data;
+      const data = await apiGet<{ users: AdminUser[] }>('/api/admin/users');
+      const result = data.users as UsersResult;
+      result.users = data.users;
+      return result;
     },
   });
 }
@@ -21,7 +33,7 @@ export function useUpdateUserRole() {
 
   return useMutation({
     mutationFn: async ({ userId, role }: { userId: string; role: string }) => {
-      const res = await authClient.admin.setRole({ userId, role });
+      const res = await authClient.admin.setRole({ userId, role: role as 'user' | 'admin' });
       if (res.error) {
         throw new Error(res.error.message || 'Failed to update role');
       }
