@@ -10,6 +10,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { formatInTimeZone } from 'date-fns-tz';
 import { toast } from 'sonner';
 import { Flag } from '@/components/shared/Flag';
+import qrisImage from '@/components/img/qris.jpeg';
 
 export default function ProfilePage() {
   const router = useRouter();
@@ -445,7 +446,11 @@ export default function ProfilePage() {
                 </button>
               </div>
 
-              <div className="rounded-lg border border-primary/30 bg-primary/10 p-4 text-center">
+              <div className="rounded-lg border border-border/50 bg-white p-3">
+                <img src={qrisImage.src} alt="QRIS LinkAja untuk donasi" className="w-full rounded-md" />
+              </div>
+
+              <div className="mt-4 rounded-lg border border-primary/30 bg-primary/10 p-4 text-center">
                 <p className="font-sans text-xs font-bold uppercase tracking-widest text-muted-foreground">Nomor LinkAja</p>
                 <p className="mt-2 font-display text-3xl font-black tracking-tight text-primary">085156085641</p>
               </div>

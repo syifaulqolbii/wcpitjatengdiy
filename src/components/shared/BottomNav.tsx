@@ -29,6 +29,7 @@ export default function BottomNav() {
             <Link
               key={link.href}
               href={link.href}
+              prefetch={false}
               className={cn(
                 "flex flex-col items-center justify-center w-full h-full gap-1 transition-colors",
                 isActive ? "text-primary" : "text-muted-foreground hover:text-foreground"
@@ -42,6 +43,7 @@ export default function BottomNav() {
         {isAdmin && (
           <Link
             href="/admin/dashboard"
+            prefetch={false}
             className={cn(
               "flex flex-col items-center justify-center w-full h-full gap-1 transition-colors",
               pathname.startsWith("/admin") ? "text-primary" : "text-muted-foreground hover:text-foreground"

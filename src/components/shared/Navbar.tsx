@@ -47,6 +47,7 @@ export default function Navbar() {
               <Link
                 key={link.href}
                 href={link.href}
+                prefetch={false}
                 className={cn(
                   "flex items-center gap-2 text-sm font-medium transition-colors hover:text-primary",
                   isActive ? "text-primary" : "text-muted-foreground"
@@ -61,6 +62,7 @@ export default function Navbar() {
           {isAdmin && (
             <Link
               href="/admin/dashboard"
+              prefetch={false}
               className={cn(
                 "flex items-center gap-2 text-sm font-medium transition-colors hover:text-primary",
                 pathname.startsWith("/admin") ? "text-primary" : "text-muted-foreground"
