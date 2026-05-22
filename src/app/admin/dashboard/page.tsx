@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { authClient } from '@/lib/auth-client';
 import { useMatches } from '@/hooks/useMatches';
 import { usePredictions } from '@/hooks/usePredictions';
@@ -86,12 +86,62 @@ export default function AdminDashboardPage() {
     return Object.values(countMap).sort((a, b) => b.count - a.count);
   }, [championPredictions]);
 
-  // Activity Feed Placeholder
-  const activityFeed = [
-    { id: 1, type: 'admin', title: 'Admin', time: '10 mins ago', message: 'Memeriksa dashboard admin', color: 'bg-tertiary', textColor: 'text-tertiary', iconText: 'Admin' },
-    { id: 2, type: 'system', title: 'System', time: '12 mins ago', message: 'Sistem disinkronisasi', color: 'bg-primary', textColor: 'text-primary', iconText: 'System' },
-    { id: 3, type: 'user', title: 'User', time: '1 hour ago', message: 'Aktivitas prediksi terpantau lancar', color: 'bg-outline-variant', textColor: 'text-on-surface-variant', iconText: 'User' }
-  ];
+  const formatRelativeTime = (date: Date | string) => {
+    const diffMinutes = Math.max(0, Math.floor((Date.now() - new Date(date).getTime()) / 60000));
+    if (diffMinutes < 1) return 'Baru saja';
+    if (diffMinutes < 60) return `${diffMinutes} menit lalu`;
+    const diffHours = Math.floor(diffMinutes / 60);
+    if (diffHours < 24) return `${diffHours} jam lalu`;
+    const diffDays = Math.floor(diffHours / 24);
+    return `${diffDays} hari lalu`;
+  };
+
+  const activityFeed = useMemo(() => {
+    const predictionActivities = (predictions ?? []).map((prediction) => ({
+      id: `prediction-${prediction.id}`,
+      at: new Date(prediction.submittedAt),
+      message: `${prediction.user?.name ?? 'User'} submit prediksi ${prediction.match?.teamA ?? ''} vs ${prediction.match?.teamB ?? ''}`,
+      color: 'bg-primary',
+      textColor: 'text-primary',
+      iconText: 'User',
+    }));
+
+    const userActivities = (users ?? []).map((user) => ({
+      id: `user-${user.id}`,
+      at: new Date(user.createdAt),
+      message: `${user.name} bergabung${user.groupName ? ` di grup ${user.groupName}` : ''}`,
+      color: 'bg-tertiary',
+      textColor: 'text-tertiary',
+      iconText: 'User',
+    }));
+
+    const matchActivities = (matches ?? [])
+      .filter((match) => match.status === 'live' || match.status === 'finished')
+      .map((match) => ({
+        id: `match-${match.id}-${match.status}`,
+        at: new Date(match.kickoffTime),
+        message: match.status === 'live'
+          ? `${match.teamA} vs ${match.teamB} sedang live`
+          : `${match.teamA} vs ${match.teamB} selesai ${match.scoreA ?? '-'}-${match.scoreB ?? '-'}`,
+        color: match.status === 'live' ? 'bg-destructive' : 'bg-outline-variant',
+        textColor: match.status === 'live' ? 'text-destructive' : 'text-on-surface-variant',
+        iconText: match.status === 'live' ? 'Live' : 'Match',
+      }));
+
+    const championActivities = (championPredictions?.predictions ?? []).map((prediction) => ({
+      id: `champion-${prediction.id}`,
+      at: new Date(prediction.submittedAt),
+      message: `${prediction.user?.name ?? 'User'} memilih juara ${prediction.predictedWinnerFlag} ${prediction.predictedWinner}`,
+      color: 'bg-amber-500',
+      textColor: 'text-amber-500',
+      iconText: 'Juara',
+    }));
+
+    return [...predictionActivities, ...userActivities, ...matchActivities, ...championActivities]
+      .sort((a, b) => b.at.getTime() - a.at.getTime())
+      .slice(0, 8)
+      .map((activity) => ({ ...activity, time: formatRelativeTime(activity.at) }));
+  }, [championPredictions, matches, predictions, users]);
 
   return (
     <div className="p-8 content-layer flex-1 flex flex-col relative z-10 w-full overflow-x-hidden">
@@ -435,26 +485,38 @@ export default function AdminDashboardPage() {
             </div>
             
             {/* Activity Feed */}
-            <div className="flex flex-col gap-6 relative before:absolute before:inset-y-0 before:left-3 before:w-px before:bg-border/50">
-              {activityFeed.map((activity) => (
-                <div key={activity.id} className="relative pl-8">
-                  <div className={`absolute left-[0.35rem] top-1 w-2.5 h-2.5 rounded-full ${activity.color} z-10 ring-4 ring-background`}></div>
-                  <div className="flex flex-col gap-1">
-                    <div className="flex justify-between items-start">
-                      <span className={`font-display text-[10px] ${activity.textColor} font-bold uppercase tracking-wider bg-background px-2 py-0.5 rounded border border-border/50`}>
-                        {activity.iconText}
-                      </span>
-                      <span className="font-sans text-[10px] text-muted-foreground">{activity.time}</span>
+            {isUsersLoading || isPredictionsLoading || isMatchesLoading || isChampionLoading ? (
+              <div className="flex flex-col gap-4">
+                <Skeleton className="h-14 w-full bg-muted/50" />
+                <Skeleton className="h-14 w-full bg-muted/50" />
+                <Skeleton className="h-14 w-full bg-muted/50" />
+              </div>
+            ) : activityFeed.length === 0 ? (
+              <div className="rounded-lg border border-border/50 bg-secondary/20 p-4 text-center text-sm text-muted-foreground">
+                Belum ada aktivitas terbaru.
+              </div>
+            ) : (
+              <div className="flex flex-col gap-6 relative before:absolute before:inset-y-0 before:left-3 before:w-px before:bg-border/50">
+                {activityFeed.map((activity) => (
+                  <div key={activity.id} className="relative pl-8">
+                    <div className={`absolute left-[0.35rem] top-1 w-2.5 h-2.5 rounded-full ${activity.color} z-10 ring-4 ring-background`}></div>
+                    <div className="flex flex-col gap-1">
+                      <div className="flex justify-between items-start gap-3">
+                        <span className={`font-display text-[10px] ${activity.textColor} font-bold uppercase tracking-wider bg-background px-2 py-0.5 rounded border border-border/50`}>
+                          {activity.iconText}
+                        </span>
+                        <span className="font-sans text-[10px] text-muted-foreground whitespace-nowrap">{activity.time}</span>
+                      </div>
+                      <p className="font-sans text-sm text-foreground leading-tight mt-1">{activity.message}</p>
                     </div>
-                    <p className="font-sans text-sm text-foreground leading-tight mt-1">{activity.message}</p>
                   </div>
-                </div>
-              ))}
+                ))}
+              </div>
+            )}
+
+            <div className="w-full mt-8 py-2.5 bg-secondary/60 border border-border/50 text-muted-foreground text-xs font-display font-bold uppercase tracking-wider rounded text-center">
+              Menampilkan {activityFeed.length} aktivitas terbaru
             </div>
-            
-            <button className="w-full mt-8 py-2.5 bg-secondary hover:bg-secondary/80 border border-border/50 text-muted-foreground text-xs font-display font-bold uppercase tracking-wider rounded transition-colors">
-              Load More Activity
-            </button>
           </div>
         </aside>
       </div>
