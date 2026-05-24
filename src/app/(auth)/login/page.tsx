@@ -92,6 +92,7 @@ function LoginPageContent() {
         }
         
         toast.success("Registration successful! You are now logged in.");
+        router.refresh();
         router.push("/dashboard");
       } else {
         const { error } = await authClient.signIn.email({
@@ -105,6 +106,7 @@ function LoginPageContent() {
           return;
         }
 
+        router.refresh();
         router.push("/dashboard");
       }
     } catch (err) {
