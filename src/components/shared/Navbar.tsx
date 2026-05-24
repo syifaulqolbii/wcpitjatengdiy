@@ -9,6 +9,7 @@ import { toast } from "sonner";
 import { BrandLogo } from "@/components/shared/BrandLogo";
 import qrisImage from "@/components/img/qris.jpeg";
 import { useState } from "react";
+import { DONATION_PHONE } from "@/lib/constants";
 
 const NAV_LINKS = [
   { href: "/dashboard", label: "Dashboard", icon: Home },
@@ -24,7 +25,7 @@ export default function Navbar() {
   const isAdmin = session?.user?.role === "admin";
 
   const handleCopyDonationNumber = async () => {
-    await navigator.clipboard.writeText("085156085641");
+    await navigator.clipboard.writeText(DONATION_PHONE);
     toast.success("Nomor LinkAja disalin");
   };
 
@@ -109,7 +110,7 @@ export default function Navbar() {
 
             <div className="mt-4 rounded-lg border border-primary/30 bg-primary/10 p-4 text-center">
               <p className="font-sans text-xs font-bold uppercase tracking-widest text-muted-foreground">Nomor LinkAja</p>
-              <p className="mt-2 font-display text-3xl font-black tracking-tight text-primary">085156085641</p>
+              <p className="mt-2 font-display text-3xl font-black tracking-tight text-primary">{DONATION_PHONE}</p>
             </div>
 
             <div className="mt-5 flex gap-3">

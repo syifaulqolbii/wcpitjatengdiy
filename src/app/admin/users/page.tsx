@@ -1,8 +1,9 @@
 "use client";
 
 import React, { useState } from 'react';
-import { Search, Bell, Settings, Link as LinkIcon, Key, Trash2, X, Copy, Clock, Shield, UsersRound } from 'lucide-react';
+import { Search, Link as LinkIcon, Key, Trash2, X, Copy, Clock, Shield, UsersRound } from 'lucide-react';
 import { useUsers, useUpdateUserRole, useDeleteUser, useRecoverUserAccount } from '@/hooks/useUsers';
+import { MAX_USER_SLOTS } from '@/lib/constants';
 import { useLeaderboard } from '@/hooks/useLeaderboard';
 import { useGroups, useAssignUserToGroup } from '@/hooks/useGroups';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -90,7 +91,7 @@ export default function AdminUsersPage() {
     closeRecoveryModal();
   };
 
-  const users = usersData?.users || [];
+  const users = usersData || [];
   const filteredUsers = users.filter(u =>
     u.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
     u.email.toLowerCase().includes(searchQuery.toLowerCase())
@@ -117,24 +118,13 @@ export default function AdminUsersPage() {
         <div className="flex items-center gap-6">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground w-4 h-4" />
-            <input 
-              className="bg-card border-none text-foreground font-sans text-sm rounded py-2 pl-10 pr-4 w-64 focus:ring-1 focus:ring-primary outline-none placeholder:text-muted-foreground shadow-[inset_0_2px_10px_rgba(0,0,0,0.5)]" 
-              placeholder="Search Users..." 
+            <input
+              className="bg-card border-none text-foreground font-sans text-sm rounded py-2 pl-10 pr-4 w-64 focus:ring-1 focus:ring-primary outline-none placeholder:text-muted-foreground shadow-[inset_0_2px_10px_rgba(0,0,0,0.5)]"
+              placeholder="Search Users..."
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
-          </div>
-          <div className="flex items-center gap-4 text-primary">
-            <button className="hover:bg-secondary/50 transition-colors p-2 rounded-full flex">
-              <Bell className="w-5 h-5" />
-            </button>
-            <button className="hover:bg-secondary/50 transition-colors p-2 rounded-full flex">
-              <Settings className="w-5 h-5" />
-            </button>
-          </div>
-          <div className="h-10 w-10 rounded-full bg-secondary overflow-hidden border border-border/50 flex items-center justify-center font-display font-bold text-primary">
-            A
           </div>
         </div>
       </header>
@@ -150,7 +140,7 @@ export default function AdminUsersPage() {
               <span className="font-sans text-sm text-muted-foreground uppercase tracking-widest">Total Slots</span>
               <div className="flex items-center gap-2 bg-secondary/80 px-3 py-1 rounded">
                 <span className="h-2 w-2 rounded-full bg-yellow-400"></span>
-                <span className="font-display text-sm font-bold text-yellow-400">{users.length}/30 Terisi</span>
+                <span className="font-display text-sm font-bold text-yellow-400">{users.length}/{MAX_USER_SLOTS} Terisi</span>
               </div>
             </div>
           </div>
@@ -312,7 +302,7 @@ export default function AdminUsersPage() {
                     <Clock className="text-primary w-5 h-5" />
                     <div>
                       <p className="font-display text-sm font-semibold text-foreground">Tautan dapat digunakan.</p>
-                      <p className="font-sans text-xs text-muted-foreground">Sisa slot: {30 - users.length}</p>
+                      <p className="font-sans text-xs text-muted-foreground">Sisa slot: {MAX_USER_SLOTS - users.length}</p>
                     </div>
                   </div>
                 </div>
@@ -321,7 +311,7 @@ export default function AdminUsersPage() {
                   onClick={() => {
                      navigator.clipboard.writeText(`${typeof window !== 'undefined' ? window.location.origin : ''}/login?mode=register`);
                      setIsModalOpen(false);
-                     alert('Tautan disalin!');
+                     toast.success('Tautan disalin!');
                   }}
                   className="w-full bg-primary text-background font-display uppercase tracking-tight font-bold py-4 rounded hover:bg-primary/90 transition-all shadow-[0_0_15px_rgba(0,230,118,0.15)] hover:shadow-[0_0_25px_rgba(0,230,118,0.3)] flex items-center justify-center gap-2"
                 >

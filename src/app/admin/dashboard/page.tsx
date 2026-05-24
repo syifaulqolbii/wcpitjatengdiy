@@ -46,10 +46,11 @@ export default function AdminDashboardPage() {
 
   // Today Matches
   const today = new Date();
-  const todayDateString = formatInTimeZone(today, 'UTC', 'yyyy-MM-dd');
-  
+  const localTz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+  const todayDateString = formatInTimeZone(today, localTz, 'yyyy-MM-dd');
+
   const todayMatches = matches?.filter(m => {
-    const matchDateString = formatInTimeZone(new Date(m.kickoffTime), 'UTC', 'yyyy-MM-dd');
+    const matchDateString = formatInTimeZone(new Date(m.kickoffTime), localTz, 'yyyy-MM-dd');
     return matchDateString === todayDateString;
   }).sort((a, b) => new Date(a.kickoffTime).getTime() - new Date(b.kickoffTime).getTime()) || [];
 
@@ -57,7 +58,8 @@ export default function AdminDashboardPage() {
     if (!matchToCalc) return;
     setIsCalculating(true);
     try {
-      await fetch(`/api/matches/${matchToCalc.id}/calculate`, { method: 'POST' });
+      const res = await fetch(`/api/matches/${matchToCalc.id}/calculate`, { method: 'POST' });
+      if (!res.ok) throw new Error('Server error');
       toast.success(`Kalkulasi poin untuk ${matchToCalc.teamA} vs ${matchToCalc.teamB} berhasil!`);
     } catch (error) {
       toast.error('Gagal melakukan kalkulasi poin');
@@ -158,8 +160,6 @@ export default function AdminDashboardPage() {
         <div className="flex items-center gap-4 bg-secondary/30 px-4 py-2 rounded border border-border/50">
           <div className="w-2 h-2 rounded-full bg-primary animate-pulse"></div>
           <span className="font-display text-xs font-bold uppercase tracking-wider text-primary">System Online & Active</span>
-          <div className="h-4 w-px bg-border mx-2"></div>
-          <span className="font-sans text-xs text-muted-foreground">Last sync: Just now</span>
         </div>
       </header>
 
@@ -370,8 +370,8 @@ export default function AdminDashboardPage() {
               </div>
             </div>
             <div className="text-right">
-              <span className="block font-display text-2xl font-black text-foreground">12%</span>
-              <span className="block font-sans text-xs text-muted-foreground">CPU Usage</span>
+              <span className="block font-display text-2xl font-black text-foreground">{totalPredictions}</span>
+              <span className="block font-sans text-xs text-muted-foreground">Total Prediksi</span>
             </div>
           </section>
 

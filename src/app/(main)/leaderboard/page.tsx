@@ -46,7 +46,7 @@ export default function LeaderboardPage() {
         <EmptyState
           type="leaderboard"
           title="Belum Ada Grup"
-          description="Kamu belum bergabung ke grup manapun. Hubungi admin untuk mendapatkan kode undangan."
+          description="Kamu belum bergabung ke grup manapun. Hubungi admin WCP IT Jateng DIY untuk mendapatkan kode undangan."
         />
       </div>
     );

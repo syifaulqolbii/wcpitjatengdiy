@@ -29,11 +29,8 @@ export default function AdminGroupsPage() {
   const { data: members, isLoading: isMembersLoading } = useGroupMembers(membersGroupId);
 
   const membersGroup = groups?.find(g => g.id === membersGroupId);
-  const allUsers = usersData?.users ?? [];
-  const unassignedUsers = allUsers.filter(u => {
-    const member = members?.find(m => m.id === u.id);
-    return !member;
-  });
+  const allUsers = usersData ?? [];
+  const unassignedUsers = allUsers.filter(u => u.groupId === null);
 
   const handleCreate = async () => {
     if (!newGroupName.trim()) { toast.error('Nama grup wajib diisi'); return; }

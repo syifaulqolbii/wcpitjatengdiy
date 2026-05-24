@@ -205,7 +205,6 @@ export default function DashboardPage() {
 
       <section className="relative rounded-xl overflow-hidden bg-card/50 shadow-[0px_24px_48px_rgba(0,0,0,0.4)] group border border-border/50 min-h-[300px] flex items-center justify-center">
         <div className="absolute inset-0 opacity-20 bg-gradient-to-br from-primary/30 to-background pointer-events-none" />
-        <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1518605368461-1e1e1147a274?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80')] bg-cover bg-center mix-blend-overlay opacity-30 pointer-events-none" />
 
         {isLiveLoading || isUpcomingLoading ? (
           <Skeleton className="w-full h-full absolute inset-0 rounded-xl bg-muted/20" />

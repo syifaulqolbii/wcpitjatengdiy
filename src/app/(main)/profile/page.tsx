@@ -4,6 +4,7 @@ import React, { useState, useMemo } from 'react';
 import { Star, Check, X, ChevronRight, LogOut, Loader2, Camera, Trash2, Heart, Copy } from 'lucide-react';
 import { authClient } from '@/lib/auth-client';
 import { useLeaderboard } from '@/hooks/useLeaderboard';
+import { useMyGroup } from '@/hooks/useMyGroup';
 import { usePredictions } from '@/hooks/usePredictions';
 import { useRouter } from 'next/navigation';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -11,6 +12,7 @@ import { formatInTimeZone } from 'date-fns-tz';
 import { toast } from 'sonner';
 import { Flag } from '@/components/shared/Flag';
 import qrisImage from '@/components/img/qris.jpeg';
+import { DONATION_PHONE } from '@/lib/constants';
 
 export default function ProfilePage() {
   const router = useRouter();
@@ -18,7 +20,9 @@ export default function ProfilePage() {
   const userId = session?.user?.id;
   const userImage = (session?.user as { image?: string | null } | undefined)?.image;
   
-  const { data: leaderboard, isLoading: isLeaderboardLoading } = useLeaderboard();
+  const { data: myGroup } = useMyGroup();
+  const groupId = myGroup?.groupId ?? undefined;
+  const { data: leaderboard, isLoading: isLeaderboardLoading } = useLeaderboard(groupId, !!(groupId));
   const { data: predictions, isLoading: isPredictionsLoading } = usePredictions();
 
   const [isChangingPassword, setIsChangingPassword] = useState(false);
@@ -172,7 +176,7 @@ export default function ProfilePage() {
   };
 
   const handleCopyDonationNumber = async () => {
-    await navigator.clipboard.writeText('085156085641');
+    await navigator.clipboard.writeText(DONATION_PHONE);
     toast.success('Nomor LinkAja disalin');
   };
 
@@ -183,7 +187,7 @@ export default function ProfilePage() {
     return name.substring(0, 2).toUpperCase();
   };
 
-  if (isSessionLoading || isLeaderboardLoading || isPredictionsLoading) {
+  if (isSessionLoading || isPredictionsLoading || (!!groupId && isLeaderboardLoading)) {
     return (
       <div className="relative z-10 max-w-lg mx-auto px-4 md:px-0 pb-10">
         <Skeleton className="h-12 w-48 my-6" />
@@ -252,6 +256,12 @@ export default function ProfilePage() {
             <p className="text-muted-foreground text-sm font-medium mb-6 z-10 relative">{session?.user?.email || 'user@email.com'}</p>
             
             {/* Stats Row */}
+            {!groupId ? (
+              <div className="w-full rounded-lg border border-border/50 bg-secondary/50 p-4 z-10 relative text-center">
+                <p className="text-sm text-muted-foreground">Kamu belum bergabung ke grup manapun.</p>
+                <p className="text-xs text-muted-foreground mt-1">Hubungi Admin WCP IT Jateng DIY untuk mendapatkan kode undangan.</p>
+              </div>
+            ) : (
             <div className="flex w-full justify-between items-center bg-secondary/80 backdrop-blur-md rounded-lg p-4 z-10 relative border border-border/50">
               <div className="flex flex-col items-center">
                 <span className="text-muted-foreground text-[10px] font-bold tracking-widest uppercase mb-1">Poin</span>
@@ -270,6 +280,7 @@ export default function ProfilePage() {
                 </span>
               </div>
             </div>
+            )}
           </div>
         </section>
 
@@ -299,7 +310,7 @@ export default function ProfilePage() {
                       
                       const points = pred.points ?? 0;
                       const isWin = points > 0;
-                      const isPerfect = points === 3;
+                      const isPerfect = points === 5;
                       
                       return (
                         <div key={pred.id} className="bg-card rounded-lg p-4 border border-border/50 flex flex-col gap-3">
@@ -452,7 +463,7 @@ export default function ProfilePage() {
 
               <div className="mt-4 rounded-lg border border-primary/30 bg-primary/10 p-4 text-center">
                 <p className="font-sans text-xs font-bold uppercase tracking-widest text-muted-foreground">Nomor LinkAja</p>
-                <p className="mt-2 font-display text-3xl font-black tracking-tight text-primary">085156085641</p>
+                <p className="mt-2 font-display text-3xl font-black tracking-tight text-primary">{DONATION_PHONE}</p>
               </div>
 
               <div className="mt-5 flex gap-3">

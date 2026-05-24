@@ -14,17 +14,10 @@ type AdminUser = {
   createdAt: string;
 };
 
-type UsersResult = AdminUser[] & { users: AdminUser[] };
-
 export function useUsers() {
   return useQuery({
     queryKey: ['users'],
-    queryFn: async () => {
-      const data = await apiGet<{ users: AdminUser[] }>('/api/admin/users');
-      const result = data.users as UsersResult;
-      result.users = data.users;
-      return result;
-    },
+    queryFn: () => apiGet<{ users: AdminUser[] }>('/api/admin/users').then(d => d.users),
   });
 }
 
