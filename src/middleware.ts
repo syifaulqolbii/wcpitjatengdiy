@@ -41,32 +41,41 @@ export async function middleware(request: NextRequest) {
   // Based on the schema, role is stored in user object (customized)
   const isAdmin = isLoggedIn && session?.user?.role === "admin";
 
+  // Helper to create a redirect with no-store cache header
+  const redirect = (url: string) => {
+    const res = NextResponse.redirect(new URL(url, request.url));
+    res.headers.set("Cache-Control", "no-store");
+    return res;
+  };
+
   // Landing page: logged-in users should continue to the app.
   if (pathname === "/" && isLoggedIn) {
-    return NextResponse.redirect(new URL("/dashboard", request.url));
+    return redirect("/dashboard");
   }
 
   // 1. Auth routes (login/register): if already logged in, go to dashboard
   if (isAuthRoute && isLoggedIn) {
-    return NextResponse.redirect(new URL("/dashboard", request.url));
+    return redirect("/dashboard");
   }
 
   // 2. Main routes: must be logged in
   if (isMainRoute && !isLoggedIn) {
-    return NextResponse.redirect(new URL("/login", request.url));
+    return redirect("/login");
   }
 
   // 3. Admin routes: must be logged in AND have 'admin' role
   if (isAdminRoute) {
     if (!isLoggedIn) {
-      return NextResponse.redirect(new URL("/login", request.url));
+      return redirect("/login");
     }
     if (!isAdmin) {
-      return NextResponse.redirect(new URL("/dashboard", request.url));
+      return redirect("/dashboard");
     }
   }
 
-  return NextResponse.next();
+  const response = NextResponse.next();
+  response.headers.set("Cache-Control", "no-store");
+  return response;
 }
 
 export const config = {
