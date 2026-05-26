@@ -1,7 +1,7 @@
 import { db } from "@/db";
-import { groups, users, predictions } from "@/db/schema";
+import { groups, users, predictions, tournamentPredictions } from "@/db/schema";
 import { Err, handleError, ok, requireAdmin } from "@/lib/api-helpers";
-import { eq, sum, isNotNull } from "drizzle-orm";
+import { eq, inArray, sql } from "drizzle-orm";
 import { NextRequest } from "next/server";
 
 type RouteContext = { params: Promise<{ groupId: string }> };
@@ -14,7 +14,8 @@ export async function GET(req: NextRequest, { params }: RouteContext) {
     const [group] = await db.select({ id: groups.id }).from(groups).where(eq(groups.id, groupId)).limit(1);
     if (!group) return Err.notFound('Grup');
 
-    const members = await db
+    // Base member list (always returned, even if no predictions yet).
+    const memberRows = await db
       .select({
         id: users.id,
         name: users.name,
@@ -22,17 +23,44 @@ export async function GET(req: NextRequest, { params }: RouteContext) {
         image: users.image,
         role: users.role,
         createdAt: users.createdAt,
-        totalPoints: sum(predictions.points),
       })
       .from(users)
-      .leftJoin(predictions, eq(predictions.userId, users.id))
-      .where(eq(users.groupId, groupId))
-      .groupBy(users.id);
+      .where(eq(users.groupId, groupId));
 
-    return ok(members.map(m => ({
-      ...m,
-      totalPoints: m.totalPoints ? Number(m.totalPoints) : 0,
-    })));
+    const memberIds = memberRows.map((m) => m.id);
+
+    if (memberIds.length === 0) {
+      return ok([]);
+    }
+
+    // Match-prediction points aggregated per user, scoped to this group.
+    const matchPointsRows = await db
+      .select({
+        userId: predictions.userId,
+        totalPoints: sql<number>`COALESCE(SUM(${predictions.points}), 0)`.mapWith(Number),
+      })
+      .from(predictions)
+      .where(inArray(predictions.userId, memberIds))
+      .groupBy(predictions.userId);
+
+    // Champion (tournament) points scoped to the same user set.
+    const championRows = await db
+      .select({
+        userId: tournamentPredictions.userId,
+        points: tournamentPredictions.points,
+      })
+      .from(tournamentPredictions)
+      .where(inArray(tournamentPredictions.userId, memberIds));
+
+    const matchPointsByUser = new Map(matchPointsRows.map((r) => [r.userId, r.totalPoints]));
+    const championPointsByUser = new Map(championRows.map((r) => [r.userId, r.points ?? 0]));
+
+    return ok(
+      memberRows.map((m) => ({
+        ...m,
+        totalPoints: (matchPointsByUser.get(m.id) ?? 0) + (championPointsByUser.get(m.id) ?? 0),
+      }))
+    );
   } catch (error) {
     return handleError(error);
   }

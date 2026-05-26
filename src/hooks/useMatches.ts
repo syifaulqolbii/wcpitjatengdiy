@@ -41,6 +41,10 @@ export function useUpdateMatch() {
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ['matches'] });
       queryClient.invalidateQueries({ queryKey: ['matches', variables.id] });
+      // Score edits trigger automatic point recalculation server-side; refresh
+      // dependent caches so leaderboard / predictions reflect the new state.
+      queryClient.invalidateQueries({ queryKey: ['leaderboard'] });
+      queryClient.invalidateQueries({ queryKey: ['predictions'] });
       toast.success('Match updated successfully');
     },
     onError: (error) => {
@@ -65,10 +69,15 @@ export function useDeleteMatch() {
 }
 
 export function useCalculateScore(matchId: string) {
+  const queryClient = useQueryClient();
+
   return useMutation({
-    mutationFn: () => apiPost<{ success: boolean; updatedPredictions: number }>(`/api/matches/${matchId}/calculate`, {}),
+    mutationFn: () => apiPost<{ updated: number; message: string }>(`/api/matches/${matchId}/calculate`, {}),
     onSuccess: (data) => {
-      toast.success(`Score calculation triggered. Updated ${data.updatedPredictions} predictions.`);
+      queryClient.invalidateQueries({ queryKey: ['leaderboard'] });
+      queryClient.invalidateQueries({ queryKey: ['predictions'] });
+      queryClient.invalidateQueries({ queryKey: ['matches'] });
+      toast.success(`Score calculation triggered. Updated ${data.updated} predictions.`);
     },
     onError: (error) => {
       toast.error(error.message || 'Failed to trigger score calculation');

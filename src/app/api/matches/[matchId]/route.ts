@@ -10,6 +10,7 @@ import {
   handleError,
 } from "@/lib/api-helpers";
 import { updateMatchSchema } from "@/lib/validators";
+import { recalculateMatchPoints } from "@/lib/scoring";
 
 // ─── GET /api/matches/:matchId ────────────────────────────────
 // Auth: required
@@ -97,7 +98,30 @@ export async function PUT(
       .where(eq(matches.id, params.matchId))
       .returning();
 
-    return ok(updated);
+    // Auto-recalculate points whenever scores change OR the match was just
+    // marked finished. Idempotent — safe to call again on subsequent edits.
+    let recalculatedPredictions = 0;
+    const scoreChanged =
+      (input.scoreA !== undefined && input.scoreA !== existing.scoreA) ||
+      (input.scoreB !== undefined && input.scoreB !== existing.scoreB);
+    const becameFinished = statusOverride.status === "finished" && existing.status !== "finished";
+
+    if (
+      updated.status === "finished" &&
+      updated.scoreA !== null &&
+      updated.scoreB !== null &&
+      (scoreChanged || becameFinished)
+    ) {
+      try {
+        recalculatedPredictions = await recalculateMatchPoints(params.matchId);
+      } catch (err) {
+        // Don't fail the match update if recalc errors out — surface in logs
+        // and let admin retry via the dedicated calculate endpoint.
+        console.error('[matches PUT] auto-recalc failed', { matchId: params.matchId, err });
+      }
+    }
+
+    return ok({ ...updated, recalculatedPredictions });
   } catch (error) {
     return handleError(error);
   }

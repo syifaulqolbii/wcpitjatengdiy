@@ -1,3 +1,6 @@
+"use client";
+
+import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
 
 interface FlagProps {
@@ -53,25 +56,32 @@ function getCountryCode(flag: string): string {
 
 export function Flag({ flag, className, size = 'md' }: FlagProps) {
   const code = getCountryCode(flag);
-  
+  const [hasError, setHasError] = useState(false);
+
+  useEffect(() => {
+    setHasError(false);
+  }, [flag]);
+
   return (
     <div className={cn("inline-flex relative overflow-hidden group rounded-[2px]", sizeMap[size], className)}>
-      <img 
-        src={`https://flagcdn.com/w320/${code}.png`}
-        alt={flag}
-        className="animate-flag-wave w-full h-auto block border border-white/10"
-        onError={(e) => {
-          (e.target as HTMLImageElement).style.display = 'none';
-          (e.target as HTMLImageElement).parentElement!.innerHTML = `<span class="text-2xl">${flag}</span>`;
-        }}
-      />
-      
+      {hasError ? (
+        <span className="text-2xl">{flag}</span>
+      ) : (
+        <img
+          src={`https://flagcdn.com/w320/${code}.png`}
+          alt={flag}
+          referrerPolicy="no-referrer"
+          className="animate-flag-wave w-full h-auto block border border-white/10"
+          onError={() => setHasError(true)}
+        />
+      )}
+
       {/* Shine effect */}
       <div className="flag-shine-effect"></div>
-      
+
       {/* Cloth Texture Overlay */}
       <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/natural-paper.png')] opacity-10 pointer-events-none mix-blend-multiply"></div>
-      
+
       {/* Subtle depth shadow */}
       <div className="absolute inset-0 bg-gradient-to-tr from-black/20 via-transparent to-white/10 pointer-events-none"></div>
     </div>

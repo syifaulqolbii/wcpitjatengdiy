@@ -70,7 +70,7 @@ export function handleError(error: unknown): NextResponse<ErrorResponse> {
     return error.status === 403 ? Err.forbidden() : Err.unauthorized();
   }
   if (error instanceof z.ZodError) {
-    const msg = error.errors.map((e) => `${e.path.join(".")}: ${e.message}`).join(", ");
+    const msg = error.issues.map((e) => `${e.path.join(".")}: ${e.message}`).join(", ");
     return Err.badRequest(msg, "VALIDATION_ERROR");
   }
   console.error("[API Error]", error);

@@ -3,7 +3,7 @@ import { toNextJsHandler } from "better-auth/next-js";
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/db";
 import { groups, users } from "@/db/schema";
-import { eq } from "drizzle-orm";
+import { sql } from "drizzle-orm";
 
 const handler = toNextJsHandler(auth);
 
@@ -11,9 +11,18 @@ async function findGroupByInviteCode(code: string) {
   const [group] = await db
     .select()
     .from(groups)
-    .where(eq(groups.inviteCode, code.toUpperCase()))
+    .where(sql`upper(${groups.inviteCode}) = upper(${code})`)
     .limit(1);
   return group ?? null;
+}
+
+async function findUserByEmailCaseInsensitive(email: string) {
+  const [row] = await db
+    .select({ id: users.id })
+    .from(users)
+    .where(sql`lower(${users.email}) = lower(${email})`)
+    .limit(1);
+  return row ?? null;
 }
 
 export async function POST(req: NextRequest) {
@@ -22,27 +31,32 @@ export async function POST(req: NextRequest) {
     let group: typeof groups.$inferSelect | null = null;
     let email = '';
 
+    let body: { invitationCode?: unknown; email?: unknown } | null = null;
     try {
-      const body = await clonedReq.json();
-      const code = body.invitationCode;
-      email = body.email ?? '';
-
-      if (!code) {
-        return NextResponse.json(
-          { data: null, error: { message: 'Kode undangan wajib diisi', code: 'INVALID_INVITATION_CODE' } },
-          { status: 400 }
-        );
-      }
-
-      group = await findGroupByInviteCode(code);
-      if (!group) {
-        return NextResponse.json(
-          { data: null, error: { message: 'Kode undangan tidak valid', code: 'INVALID_INVITATION_CODE' } },
-          { status: 400 }
-        );
-      }
+      body = await clonedReq.json();
     } catch {
-      // Ignore JSON parse error, let better-auth handle it
+      return NextResponse.json(
+        { data: null, error: { message: 'Body request tidak valid', code: 'INVALID_BODY' } },
+        { status: 400 }
+      );
+    }
+
+    const code = typeof body?.invitationCode === 'string' ? body.invitationCode : '';
+    email = typeof body?.email === 'string' ? body.email : '';
+
+    if (!code) {
+      return NextResponse.json(
+        { data: null, error: { message: 'Kode undangan wajib diisi', code: 'INVALID_INVITATION_CODE' } },
+        { status: 400 }
+      );
+    }
+
+    group = await findGroupByInviteCode(code);
+    if (!group) {
+      return NextResponse.json(
+        { data: null, error: { message: 'Kode undangan tidak valid', code: 'INVALID_INVITATION_CODE' } },
+        { status: 400 }
+      );
     }
 
     const response = await handler.POST(req);
@@ -50,16 +64,14 @@ export async function POST(req: NextRequest) {
     // Assign groupId to the newly registered user
     if (response.ok && group && email) {
       try {
-        const [newUser] = await db
-          .select({ id: users.id })
-          .from(users)
-          .where(eq(users.email, email.toLowerCase()))
-          .limit(1);
+        const newUser = await findUserByEmailCaseInsensitive(email);
         if (newUser) {
-          await db.update(users).set({ groupId: group.id }).where(eq(users.id, newUser.id));
+          await db.update(users).set({ groupId: group.id }).where(sql`${users.id} = ${newUser.id}`);
         }
-      } catch {
-        // Non-fatal: user registered but group assignment failed
+      } catch (error) {
+        // Non-fatal: user registered but group assignment failed.
+        // Log so an admin can recover from /admin/users.
+        console.error('[signup] Failed to assign group to new user', { email, groupId: group.id, error });
       }
     }
 

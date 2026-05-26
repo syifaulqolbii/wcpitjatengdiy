@@ -4,6 +4,8 @@ import React, { Suspense, useState, useMemo } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { useMatches } from '@/hooks/useMatches';
 import { usePredictions } from '@/hooks/usePredictions';
+import { useSettings } from '@/hooks/useSettings';
+import { Match } from '@/types';
 import { MatchCard } from './match-card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { formatInTimeZone } from 'date-fns-tz';
@@ -14,6 +16,8 @@ function PredictionsPageContent() {
   const [filter, setFilter] = useState<'all' | 'open' | 'finished'>(initialFilter);
   const { data: matches, isLoading: isMatchesLoading } = useMatches();
   const { data: predictions, isLoading: isPredictionsLoading } = usePredictions();
+  const { data: settings } = useSettings();
+  const lockInMinutes = settings?.lockInMinutes ? parseInt(settings.lockInMinutes, 10) : 15;
 
   const getPrediction = (matchId: string) => predictions?.find(p => p.matchId === matchId);
 
@@ -23,15 +27,15 @@ function PredictionsPageContent() {
       if (filter === 'all') return true;
       if (filter === 'finished') return match.status === 'finished';
       if (filter === 'open') {
-        const isLocked = new Date(match.kickoffTime).getTime() - 15 * 60 * 1000 <= Date.now();
+        const isLocked = new Date(match.kickoffTime).getTime() - lockInMinutes * 60 * 1000 <= Date.now();
         return match.status !== 'finished' && !isLocked;
       }
       return true;
     });
-  }, [matches, filter]);
+  }, [matches, filter, lockInMinutes]);
 
   const groupedMatches = useMemo(() => {
-    const groups: Record<string, typeof matches> = {};
+    const groups: Record<string, Match[]> = {};
     for (const match of filteredMatches) {
       // Group by "Group A - 15 Jun 2026"
       try {
@@ -40,7 +44,7 @@ function PredictionsPageContent() {
         const groupKey = `${match.group} — ${dateStr}`;
         if (!groups[groupKey]) groups[groupKey] = [];
         groups[groupKey].push(match);
-      } catch (e) {
+      } catch {
         // Fallback if formatInTimeZone fails for any reason
         const groupKey = match.group;
         if (!groups[groupKey]) groups[groupKey] = [];

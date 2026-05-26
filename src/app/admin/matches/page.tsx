@@ -464,7 +464,7 @@ export default function AdminMatchesPage() {
       )}
 
       {/* MODAL OVERLAY: INPUT HASIL / CREATE / EDIT */}
-      {modalType && modalType !== 'calc' && (
+      {modalType && (
         <div className="fixed inset-0 z-50 flex items-center justify-center">
           <div className="absolute inset-0 bg-background/80 backdrop-blur-md" onClick={handleCloseModal}></div>
           

@@ -1,9 +1,9 @@
 import { NextRequest } from "next/server";
 import { db } from "@/db";
-import { matches, predictions } from "@/db/schema";
+import { matches } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { ok, Err, requireAdmin, handleError } from "@/lib/api-helpers";
-import { calculatePoints, snapshotLeaderboardBeforeCalculation } from "@/lib/scoring";
+import { recalculateMatchPoints } from "@/lib/scoring";
 
 // ─── POST /api/matches/:matchId/calculate ─────────────────────
 // Auth: admin only
@@ -32,7 +32,7 @@ export async function POST(
       );
     }
 
-    if (match.scoreA === null || match.scoreA === undefined || 
+    if (match.scoreA === null || match.scoreA === undefined ||
         match.scoreB === null || match.scoreB === undefined) {
       return Err.badRequest(
         "Match must have final scores (scoreA and scoreB) before calculating.",
@@ -40,35 +40,10 @@ export async function POST(
       );
     }
 
-    await snapshotLeaderboardBeforeCalculation();
+    const updatedCount = await recalculateMatchPoints(params.matchId);
 
-    // 3. Fetch all predictions for this match
-    const matchPredictions = await db
-      .select()
-      .from(predictions)
-      .where(eq(predictions.matchId, params.matchId));
-
-    if (matchPredictions.length === 0) {
+    if (updatedCount === 0) {
       return ok({ updated: 0, message: "No predictions to calculate." });
-    }
-
-    // 4. Calculate and update points for each prediction
-    let updatedCount = 0;
-
-    for (const prediction of matchPredictions) {
-      const points = calculatePoints(
-        prediction.predictedA,
-        prediction.predictedB,
-        match.scoreA,
-        match.scoreB
-      );
-
-      await db
-        .update(predictions)
-        .set({ points })
-        .where(eq(predictions.id, prediction.id));
-
-      updatedCount++;
     }
 
     return ok({

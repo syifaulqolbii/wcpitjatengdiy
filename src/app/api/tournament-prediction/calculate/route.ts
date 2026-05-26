@@ -1,8 +1,9 @@
 import { NextRequest } from "next/server";
 import { db } from "@/db";
-import { tournamentPredictions, settings } from "@/db/schema";
+import { tournamentPredictions, settings, leaderboardSnapshots } from "@/db/schema";
 import { ok, Err, requireAdmin, handleError } from "@/lib/api-helpers";
 import { WC2026_TEAMS } from "@/lib/wc2026-teams";
+import { getCurrentLeaderboardSnapshot } from "@/lib/scoring";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
 
@@ -46,11 +47,26 @@ export async function POST(req: NextRequest) {
       return ok({ correct: 0, wrong: 0, total: 0 });
     }
 
+    // Compute snapshot data BEFORE the write transaction (read-only).
+    // It will be inserted inside the transaction so it's atomic with the points update.
+    const snapshotEntries = await getCurrentLeaderboardSnapshot();
+
     let correctCount = 0;
     let wrongCount = 0;
 
     // 3 & 4. Loop & Bulk Update (Using transaction for safety)
     await db.transaction(async (tx) => {
+      // Persist the pre-calculation snapshot first so rankChange remains meaningful.
+      if (snapshotEntries.length > 0) {
+        await tx.insert(leaderboardSnapshots).values(
+          snapshotEntries.map((entry) => ({
+            userId: entry.userId,
+            rank: entry.rank,
+            totalPoints: entry.totalPoints,
+          }))
+        );
+      }
+
       for (const pred of allPredictions) {
         let pointsToAward = 0;
         

@@ -1,8 +1,9 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { authClient } from '@/lib/auth-client';
 import { useLeaderboard } from '@/hooks/useLeaderboard';
+import { useMyGroup } from '@/hooks/useMyGroup';
 import { useMatches } from '@/hooks/useMatches';
 import { usePredictions } from '@/hooks/usePredictions';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -10,6 +11,7 @@ import EmptyState from '@/components/shared/EmptyState';
 import { cn } from '@/lib/utils';
 import { Flag } from '@/components/shared/Flag';
 import { useTournamentPrediction } from '@/hooks/useTournamentPrediction';
+import { useSettings } from '@/hooks/useSettings';
 import { ChampionPickModal } from '@/components/predictions/ChampionPickModal';
 import { Trophy, Clock, AlertCircle, CheckCircle2, Lock, ArrowRight } from 'lucide-react';
 
@@ -17,14 +19,24 @@ export default function DashboardPage() {
   const { data: session, isPending: isSessionLoading } = authClient.useSession();
   const userId = session?.user?.id;
 
-  const { data: leaderboard, isLoading: isLeaderboardLoading } = useLeaderboard();
+  const { data: myGroup } = useMyGroup();
+  const groupId = myGroup?.groupId ?? undefined;
+  const { data: leaderboard, isLoading: isLeaderboardLoading } = useLeaderboard(groupId, !!groupId);
   const { data: liveMatches, isLoading: isLiveLoading } = useMatches('live');
   const { data: upcomingMatches, isLoading: isUpcomingLoading } = useMatches('upcoming');
   const { data: finishedMatches, isLoading: isFinishedLoading } = useMatches('finished');
   const { data: predictions, isLoading: isPredictionsLoading } = usePredictions();
   const { data: championData, isLoading: isChampionLoading } = useTournamentPrediction();
+  const { data: settings } = useSettings();
+  const lockInMinutes = settings?.lockInMinutes ? parseInt(settings.lockInMinutes, 10) : 15;
 
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [, forceTick] = useState(0);
+
+  useEffect(() => {
+    const interval = setInterval(() => forceTick((t) => t + 1), 30000);
+    return () => clearInterval(interval);
+  }, []);
 
   const userStats = leaderboard?.find((entry) => entry.userId === userId);
 
@@ -251,7 +263,7 @@ export default function DashboardPage() {
               }
 
               const prediction = getPrediction(heroMatch.id);
-              const lockTime = new Date(heroMatch.kickoffTime).getTime() - 15 * 60 * 1000;
+              const lockTime = new Date(heroMatch.kickoffTime).getTime() - lockInMinutes * 60 * 1000;
               const isLocked = isLive || lockTime <= Date.now();
               const countdownLabel = isLive ? 'Pertandingan sedang berlangsung' : getCountdownLabel(heroMatch.kickoffTime);
 
@@ -295,7 +307,7 @@ export default function DashboardPage() {
                     <AlertCircle className="h-6 w-6 text-primary shrink-0" />
                     <div>
                       <span className="text-xs text-primary font-bold uppercase tracking-widest">Belum Ada Prediksi</span>
-                      <p className="mt-1 text-sm text-muted-foreground">Deadline: 15 menit sebelum kickoff · {countdownLabel}</p>
+                      <p className="mt-1 text-sm text-muted-foreground">Deadline: {lockInMinutes} menit sebelum kickoff · {countdownLabel}</p>
                     </div>
                   </div>
                   <a href="/predictions?filter=open" className="inline-flex items-center justify-center gap-2 rounded-md bg-primary px-4 py-2 text-xs font-bold uppercase tracking-widest text-background transition-colors hover:bg-primary/90">

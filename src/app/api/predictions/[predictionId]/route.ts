@@ -1,7 +1,7 @@
 import { NextRequest } from "next/server";
 import { db } from "@/db";
 import { matches, predictions } from "@/db/schema";
-import { eq, and } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 import {
   ok,
   Err,
@@ -9,13 +9,13 @@ import {
   handleError,
 } from "@/lib/api-helpers";
 import { updatePredictionSchema } from "@/lib/validators";
+import { getScoringRules } from "@/lib/scoring";
 import { z } from "zod";
 
 // ─── Lock-in check helper ─────────────────────────────────────
-function isLocked(kickoffTime: Date): boolean {
-  const LOCK_MINUTES = 15;
+function isLocked(kickoffTime: Date, lockInMinutes: number): boolean {
   const now = new Date();
-  const lockDeadline = new Date(kickoffTime.getTime() - LOCK_MINUTES * 60 * 1000);
+  const lockDeadline = new Date(kickoffTime.getTime() - lockInMinutes * 60 * 1000);
   return now >= lockDeadline;
 }
 
@@ -58,9 +58,10 @@ export async function PUT(
     }
 
     // 4. Lock-in check: same rule as POST
-    if (isLocked(match.kickoffTime)) {
+    const { lockInMinutes } = await getScoringRules();
+    if (isLocked(match.kickoffTime, lockInMinutes)) {
       return Err.badRequest(
-        "Predictions are locked 15 minutes before kick-off.",
+        `Predictions are locked ${lockInMinutes} minutes before kick-off.`,
         "PREDICTION_LOCKED"
       );
     }
@@ -83,7 +84,7 @@ export async function PUT(
     return ok(updated);
   } catch (error) {
     if (error instanceof z.ZodError) {
-      const msg = error.errors
+      const msg = error.issues
         .map((e) => `${e.path.join(".")}: ${e.message}`)
         .join(", ");
       return Err.badRequest(msg, "VALIDATION_ERROR");

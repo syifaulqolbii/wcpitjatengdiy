@@ -4,14 +4,18 @@ import React, { useState, useEffect } from 'react';
 import { Match, Prediction } from '@/types';
 import { Timer, Lock, CheckCircle2, XCircle } from 'lucide-react';
 import { useSubmitPrediction, useUpdatePrediction } from '@/hooks/usePredictions';
+import { useSettings } from '@/hooks/useSettings';
 import { Flag } from '@/components/shared/Flag';
 
 export function MatchCard({ match, prediction }: { match: Match; prediction?: Prediction }) {
   const [predictedA, setPredictedA] = useState<string>(prediction?.predictedA?.toString() ?? '');
   const [predictedB, setPredictedB] = useState<string>(prediction?.predictedB?.toString() ?? '');
+  const [, forceTick] = useState(0);
 
   const submitMut = useSubmitPrediction();
   const updateMut = useUpdatePrediction();
+  const { data: settings } = useSettings();
+  const lockInMinutes = settings?.lockInMinutes ? parseInt(settings.lockInMinutes, 10) : 15;
 
   useEffect(() => {
     if (prediction) {
@@ -20,12 +24,25 @@ export function MatchCard({ match, prediction }: { match: Match; prediction?: Pr
     }
   }, [prediction]);
 
-  const isLocked = new Date(match.kickoffTime).getTime() - 15 * 60 * 1000 <= Date.now();
+  useEffect(() => {
+    const interval = setInterval(() => forceTick((t) => t + 1), 30000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const lockOffsetMs = lockInMinutes * 60 * 1000;
+  const isLocked = new Date(match.kickoffTime).getTime() - lockOffsetMs <= Date.now();
   const isFinished = match.status === 'finished';
 
-  const timeUntilLock = new Date(match.kickoffTime).getTime() - 15 * 60 * 1000 - Date.now();
-  const hoursUntilLock = Math.max(0, Math.floor(timeUntilLock / (1000 * 60 * 60)));
+  const timeUntilLock = new Date(match.kickoffTime).getTime() - lockOffsetMs - Date.now();
+  const daysUntilLock = Math.max(0, Math.floor(timeUntilLock / (1000 * 60 * 60 * 24)));
+  const hoursUntilLock = Math.max(0, Math.floor((timeUntilLock % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)));
   const minsUntilLock = Math.max(0, Math.floor((timeUntilLock % (1000 * 60 * 60)) / (1000 * 60)));
+
+  const lockLabel = daysUntilLock > 0
+    ? `Kunci dalam ${daysUntilLock} hari ${hoursUntilLock} jam ${minsUntilLock} menit`
+    : hoursUntilLock > 0
+      ? `Kunci dalam ${hoursUntilLock} jam ${minsUntilLock} menit`
+      : `Kunci dalam ${minsUntilLock} menit`;
 
   const handleSave = () => {
     if (!predictedA || !predictedB) return;
@@ -136,7 +153,7 @@ export function MatchCard({ match, prediction }: { match: Match; prediction?: Pr
       <div className="flex justify-between items-center mb-8 z-10">
         <div className="text-primary text-xs font-bold flex items-center gap-1.5 uppercase tracking-wide">
           <Timer className="w-4 h-4" />
-          {hoursUntilLock > 0 ? `Kunci dalam ${hoursUntilLock}j ${minsUntilLock}m` : `Kunci dalam ${minsUntilLock}m`}
+          {lockLabel}
         </div>
       </div>
       

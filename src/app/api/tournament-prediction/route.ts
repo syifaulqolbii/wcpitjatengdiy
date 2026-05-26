@@ -80,16 +80,27 @@ export async function POST(req: NextRequest) {
       return Err.conflict("Anda sudah mengirimkan tebakan juara");
     }
 
-    const [newPrediction] = await db
-      .insert(tournamentPredictions)
-      .values({
-        userId: session.user.id,
-        predictedWinner: data.predictedWinner,
-        predictedWinnerFlag: data.predictedWinnerFlag,
-      })
-      .returning();
+    try {
+      const [newPrediction] = await db
+        .insert(tournamentPredictions)
+        .values({
+          userId: session.user.id,
+          predictedWinner: data.predictedWinner,
+          predictedWinnerFlag: data.predictedWinnerFlag,
+        })
+        .returning();
 
-    return ok(newPrediction);
+      return ok(newPrediction);
+    } catch (insertErr) {
+      // Concurrent double-submit hits the unique constraint.
+      if (
+        insertErr instanceof Error &&
+        insertErr.message.includes("tournament_pred_user_unique")
+      ) {
+        return Err.conflict("Anda sudah mengirimkan tebakan juara");
+      }
+      throw insertErr;
+    }
   } catch (error) {
     return handleError(error);
   }

@@ -2,7 +2,8 @@
   "permissions": {
     "allow": [
       "PowerShell($i=0; Get-Content \"D:\\\\KANTOR\\\\WC_Prediction_ITJatengDIY\\\\.claude\\\\worktrees\\\\agent-ae070b28ebd7b59b6\\\\src\\\\app\\\\\\(main\\)\\\\profile\\\\page.tsx\" | ForEach-Object { $i++; if \\($i -ge 71 -and $i -le 87\\) { \"{0}: {1}\" -f $i, $_ } })",
-      "PowerShell(npm run *)"
+      "PowerShell(npm run *)",
+      "Bash(npx --no-install tsc --noEmit)"
     ]
   }
 }

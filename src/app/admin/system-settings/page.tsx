@@ -20,7 +20,8 @@ const settingsSchema = z.object({
   invitation_code: z.string().min(6, 'Minimal 6 karakter').max(30, 'Maksimal 30 karakter').regex(/^[a-zA-Z0-9]+$/, 'Hanya huruf dan angka'),
 });
 
-type SettingsFormData = z.infer<typeof settingsSchema>;
+type SettingsFormData = z.output<typeof settingsSchema>;
+type SettingsFormInput = z.input<typeof settingsSchema>;
 
 function utcToWibInput(isoUtc: string) {
   const date = new Date(isoUtc);
@@ -62,7 +63,7 @@ export default function AdminSystemSettingsPage() {
     watch,
     reset,
     formState: { errors, isDirty }
-  } = useForm<SettingsFormData>({
+  } = useForm<SettingsFormInput, unknown, SettingsFormData>({
     resolver: zodResolver(settingsSchema),
     defaultValues: {
       perfectScore: 3,

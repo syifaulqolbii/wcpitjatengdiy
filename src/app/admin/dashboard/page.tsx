@@ -133,7 +133,7 @@ export default function AdminDashboardPage() {
     const championActivities = (championPredictions?.predictions ?? []).map((prediction) => ({
       id: `champion-${prediction.id}`,
       at: new Date(prediction.submittedAt),
-      message: `${prediction.user?.name ?? 'User'} memilih juara ${prediction.predictedWinnerFlag} ${prediction.predictedWinner}`,
+      message: `${prediction.userName ?? 'User'} memilih juara ${prediction.predictedWinnerFlag} ${prediction.predictedWinner}`,
       color: 'bg-amber-500',
       textColor: 'text-amber-500',
       iconText: 'Juara',

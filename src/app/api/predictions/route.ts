@@ -10,13 +10,13 @@ import {
   handleError,
 } from "@/lib/api-helpers";
 import { createPredictionSchema } from "@/lib/validators";
+import { getScoringRules } from "@/lib/scoring";
 
 // ─── Lock-in check helper ─────────────────────────────────────
-// Returns true if the current time is within 15 minutes of kickoff
-function isLocked(kickoffTime: Date): boolean {
-  const LOCK_MINUTES = 15;
+// Returns true if the current time is within the configured lock window of kickoff
+function isLocked(kickoffTime: Date, lockInMinutes: number): boolean {
   const now = new Date();
-  const lockDeadline = new Date(kickoffTime.getTime() - LOCK_MINUTES * 60 * 1000);
+  const lockDeadline = new Date(kickoffTime.getTime() - lockInMinutes * 60 * 1000);
   return now >= lockDeadline;
 }
 
@@ -124,10 +124,11 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // 3. Lock-in check: 15 minutes before kickoff
-    if (isLocked(match.kickoffTime)) {
+    // 3. Lock-in check: configured minutes before kickoff
+    const { lockInMinutes } = await getScoringRules();
+    if (isLocked(match.kickoffTime, lockInMinutes)) {
       return Err.badRequest(
-        "Predictions are locked 15 minutes before kick-off.",
+        `Predictions are locked ${lockInMinutes} minutes before kick-off.`,
         "PREDICTION_LOCKED"
       );
     }

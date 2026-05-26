@@ -6,6 +6,7 @@ import { authClient } from '@/lib/auth-client';
 import { useLeaderboard } from '@/hooks/useLeaderboard';
 import { useMyGroup } from '@/hooks/useMyGroup';
 import { usePredictions } from '@/hooks/usePredictions';
+import { useSettings } from '@/hooks/useSettings';
 import { useRouter } from 'next/navigation';
 import { Skeleton } from '@/components/ui/skeleton';
 import { formatInTimeZone } from 'date-fns-tz';
@@ -20,10 +21,12 @@ export default function ProfilePage() {
   const userId = session?.user?.id;
   const userImage = (session?.user as { image?: string | null } | undefined)?.image;
   
-  const { data: myGroup } = useMyGroup();
+  const { data: myGroup, isLoading: isMyGroupLoading } = useMyGroup();
   const groupId = myGroup?.groupId ?? undefined;
   const { data: leaderboard, isLoading: isLeaderboardLoading } = useLeaderboard(groupId, !!(groupId));
   const { data: predictions, isLoading: isPredictionsLoading } = usePredictions();
+  const { data: settings } = useSettings();
+  const perfectScore = settings?.perfectScore ? parseInt(settings.perfectScore, 10) : 5;
 
   const [isChangingPassword, setIsChangingPassword] = useState(false);
   const [currentPassword, setCurrentPassword] = useState('');
@@ -83,10 +86,10 @@ export default function ProfilePage() {
     
     setIsSubmittingPassword(true);
     try {
-      // @ts-expect-error changePassword might not be perfectly typed depending on plugin
       const res = await authClient.changePassword({
         newPassword,
         currentPassword,
+        revokeOtherSessions: true,
       });
       if (res.error) {
         toast.error(res.error.message || 'Gagal mengganti password');
@@ -187,7 +190,7 @@ export default function ProfilePage() {
     return name.substring(0, 2).toUpperCase();
   };
 
-  if (isSessionLoading || isPredictionsLoading || (!!groupId && isLeaderboardLoading)) {
+  if (isSessionLoading || isPredictionsLoading || isMyGroupLoading || (!!groupId && isLeaderboardLoading)) {
     return (
       <div className="relative z-10 max-w-lg mx-auto px-4 md:px-0 pb-10">
         <Skeleton className="h-12 w-48 my-6" />
@@ -310,7 +313,7 @@ export default function ProfilePage() {
                       
                       const points = pred.points ?? 0;
                       const isWin = points > 0;
-                      const isPerfect = points === 5;
+                      const isPerfect = points === perfectScore;
                       
                       return (
                         <div key={pred.id} className="bg-card rounded-lg p-4 border border-border/50 flex flex-col gap-3">

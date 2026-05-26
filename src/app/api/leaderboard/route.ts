@@ -1,43 +1,64 @@
 import { NextRequest } from "next/server";
 import { db } from "@/db";
-import { leaderboardSnapshots, predictions, users } from "@/db/schema";
-import { eq, sql, sum, count, desc, isNotNull, and } from "drizzle-orm";
+import { leaderboardSnapshots, predictions, tournamentPredictions, users } from "@/db/schema";
+import { eq, sql, isNotNull, and, inArray } from "drizzle-orm";
 import { ok, requireAuth, handleError } from "@/lib/api-helpers";
+import { getScoringRules } from "@/lib/scoring";
 
 export async function GET(req: NextRequest) {
   try {
     await requireAuth(req);
 
     const groupId = req.nextUrl.searchParams.get('groupId') ?? null;
+    const rules = await getScoringRules();
 
-    const baseWhere = isNotNull(predictions.points);
-    const whereClause = groupId
-      ? and(baseWhere, eq(users.groupId, groupId))
-      : baseWhere;
-
-    const rows = await db
+    // Base list of users (filtered by group if requested) — ensures users with
+    // only champion predictions still appear in the leaderboard.
+    const usersQuery = db
       .select({
-        userId: predictions.userId,
+        userId: users.id,
         name: users.name,
         image: users.image,
-        totalPoints: sum(predictions.points).mapWith(Number),
-        perfectScores: count(
-          sql`CASE WHEN ${predictions.points} = 5 THEN 1 END`
-        ).mapWith(Number),
-        correctResults: count(
-          sql`CASE WHEN ${predictions.points} = 2 THEN 1 END`
-        ).mapWith(Number),
-        totalPredicted: count(predictions.id).mapWith(Number),
+        groupId: users.groupId,
+      })
+      .from(users);
+
+    const userRows = groupId
+      ? await usersQuery.where(eq(users.groupId, groupId))
+      : await usersQuery;
+
+    const userIds = userRows.map((u) => u.userId);
+    if (userIds.length === 0) return ok([]);
+
+    // Match predictions stats per user, scoped to the same user set.
+    const matchStats = await db
+      .select({
+        userId: predictions.userId,
+        totalPoints: sql<number>`COALESCE(SUM(${predictions.points}), 0)`.mapWith(Number),
+        perfectScores: sql<number>`COUNT(CASE WHEN ${predictions.points} = ${rules.perfectScore} THEN 1 END)`.mapWith(Number),
+        correctResults: sql<number>`COUNT(CASE WHEN ${predictions.points} = ${rules.correctResult} THEN 1 END)`.mapWith(Number),
+        totalPredicted: sql<number>`COUNT(${predictions.id})`.mapWith(Number),
       })
       .from(predictions)
-      .innerJoin(users, eq(predictions.userId, users.id))
-      .where(whereClause)
-      .groupBy(predictions.userId, users.name, users.image)
-      .orderBy(
-        desc(sum(predictions.points)),
-        desc(count(sql`CASE WHEN ${predictions.points} = 5 THEN 1 END`))
-      );
+      .where(and(isNotNull(predictions.points), inArray(predictions.userId, userIds)))
+      .groupBy(predictions.userId);
 
+    const matchStatsByUserId = new Map(matchStats.map((m) => [m.userId, m]));
+
+    // Champion points scoped to same user set.
+    const championRows = await db
+      .select({
+        userId: tournamentPredictions.userId,
+        points: tournamentPredictions.points,
+      })
+      .from(tournamentPredictions)
+      .where(and(isNotNull(tournamentPredictions.points), inArray(tournamentPredictions.userId, userIds)));
+
+    const championPointsByUserId = new Map(
+      championRows.map((cp) => [cp.userId, cp.points ?? 0])
+    );
+
+    // Latest snapshot per user (global, used for rank-change deltas only).
     const latestSnapshots = await db
       .select({
         userId: leaderboardSnapshots.userId,
@@ -56,12 +77,33 @@ export async function GET(req: NextRequest) {
       latestSnapshots.map((snapshot) => [snapshot.userId, snapshot.rank])
     );
 
+    // Build enriched rows for every user in scope.
+    const enrichedRows = userRows.map((u) => {
+      const m = matchStatsByUserId.get(u.userId);
+      const championPoints = championPointsByUserId.get(u.userId) ?? 0;
+      const matchPoints = m?.totalPoints ?? 0;
+      return {
+        userId: u.userId,
+        name: u.name,
+        image: u.image,
+        totalPoints: matchPoints + championPoints,
+        perfectScores: m?.perfectScores ?? 0,
+        correctResults: m?.correctResults ?? 0,
+        totalPredicted: m?.totalPredicted ?? 0,
+      };
+    });
+
+    enrichedRows.sort((a, b) => {
+      if (b.totalPoints !== a.totalPoints) return b.totalPoints - a.totalPoints;
+      return b.perfectScores - a.perfectScores;
+    });
+
     let currentRank = 1;
-    const leaderboard = rows.map((row, index) => {
+    const leaderboard = enrichedRows.map((row, index) => {
       if (
         index > 0 &&
-        (row.totalPoints !== rows[index - 1].totalPoints ||
-          row.perfectScores !== rows[index - 1].perfectScores)
+        (row.totalPoints !== enrichedRows[index - 1].totalPoints ||
+          row.perfectScores !== enrichedRows[index - 1].perfectScores)
       ) {
         currentRank = index + 1;
       }
@@ -71,11 +113,12 @@ export async function GET(req: NextRequest) {
         userId: row.userId,
         name: row.name,
         image: row.image,
-        totalPoints: row.totalPoints ?? 0,
-        perfectScores: row.perfectScores ?? 0,
-        correctResults: row.correctResults ?? 0,
-        totalPredicted: row.totalPredicted ?? 0,
-        rankChange: snapshotRankByUserId.has(row.userId)
+        totalPoints: row.totalPoints,
+        perfectScores: row.perfectScores,
+        correctResults: row.correctResults,
+        totalPredicted: row.totalPredicted,
+        // rankChange only meaningful for the global leaderboard since snapshots are global.
+        rankChange: !groupId && snapshotRankByUserId.has(row.userId)
           ? snapshotRankByUserId.get(row.userId)! - currentRank
           : null,
       };
