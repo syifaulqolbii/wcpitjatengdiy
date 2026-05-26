@@ -10,6 +10,7 @@ import { Search, Trophy, Download, ChevronDown, Award } from 'lucide-react';
 import { LeaderboardEntry } from '@/types';
 import { format } from 'date-fns';
 import { UserAvatar } from '@/components/shared/UserAvatar';
+import { Flag } from '@/components/shared/Flag';
 
 // ─── PlayerCard Component ───
 // Mem-fetch prediksinya sendiri untuk kalkulasi 5 match terakhir
@@ -152,8 +153,10 @@ function PlayerCard({
 
       <div className="mt-4 pt-4 border-t border-border/30">
         {championPick ? (
-          <p className="font-sans text-xs text-foreground">
-            Tebak Juara: {championPick.predictedWinnerFlag} {championPick.predictedWinner}
+          <p className="font-sans text-xs text-foreground flex items-center gap-2">
+            <span>Tebak Juara:</span>
+            <Flag flag={championPick.predictedWinnerFlag} size="sm" className="w-4" />
+            <span>{championPick.predictedWinner}</span>
           </p>
         ) : (
           <p className="font-sans text-xs text-muted-foreground italic">Belum tebak juara</p>

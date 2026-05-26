@@ -105,7 +105,11 @@ export default function DashboardPage() {
                       )}
                     />
                     <div>
-                      <p className="font-bold text-sm text-foreground">Tebakan Juara: {championData.prediction.predictedWinnerFlag} {championData.prediction.predictedWinner}</p>
+                      <p className="font-bold text-sm text-foreground flex items-center gap-2">
+                        <span>Tebakan Juara:</span>
+                        <Flag flag={championData.prediction.predictedWinnerFlag} size="sm" className="w-5" />
+                        <span>{championData.prediction.predictedWinner}</span>
+                      </p>
                       <p
                         className={cn(
                           'text-xs font-bold',
@@ -125,7 +129,11 @@ export default function DashboardPage() {
                     <Clock className="w-6 h-6 text-muted-foreground" />
                     <div>
                       <p className="font-bold text-sm text-foreground">Tebakan Juara Terkunci</p>
-                      <p className="text-xs text-muted-foreground">Pilihan Anda: {championData.prediction.predictedWinnerFlag} {championData.prediction.predictedWinner}</p>
+                      <p className="text-xs text-muted-foreground flex items-center gap-2">
+                        <span>Pilihan Anda:</span>
+                        <Flag flag={championData.prediction.predictedWinnerFlag} size="sm" className="w-5" />
+                        <span>{championData.prediction.predictedWinner}</span>
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -149,7 +157,11 @@ export default function DashboardPage() {
                     <CheckCircle2 className="w-6 h-6 text-green-500 shrink-0" />
                     <div>
                       <p className="font-bold text-sm text-green-500">Tebakan Juara Tersimpan</p>
-                      <p className="text-xs text-muted-foreground">Pilihan Anda: {championData.prediction.predictedWinnerFlag} {championData.prediction.predictedWinner}</p>
+                      <p className="text-xs text-muted-foreground flex items-center gap-2">
+                        <span>Pilihan Anda:</span>
+                        <Flag flag={championData.prediction.predictedWinnerFlag} size="sm" className="w-5" />
+                        <span>{championData.prediction.predictedWinner}</span>
+                      </p>
                     </div>
                   </div>
                   <button
