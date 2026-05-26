@@ -41,6 +41,10 @@ export async function GET(req: NextRequest) {
   }
 }
 
+const INVITE_CODE_REGEX = /^[A-Z0-9]+$/;
+const MIN_INVITE_CODE_LENGTH = 6;
+const MAX_INVITE_CODE_LENGTH = 16;
+
 export async function POST(req: NextRequest) {
   try {
     await requireAdmin(req);
@@ -53,7 +57,22 @@ export async function POST(req: NextRequest) {
       return Err.badRequest('Nama grup minimal 2 karakter', 'INVALID_NAME');
     }
 
-    const inviteCode = customCode.length >= 4 ? customCode : await uniqueInviteCode();
+    let inviteCode: string;
+    if (customCode) {
+      if (
+        customCode.length < MIN_INVITE_CODE_LENGTH ||
+        customCode.length > MAX_INVITE_CODE_LENGTH ||
+        !INVITE_CODE_REGEX.test(customCode)
+      ) {
+        return Err.badRequest(
+          `Kode undangan harus ${MIN_INVITE_CODE_LENGTH}-${MAX_INVITE_CODE_LENGTH} karakter, hanya huruf besar dan angka`,
+          'INVALID_INVITE_CODE'
+        );
+      }
+      inviteCode = customCode;
+    } else {
+      inviteCode = await uniqueInviteCode();
+    }
 
     const [existing] = await db.select({ id: groups.id }).from(groups).where(eq(groups.inviteCode, inviteCode)).limit(1);
     if (existing) return Err.conflict('Kode undangan sudah digunakan');

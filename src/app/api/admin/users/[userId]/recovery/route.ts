@@ -13,7 +13,7 @@ type RouteContext = {
 
 export async function PUT(req: NextRequest, { params }: RouteContext) {
   try {
-    await requireAdmin(req);
+    const adminSession = await requireAdmin(req);
 
     const { userId } = await params;
     const body = await req.json();
@@ -57,6 +57,11 @@ export async function PUT(req: NextRequest, { params }: RouteContext) {
       if (duplicate) return Err.conflict("Email sudah digunakan user lain.");
     }
 
+    // If admin recovers their own account, preserve their current session so
+    // the response cookie remains valid; everything else gets revoked.
+    const adminIsTarget = adminSession.user.id === userId;
+    const adminSessionId = adminIsTarget ? adminSession.session.id : null;
+
     await db.transaction(async (tx) => {
       if (emailChanged) {
         await tx
@@ -82,7 +87,13 @@ export async function PUT(req: NextRequest, { params }: RouteContext) {
           .set({ password: passwordHash, updatedAt: new Date() })
           .where(eq(accounts.id, credentialAccount.id));
 
-        await tx.delete(sessions).where(eq(sessions.userId, userId));
+        if (adminSessionId) {
+          await tx
+            .delete(sessions)
+            .where(and(eq(sessions.userId, userId), ne(sessions.id, adminSessionId)));
+        } else {
+          await tx.delete(sessions).where(eq(sessions.userId, userId));
+        }
       }
     });
 
@@ -92,6 +103,7 @@ export async function PUT(req: NextRequest, { params }: RouteContext) {
       email: emailChanged ? rawEmail : targetUser.email,
       emailChanged,
       passwordChanged: hasPassword,
+      adminSessionPreserved: adminIsTarget && hasPassword,
     });
   } catch (error) {
     return handleError(error);

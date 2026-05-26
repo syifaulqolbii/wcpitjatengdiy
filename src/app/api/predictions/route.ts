@@ -33,15 +33,22 @@ export async function GET(req: NextRequest) {
     const allUsers = searchParams.get("allUsers") === "true";
 
     const conditions = [];
-    
+
     if (allUsers && session.user.role === 'admin') {
       // Admin detail views can inspect every user's prediction for a match.
+      // Force matchId to keep the response bounded.
+      if (!matchId) {
+        return Err.badRequest(
+          "matchId wajib diisi untuk allUsers=true",
+          "MISSING_MATCH_ID"
+        );
+      }
     } else if (userIdParam && session.user.role === 'admin') {
       conditions.push(eq(predictions.userId, userIdParam));
     } else {
       conditions.push(eq(predictions.userId, session.user.id));
     }
-    
+
     if (matchId) {
       conditions.push(eq(predictions.matchId, matchId));
     }

@@ -1,5 +1,5 @@
 import { db } from "@/db";
-import { groups, users } from "@/db/schema";
+import { groups } from "@/db/schema";
 import { Err, handleError, ok, requireAdmin } from "@/lib/api-helpers";
 import { eq, ne, and } from "drizzle-orm";
 import { NextRequest } from "next/server";

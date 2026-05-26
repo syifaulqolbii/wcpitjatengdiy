@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { WC2026_TEAMS, Team } from '@/lib/wc2026-teams';
+import { WC2026_TEAMS } from '@/lib/wc2026-teams';
 import { useSubmitChampionPick, useUpdateChampionPick } from '@/hooks/useTournamentPrediction';
 import { toast } from 'sonner';
 import { Loader2, X, Trophy, AlertCircle, CheckCircle2 } from 'lucide-react';
@@ -8,10 +8,17 @@ import { format } from 'date-fns';
 import { id } from 'date-fns/locale';
 import { toZonedTime } from 'date-fns-tz';
 
+interface ExistingChampionPrediction {
+  id: string;
+  predictedWinner: string;
+  predictedWinnerFlag: string;
+  points: number | null;
+}
+
 interface ChampionPickModalProps {
   isOpen: boolean;
   onClose: () => void;
-  existingPrediction: any | null;
+  existingPrediction: ExistingChampionPrediction | null;
   deadline: string;
   bonusPoints: number;
 }
@@ -66,8 +73,8 @@ export function ChampionPickModal({
         toast.success('Tebakan juara berhasil disimpan!');
       }
       onClose();
-    } catch (error: any) {
-      toast.error(error.message || 'Terjadi kesalahan saat menyimpan tebakan');
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : 'Terjadi kesalahan saat menyimpan tebakan');
     }
   };
 

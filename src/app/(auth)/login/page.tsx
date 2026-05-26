@@ -77,8 +77,9 @@ function LoginPageContent() {
           email: data.email,
           password: data.password,
           name: data.name,
+          // invitationCode is intercepted by /api/auth/[...all] before reaching better-auth
           invitationCode: data.invitationCode,
-        } as any);
+        } as Parameters<typeof authClient.signUp.email>[0]);
 
         if (error) {
           if (error.code === 'INVALID_INVITATION_CODE') {
@@ -109,7 +110,7 @@ function LoginPageContent() {
         router.refresh();
         router.push("/dashboard");
       }
-    } catch (err) {
+    } catch {
       setErrorMsg("An unexpected error occurred.");
       toast.error("An unexpected error occurred.");
     }

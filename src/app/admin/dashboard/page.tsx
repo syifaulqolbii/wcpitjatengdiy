@@ -7,7 +7,7 @@ import { usePredictions } from '@/hooks/usePredictions';
 import { useLeaderboard } from '@/hooks/useLeaderboard';
 import { useUsers } from '@/hooks/useUsers';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Zap, Loader2, Edit, Flag as LucideFlag, X, MemoryStick, Filter, TrendingUp, Users, Swords, PieChart, Trophy } from 'lucide-react';
+import { Zap, Loader2, Edit, Flag as LucideFlag, MemoryStick, Filter, TrendingUp, Users, Swords, PieChart, Trophy } from 'lucide-react';
 import { formatInTimeZone } from 'date-fns-tz';
 import { toast } from 'sonner';
 import { Match } from '@/types';
@@ -61,7 +61,7 @@ export default function AdminDashboardPage() {
       const res = await fetch(`/api/matches/${matchToCalc.id}/calculate`, { method: 'POST' });
       if (!res.ok) throw new Error('Server error');
       toast.success(`Kalkulasi poin untuk ${matchToCalc.teamA} vs ${matchToCalc.teamB} berhasil!`);
-    } catch (error) {
+    } catch {
       toast.error('Gagal melakukan kalkulasi poin');
     } finally {
       setIsCalculating(false);

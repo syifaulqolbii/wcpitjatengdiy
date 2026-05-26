@@ -49,7 +49,7 @@ function getCountryCode(flag: string): string {
       .join('');
     
     return code.length === 2 ? code.toLowerCase() : 'id';
-  } catch (e) {
+  } catch {
     return 'id';
   }
 }
