@@ -19,6 +19,40 @@ export default function LeaderboardPage() {
 
   const { data: leaderboard, isLoading } = useLeaderboard(groupId, !isGroupLoading && !!groupId);
 
+  const [selectedStage, setSelectedStage] = React.useState<string>('all');
+
+  const displayLeaderboard = React.useMemo(() => {
+    if (!leaderboard) return [];
+    
+    const sorted = [...leaderboard].map(entry => {
+      let displayPoints = entry.totalPoints;
+      if (selectedStage !== 'all') {
+         displayPoints = entry.stagePoints?.[selectedStage] ?? 0;
+      }
+      return { ...entry, displayPoints };
+    });
+
+    if (selectedStage !== 'all') {
+      sorted.sort((a, b) => {
+        if (b.displayPoints !== a.displayPoints) return b.displayPoints - a.displayPoints;
+        return b.perfectScores - a.perfectScores;
+      });
+      let currentRank = 1;
+      sorted.forEach((row, index) => {
+        if (
+          index > 0 &&
+          (row.displayPoints !== sorted[index - 1].displayPoints ||
+            row.perfectScores !== sorted[index - 1].perfectScores)
+        ) {
+          currentRank = index + 1;
+        }
+        row.rank = currentRank;
+      });
+    }
+
+    return sorted;
+  }, [leaderboard, selectedStage]);
+
   if (isGroupLoading || isLoading) {
     return (
       <div className="relative z-10 max-w-3xl mx-auto px-4 md:px-0 pb-10 overflow-x-hidden md:overflow-x-visible">
@@ -52,7 +86,7 @@ export default function LeaderboardPage() {
     );
   }
 
-  if (!leaderboard || leaderboard.length === 0) {
+  if (!displayLeaderboard || displayLeaderboard.length === 0) {
      return (
         <div className="relative z-10 max-w-3xl mx-auto px-4 md:px-0 pb-10 mt-10">
            <EmptyState type="leaderboard" title="Klasemen Kosong" description="Belum ada data klasemen untuk grupmu." />
@@ -60,11 +94,11 @@ export default function LeaderboardPage() {
      );
   }
 
-  const top3 = leaderboard.slice(0, 3);
-  const rank1 = top3.find(r => r.rank === 1) || leaderboard[0];
-  const rank2 = top3.find(r => r.rank === 2) || leaderboard[1];
-  const rank3 = top3.find(r => r.rank === 3) || leaderboard[2];
-  const rest = leaderboard.slice(3);
+  const top3 = displayLeaderboard.slice(0, 3);
+  const rank1 = top3.find(r => r.rank === 1) || displayLeaderboard[0];
+  const rank2 = top3.find(r => r.rank === 2) || displayLeaderboard[1];
+  const rank3 = top3.find(r => r.rank === 3) || displayLeaderboard[2];
+  const rest = displayLeaderboard.slice(3);
 
   const getShortName = (name: string) => {
     if (!name) return 'User';
@@ -83,12 +117,30 @@ export default function LeaderboardPage() {
             </h1>
             <UserAvatar name={session?.user?.name} image={(session?.user as { image?: string | null } | undefined)?.image} className="h-10 w-10 border border-border/50 bg-card md:h-12 md:w-12" textClassName="text-lg text-primary" />
         </div>
-        {groupName && (
-          <div className="flex items-center gap-2 mt-2 mb-1">
-            <Users className="w-4 h-4 text-primary" />
-            <span className="font-display text-sm font-bold text-primary uppercase tracking-wider">{groupName}</span>
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mt-4 mb-2">
+          {groupName && (
+            <div className="flex items-center gap-2">
+              <Users className="w-4 h-4 text-primary" />
+              <span className="font-display text-sm font-bold text-primary uppercase tracking-wider">{groupName}</span>
+            </div>
+          )}
+          <div className="relative z-20">
+            <select 
+              value={selectedStage}
+              onChange={(e) => setSelectedStage(e.target.value)}
+              className="bg-secondary/50 border border-border/50 text-foreground text-sm rounded-lg focus:ring-primary focus:border-primary block w-full p-2.5 outline-none font-display uppercase tracking-wider font-bold appearance-none cursor-pointer hover:bg-secondary/80 transition-colors shadow-sm"
+            >
+              <option value="all">Semua Babak</option>
+              <option value="group_stage">Babak Grup</option>
+              <option value="round_32">Babak 32 Besar</option>
+              <option value="round_16">Babak 16 Besar</option>
+              <option value="quarter_final">Perempat Final</option>
+              <option value="semi_final">Semi Final</option>
+              <option value="juara_3">Juara 3</option>
+              <option value="final">Final</option>
+            </select>
           </div>
-        )}
+        </div>
         <p className="font-sans text-muted-foreground text-xs md:text-sm tracking-wide">Update otomatis setiap 30 detik</p>
       </section>
 
@@ -104,7 +156,7 @@ export default function LeaderboardPage() {
                 <span className="font-display font-bold text-3xl md:text-4xl text-slate-300 relative z-10 opacity-40">2</span>
                 <div className="relative z-10 mt-1"><RankChangeBadge rankChange={rank2.rankChange} /></div>
                 <span className="font-display font-bold text-sm md:text-base text-foreground mt-auto relative z-10 truncate w-full text-center px-1">{getShortName(rank2.name)}</span>
-                <span className="font-sans text-xs md:text-sm text-primary font-semibold relative z-10">{rank2.totalPoints} pts</span>
+                <span className="font-sans text-xs md:text-sm text-primary font-semibold relative z-10">{rank2.displayPoints} pts</span>
               </div>
             </div>
           )}
@@ -121,7 +173,7 @@ export default function LeaderboardPage() {
                 <span className="font-display font-black text-5xl md:text-6xl text-yellow-400 relative z-10 opacity-30 drop-shadow-md">1</span>
                 <div className="relative z-10 mt-1"><RankChangeBadge rankChange={rank1.rankChange} /></div>
                 <span className="font-display font-bold text-base md:text-lg text-foreground mt-auto relative z-10 truncate w-full text-center px-1">{getShortName(rank1.name)}</span>
-                <span className="font-sans text-sm md:text-base text-primary font-bold relative z-10 bg-primary/10 px-2 py-0.5 rounded mt-1">{rank1.totalPoints} pts</span>
+                <span className="font-sans text-sm md:text-base text-primary font-bold relative z-10 bg-primary/10 px-2 py-0.5 rounded mt-1">{rank1.displayPoints} pts</span>
               </div>
             </div>
           )}
@@ -133,7 +185,7 @@ export default function LeaderboardPage() {
                 <span className="font-display font-bold text-2xl md:text-3xl text-amber-600 relative z-10 opacity-40">3</span>
                 <div className="relative z-10 mt-1"><RankChangeBadge rankChange={rank3.rankChange} /></div>
                 <span className="font-display font-bold text-sm md:text-base text-foreground mt-auto relative z-10 truncate w-full text-center px-1">{getShortName(rank3.name)}</span>
-                <span className="font-sans text-xs md:text-sm text-primary font-semibold relative z-10">{rank3.totalPoints} pts</span>
+                <span className="font-sans text-xs md:text-sm text-primary font-semibold relative z-10">{rank3.displayPoints} pts</span>
               </div>
             </div>
           )}
@@ -169,7 +221,7 @@ export default function LeaderboardPage() {
                   )}
                 </div>
                 <div className="flex items-center gap-2 mt-0.5">
-                  <span className={`font-sans text-xs md:text-sm ${isCurrentUser ? 'text-foreground' : 'text-muted-foreground'}`}>{entry.totalPoints} pts</span>
+                  <span className={`font-sans text-xs md:text-sm ${isCurrentUser ? 'text-foreground' : 'text-muted-foreground'}`}>{entry.displayPoints} pts</span>
                   <span className="w-1 h-1 rounded-full bg-border"></span>
                   <span className={`font-sans text-[10px] md:text-xs flex items-center gap-0.5 font-bold ${entry.perfectScores > 0 ? 'text-yellow-400' : 'text-muted-foreground/50'}`}>
                     {entry.perfectScores} <Star className={`w-3 h-3 ${entry.perfectScores > 0 ? 'fill-yellow-400' : ''}`} />
@@ -177,7 +229,7 @@ export default function LeaderboardPage() {
                 </div>
               </div>
               <div className={`font-display font-black text-2xl md:text-3xl pr-2 relative z-10 ${isCurrentUser ? 'text-primary drop-shadow-[0_0_8px_rgba(0,230,118,0.3)]' : 'text-primary opacity-90'}`}>
-                {entry.totalPoints}
+                {entry.displayPoints}
               </div>
             </div>
           );

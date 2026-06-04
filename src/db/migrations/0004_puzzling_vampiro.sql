@@ -1,0 +1,1 @@
+ALTER TABLE "matches" ADD COLUMN "stage" text DEFAULT 'group_stage' NOT NULL;

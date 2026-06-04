@@ -20,7 +20,7 @@ export default function AdminMatchesPage() {
 
   // Form states for Create/Edit
   const [formData, setFormData] = useState<Partial<Match>>({
-    teamA: '', teamB: '', flagA: '', flagB: '', group: '', kickoffTime: new Date()
+    teamA: '', teamB: '', flagA: '', flagB: '', group: '', stage: 'group_stage', kickoffTime: new Date()
   });
 
   const [isCalcModalOpen, setIsCalcModalOpen] = useState(false);
@@ -62,7 +62,7 @@ export default function AdminMatchesPage() {
     setSelectedMatch(match);
     setFormData({
       teamA: match.teamA, teamB: match.teamB, flagA: match.flagA, flagB: match.flagB, 
-      group: match.group, kickoffTime: match.kickoffTime, status: match.status
+      group: match.group, stage: match.stage, kickoffTime: match.kickoffTime, status: match.status
     });
     setModalType('edit');
   };
@@ -70,7 +70,7 @@ export default function AdminMatchesPage() {
   const handleOpenCreateModal = () => {
     setSelectedMatch(null);
     setFormData({
-      teamA: '', teamB: '', flagA: '', flagB: '', group: '', kickoffTime: new Date(), status: 'upcoming'
+      teamA: '', teamB: '', flagA: '', flagB: '', group: '', stage: 'group_stage', kickoffTime: new Date(), status: 'upcoming'
     });
     setModalType('create');
   };
@@ -517,15 +517,31 @@ export default function AdminMatchesPage() {
                 </div>
               ) : (
                 <div className="space-y-4 relative z-10">
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div>
-                      <label className="block text-xs font-bold text-muted-foreground uppercase tracking-widest mb-1">Grup/Babak</label>
+                      <label className="block text-xs font-bold text-muted-foreground uppercase tracking-widest mb-1">Nama Grup/Info</label>
                       <input 
                         className="w-full bg-secondary border-none rounded text-sm p-3 focus:ring-1 focus:ring-primary outline-none" 
                         placeholder="Group A"
                         value={formData.group}
                         onChange={e => setFormData({...formData, group: e.target.value})}
                       />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-bold text-muted-foreground uppercase tracking-widest mb-1">Babak (Stage)</label>
+                      <select 
+                        className="w-full bg-secondary border-none rounded text-sm p-3 focus:ring-1 focus:ring-primary outline-none appearance-none" 
+                        value={formData.stage ?? 'group_stage'}
+                        onChange={e => setFormData({...formData, stage: e.target.value})}
+                      >
+                        <option value="group_stage">Babak Grup</option>
+                        <option value="round_32">Babak 32 Besar</option>
+                        <option value="round_16">Babak 16 Besar</option>
+                        <option value="quarter_final">Perempat Final</option>
+                        <option value="semi_final">Semi Final</option>
+                        <option value="juara_3">Juara 3</option>
+                        <option value="final">Final</option>
+                      </select>
                     </div>
                     <div>
                       <label className="block text-xs font-bold text-muted-foreground uppercase tracking-widest mb-1">Waktu (Lokal)</label>

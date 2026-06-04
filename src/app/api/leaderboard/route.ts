@@ -1,6 +1,6 @@
 import { NextRequest } from "next/server";
 import { db } from "@/db";
-import { leaderboardSnapshots, predictions, tournamentPredictions, users } from "@/db/schema";
+import { leaderboardSnapshots, predictions, tournamentPredictions, users, matches } from "@/db/schema";
 import { eq, sql, isNotNull, and, inArray } from "drizzle-orm";
 import { ok, requireAuth, handleError } from "@/lib/api-helpers";
 import { getScoringRules } from "@/lib/scoring";
@@ -45,6 +45,26 @@ export async function GET(req: NextRequest) {
 
     const matchStatsByUserId = new Map(matchStats.map((m) => [m.userId, m]));
 
+    // Match predictions points per stage
+    const matchStatsByStage = await db
+      .select({
+        userId: predictions.userId,
+        stage: matches.stage,
+        points: sql<number>`COALESCE(SUM(${predictions.points}), 0)`.mapWith(Number),
+      })
+      .from(predictions)
+      .innerJoin(matches, eq(predictions.matchId, matches.id))
+      .where(and(isNotNull(predictions.points), inArray(predictions.userId, userIds)))
+      .groupBy(predictions.userId, matches.stage);
+
+    const stagePointsByUserId = new Map<string, Record<string, number>>();
+    for (const stat of matchStatsByStage) {
+      if (!stagePointsByUserId.has(stat.userId)) {
+        stagePointsByUserId.set(stat.userId, {});
+      }
+      stagePointsByUserId.get(stat.userId)![stat.stage] = stat.points;
+    }
+
     // Champion points scoped to same user set.
     const championRows = await db
       .select({
@@ -87,6 +107,7 @@ export async function GET(req: NextRequest) {
         name: u.name,
         image: u.image,
         totalPoints: matchPoints + championPoints,
+        stagePoints: stagePointsByUserId.get(u.userId) ?? {},
         perfectScores: m?.perfectScores ?? 0,
         correctResults: m?.correctResults ?? 0,
         totalPredicted: m?.totalPredicted ?? 0,
@@ -114,6 +135,7 @@ export async function GET(req: NextRequest) {
         name: row.name,
         image: row.image,
         totalPoints: row.totalPoints,
+        stagePoints: row.stagePoints,
         perfectScores: row.perfectScores,
         correctResults: row.correctResults,
         totalPredicted: row.totalPredicted,

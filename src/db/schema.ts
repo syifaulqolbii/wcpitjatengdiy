@@ -87,6 +87,7 @@ export const matches = pgTable("matches", {
   flagA: text("flag_a").notNull(),
   flagB: text("flag_b").notNull(),
   group: text("group").notNull(),
+  stage: text("stage").notNull().default("group_stage"),
   kickoffTime: timestamp("kickoff_time", { withTimezone: true }).notNull(),
   status: text("status").default("upcoming").notNull(),
   scoreA: integer("score_a"),

@@ -13,6 +13,7 @@ export interface Match {
   flagA: string;        // emoji bendera
   flagB: string;
   group: string;        // "Group A", "Round of 32", dst
+  stage: string;        // 'group_stage', 'round_16', dst
   kickoffTime: Date;    // selalu UTC
   status: 'upcoming' | 'live' | 'finished';
   scoreA: number | null;
@@ -37,6 +38,7 @@ export interface LeaderboardEntry {
   name: string;
   image: string | null;
   totalPoints: number;
+  stagePoints: Record<string, number>;
   perfectScores: number;
   correctResults: number;
   totalPredicted: number;
