@@ -14,6 +14,7 @@ export default function AdminUsersPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [recoverUser, setRecoverUser] = useState<{ id: string; name: string; email: string } | null>(null);
+  const [recoveryName, setRecoveryName] = useState('');
   const [recoveryEmail, setRecoveryEmail] = useState('');
   const [temporaryPassword, setTemporaryPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -45,6 +46,7 @@ export default function AdminUsersPage() {
 
   const openRecoveryModal = (user: { id: string; name: string; email: string }) => {
     setRecoverUser(user);
+    setRecoveryName(user.name);
     setRecoveryEmail(user.email);
     setTemporaryPassword('');
     setConfirmPassword('');
@@ -52,6 +54,7 @@ export default function AdminUsersPage() {
 
   const closeRecoveryModal = () => {
     setRecoverUser(null);
+    setRecoveryName('');
     setRecoveryEmail('');
     setTemporaryPassword('');
     setConfirmPassword('');
@@ -59,16 +62,23 @@ export default function AdminUsersPage() {
 
   const handleRecoverAccount = async () => {    if (!recoverUser) return;
 
+    const nextName = recoveryName.trim();
     const nextEmail = recoveryEmail.trim().toLowerCase();
+    const nameChanged = nextName !== recoverUser.name;
     const emailChanged = nextEmail !== recoverUser.email.toLowerCase();
     const passwordChanged = temporaryPassword.length > 0;
 
-    if (!emailChanged && !passwordChanged) {
-      toast.error('Ubah email atau isi password sementara dulu');
+    if (!nameChanged && !emailChanged && !passwordChanged) {
+      toast.error('Ubah nama, email, atau isi password sementara');
       return;
     }
 
-    if (!nextEmail || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(nextEmail)) {
+    if (nameChanged && (nextName.length < 2 || nextName.length > 50)) {
+      toast.error('Nama harus antara 2 hingga 50 karakter');
+      return;
+    }
+
+    if (emailChanged && (!nextEmail || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(nextEmail))) {
       toast.error('Format email tidak valid');
       return;
     }
@@ -85,6 +95,7 @@ export default function AdminUsersPage() {
 
     await recoverAccount.mutateAsync({
       userId: recoverUser.id,
+      name: nameChanged ? nextName : undefined,
       email: emailChanged ? nextEmail : undefined,
       password: passwordChanged ? temporaryPassword : undefined,
     });
@@ -230,7 +241,7 @@ export default function AdminUsersPage() {
                       <button
                         onClick={() => openRecoveryModal(user)}
                         className="text-muted-foreground hover:text-primary transition-colors p-1"
-                        title="Pulihkan Akun"
+                        title="Edit Profil / Pulihkan Akun"
                       >
                         <Key className="w-5 h-5" />
                       </button>
@@ -335,8 +346,8 @@ export default function AdminUsersPage() {
             <div className="p-8">
               <div className="flex justify-between items-start mb-6">
                 <div>
-                  <h4 className="font-display text-2xl font-bold tracking-tight text-foreground">Pulihkan Akun</h4>
-                  <p className="font-sans text-sm text-muted-foreground mt-1">Bantu user masuk lagi tanpa membuat akun baru.</p>
+                  <h4 className="font-display text-2xl font-bold tracking-tight text-foreground">Edit Profil & Akun</h4>
+                  <p className="font-sans text-sm text-muted-foreground mt-1">Ubah identitas atau bantu user masuk kembali.</p>
                 </div>
                 <button onClick={closeRecoveryModal} className="text-muted-foreground hover:text-foreground transition-colors">
                   <X className="w-5 h-5" />
@@ -351,7 +362,18 @@ export default function AdminUsersPage() {
                 </div>
 
                 <div className="rounded-lg border border-primary/30 bg-primary/10 p-4 text-sm text-muted-foreground">
-                  Recovery ini mempertahankan userId yang sama, jadi prediksi dan poin user tidak hilang. Jangan hapus dan buat ulang user untuk kasus lupa login.
+                  Perubahan ini mempertahankan userId yang sama, jadi prediksi dan poin user tidak hilang.
+                </div>
+
+                <div>
+                  <label className="block font-sans text-xs text-muted-foreground uppercase tracking-widest mb-2">Nama Pengguna</label>
+                  <input
+                    className="w-full bg-secondary border border-border/50 rounded px-4 py-3 text-foreground font-sans text-sm focus:ring-1 focus:ring-primary outline-none"
+                    type="text"
+                    value={recoveryName}
+                    onChange={(e) => setRecoveryName(e.target.value)}
+                    placeholder="Budi - Tim A"
+                  />
                 </div>
 
                 <div>
@@ -400,7 +422,7 @@ export default function AdminUsersPage() {
                     disabled={recoverAccount.isPending}
                     className="flex-1 bg-primary text-background font-display uppercase tracking-tight font-bold py-4 rounded hover:bg-primary/90 transition-all shadow-[0_0_15px_rgba(0,230,118,0.15)] hover:shadow-[0_0_25px_rgba(0,230,118,0.3)] disabled:opacity-50 disabled:hover:shadow-none"
                   >
-                    {recoverAccount.isPending ? 'Memulihkan...' : 'Pulihkan Akun'}
+                    {recoverAccount.isPending ? 'Menyimpan...' : 'Simpan Perubahan'}
                   </button>
                 </div>
               </div>

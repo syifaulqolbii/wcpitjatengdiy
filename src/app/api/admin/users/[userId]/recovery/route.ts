@@ -18,12 +18,18 @@ export async function PUT(req: NextRequest, { params }: RouteContext) {
     const { userId } = await params;
     const body = await req.json();
     const rawEmail = typeof body.email === "string" ? body.email.trim().toLowerCase() : "";
+    const rawName = typeof body.name === "string" ? body.name.trim() : "";
     const password = typeof body.password === "string" ? body.password : "";
     const hasEmail = rawEmail.length > 0;
+    const hasName = rawName.length > 0;
     const hasPassword = password.length > 0;
 
-    if (!hasEmail && !hasPassword) {
-      return Err.badRequest("Isi email baru atau password sementara.", "NO_RECOVERY_FIELDS");
+    if (!hasEmail && !hasPassword && !hasName) {
+      return Err.badRequest("Isi minimal salah satu data (nama, email, atau password).", "NO_RECOVERY_FIELDS");
+    }
+
+    if (hasName && (rawName.length < 2 || rawName.length > 50)) {
+      return Err.badRequest("Nama harus antara 2 hingga 50 karakter.", "INVALID_NAME");
     }
 
     if (hasEmail && (!emailRegex.test(rawEmail) || rawEmail.length > 254)) {
@@ -42,9 +48,10 @@ export async function PUT(req: NextRequest, { params }: RouteContext) {
     if (!targetUser) return Err.notFound("User");
 
     const emailChanged = hasEmail && rawEmail !== targetUser.email.toLowerCase();
+    const nameChanged = hasName && rawName !== targetUser.name;
 
-    if (!emailChanged && !hasPassword) {
-      return Err.badRequest("Tidak ada perubahan untuk dipulihkan.", "NO_CHANGES");
+    if (!emailChanged && !hasPassword && !nameChanged) {
+      return Err.badRequest("Tidak ada perubahan untuk disimpan.", "NO_CHANGES");
     }
 
     if (emailChanged) {
@@ -63,10 +70,14 @@ export async function PUT(req: NextRequest, { params }: RouteContext) {
     const adminSessionId = adminIsTarget ? adminSession.session.id : null;
 
     await db.transaction(async (tx) => {
-      if (emailChanged) {
+      if (emailChanged || nameChanged) {
         await tx
           .update(users)
-          .set({ email: rawEmail, updatedAt: new Date() })
+          .set({ 
+            ...(emailChanged && { email: rawEmail }),
+            ...(nameChanged && { name: rawName }),
+            updatedAt: new Date() 
+          })
           .where(eq(users.id, userId));
       }
 
@@ -101,7 +112,9 @@ export async function PUT(req: NextRequest, { params }: RouteContext) {
       success: true,
       userId,
       email: emailChanged ? rawEmail : targetUser.email,
+      name: nameChanged ? rawName : targetUser.name,
       emailChanged,
+      nameChanged,
       passwordChanged: hasPassword,
       adminSessionPreserved: adminIsTarget && hasPassword,
     });

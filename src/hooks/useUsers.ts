@@ -67,14 +67,14 @@ export function useRecoverUserAccount() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ userId, email, password }: { userId: string; email?: string; password?: string }) =>
+    mutationFn: ({ userId, email, name, password }: { userId: string; email?: string; name?: string; password?: string }) =>
       apiPut<{ success: boolean; userId: string; email: string; emailChanged: boolean; passwordChanged: boolean }>(
         `/api/admin/users/${userId}/recovery`,
-        { email, password }
+        { email, name, password }
       ),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['users'] });
-      toast.success('Akun berhasil dipulihkan');
+      toast.success('Profil / Akun berhasil diperbarui');
     },
     onError: (error) => {
       toast.error(error.message);
