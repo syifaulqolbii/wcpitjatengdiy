@@ -1,11 +1,12 @@
 "use client";
 
 import React, { useState } from 'react';
-import { Search, Link as LinkIcon, Key, Trash2, X, Copy, Clock, Shield, UsersRound } from 'lucide-react';
+import { Search, Link as LinkIcon, Key, Trash2, X, Copy, Clock, Shield, UsersRound, History } from 'lucide-react';
 import { useUsers, useUpdateUserRole, useDeleteUser, useRecoverUserAccount } from '@/hooks/useUsers';
 import { MAX_USER_SLOTS } from '@/lib/constants';
 import { useLeaderboard } from '@/hooks/useLeaderboard';
 import { useGroups, useAssignUserToGroup } from '@/hooks/useGroups';
+import { useUserPredictions } from '@/hooks/usePredictions';
 import { Skeleton } from '@/components/ui/skeleton';
 import { format } from 'date-fns';
 import { toast } from 'sonner';
@@ -14,6 +15,7 @@ export default function AdminUsersPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [recoverUser, setRecoverUser] = useState<{ id: string; name: string; email: string } | null>(null);
+  const [historyUser, setHistoryUser] = useState<{ id: string; name: string } | null>(null);
   const [recoveryName, setRecoveryName] = useState('');
   const [recoveryEmail, setRecoveryEmail] = useState('');
   const [temporaryPassword, setTemporaryPassword] = useState('');
@@ -27,6 +29,8 @@ export default function AdminUsersPage() {
   const deleteUser = useDeleteUser();
   const recoverAccount = useRecoverUserAccount();
   const assignUserToGroup = useAssignUserToGroup();
+
+  const { data: userPredictions, isLoading: isPredictionsLoading } = useUserPredictions(historyUser?.id);
 
   const [assignGroupUser, setAssignGroupUser] = useState<{ id: string; name: string; groupId?: string | null } | null>(null);
   const [selectedGroupId, setSelectedGroupId] = useState('');
@@ -231,6 +235,13 @@ export default function AdminUsersPage() {
                       {format(new Date(user.createdAt), 'dd MMM yyyy')}
                     </div>
                     <div className="flex justify-end gap-2 pr-2">
+                      <button
+                        onClick={() => setHistoryUser({ id: user.id, name: user.name })}
+                        className="text-muted-foreground hover:text-primary transition-colors p-1"
+                        title="Lihat Riwayat Prediksi"
+                      >
+                        <History className="w-5 h-5" />
+                      </button>
                       <button
                         onClick={() => { setAssignGroupUser({ id: user.id, name: user.name, groupId: (user as { groupId?: string | null }).groupId }); setSelectedGroupId(''); }}
                         className="text-muted-foreground hover:text-primary transition-colors p-1"
@@ -473,6 +484,88 @@ export default function AdminUsersPage() {
                     {assignUserToGroup.isPending ? 'Menyimpan...' : 'Assign'}
                   </button>
                 </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal: History Predictions */}
+      {historyUser && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-md p-4">
+          <div className="absolute w-96 h-96 bg-primary/10 rounded-full blur-[100px] pointer-events-none"></div>
+          <div className="bg-card border border-border/50 rounded-xl w-full max-w-2xl shadow-[0px_24px_48px_rgba(0,0,0,0.6)] relative overflow-hidden max-h-[90vh] flex flex-col">
+            <div className="h-2 w-full bg-gradient-to-r from-primary to-emerald-700 absolute top-0 left-0"></div>
+            <div className="p-6 md:p-8 flex flex-col h-full">
+              <div className="flex justify-between items-start mb-6 shrink-0">
+                <div>
+                  <h4 className="font-display text-2xl font-bold tracking-tight text-foreground">Riwayat Prediksi</h4>
+                  <p className="font-sans text-sm text-muted-foreground mt-1">Melihat semua tebakan milik <span className="text-foreground font-semibold">{historyUser.name}</span>.</p>
+                </div>
+                <button onClick={() => setHistoryUser(null)} className="text-muted-foreground hover:text-foreground transition-colors bg-secondary/50 rounded-full p-1">
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+              
+              <div className="overflow-y-auto flex-1 pr-2 space-y-3 custom-scrollbar">
+                {isPredictionsLoading ? (
+                  <div className="flex flex-col gap-3">
+                    <Skeleton className="h-20 w-full rounded-lg" />
+                    <Skeleton className="h-20 w-full rounded-lg" />
+                    <Skeleton className="h-20 w-full rounded-lg" />
+                  </div>
+                ) : !userPredictions || userPredictions.length === 0 ? (
+                  <div className="text-center p-8 bg-secondary/30 rounded-lg border border-border/30">
+                    <p className="text-muted-foreground font-sans">Belum ada tebakan dari user ini.</p>
+                  </div>
+                ) : (
+                  userPredictions.map((pred: any) => {
+                    const match = pred.match;
+                    const isUpcoming = match.status === 'upcoming';
+                    const hasResult = match.scoreA !== null && match.scoreB !== null;
+                    
+                    return (
+                      <div key={pred.id} className="bg-secondary/30 border border-border/30 rounded-lg p-4 flex flex-col md:flex-row md:items-center justify-between gap-4 hover:border-primary/30 transition-colors">
+                        <div className="flex items-center gap-4 flex-1">
+                          <div className="flex-1 flex items-center justify-end gap-3 text-right">
+                            <span className="font-display font-bold text-sm md:text-base text-foreground">{match.teamA}</span>
+                            <span className="text-xl md:text-2xl">{match.flagA}</span>
+                          </div>
+                          
+                          <div className="bg-background border border-border/50 rounded px-3 py-1 flex items-center gap-2 shadow-inner">
+                            <span className="font-display font-black text-primary">{pred.predictedA}</span>
+                            <span className="text-muted-foreground text-xs">-</span>
+                            <span className="font-display font-black text-primary">{pred.predictedB}</span>
+                          </div>
+                          
+                          <div className="flex-1 flex items-center justify-start gap-3">
+                            <span className="text-xl md:text-2xl">{match.flagB}</span>
+                            <span className="font-display font-bold text-sm md:text-base text-foreground">{match.teamB}</span>
+                          </div>
+                        </div>
+
+                        <div className="flex items-center justify-between md:justify-end gap-4 min-w-[150px] border-t md:border-t-0 border-border/30 pt-3 md:pt-0">
+                          {isUpcoming ? (
+                            <span className="text-xs uppercase tracking-widest text-muted-foreground font-sans">
+                              {format(new Date(match.kickoffTime), 'dd MMM HH:mm')}
+                            </span>
+                          ) : (
+                            <div className="flex items-center gap-2">
+                              {hasResult ? (
+                                <div className="text-xs font-sans text-muted-foreground mr-2">
+                                  Skor Asli: <span className="font-bold text-foreground">{match.scoreA}-{match.scoreB}</span>
+                                </div>
+                              ) : null}
+                              <span className={`px-2 py-1 rounded text-xs font-display font-bold uppercase tracking-wider ${pred.points && pred.points > 0 ? 'bg-primary/20 text-primary border border-primary/30' : 'bg-destructive/20 text-destructive border border-destructive/30'}`}>
+                                {pred.points !== null ? `+${pred.points} Pts` : 'Pending'}
+                              </span>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })
+                )}
               </div>
             </div>
           </div>
