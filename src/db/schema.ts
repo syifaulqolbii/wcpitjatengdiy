@@ -16,6 +16,18 @@ export const groups = pgTable("groups", {
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
 });
 
+// ─── Group Whitelists ─────────────────────────────────────────
+export const groupWhitelists = pgTable("group_whitelists", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  groupId: uuid("group_id")
+    .notNull()
+    .references(() => groups.id, { onDelete: "cascade" }),
+  email: text("email").notNull(),
+  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+}, (table) => ({
+  uniqueGroupEmail: unique("uq_group_email").on(table.groupId, table.email),
+}));
+
 // ─── Users ────────────────────────────────────────────────────
 // Managed by Better Auth — extended with admin plugin fields
 export const users = pgTable("users", {

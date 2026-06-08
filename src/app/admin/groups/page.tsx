@@ -1,8 +1,8 @@
 "use client";
 
 import React, { useState } from 'react';
-import { Users, Plus, Copy, Trash2, X, RefreshCw, Pencil, UserMinus, UserPlus } from 'lucide-react';
-import { useGroups, useGroupMembers, useCreateGroup, useUpdateGroup, useDeleteGroup, useAssignUserToGroup, useRemoveUserFromGroup } from '@/hooks/useGroups';
+import { Users, Plus, Copy, Trash2, X, RefreshCw, Pencil, UserMinus, UserPlus, Shield, Info } from 'lucide-react';
+import { useGroups, useGroupMembers, useCreateGroup, useUpdateGroup, useDeleteGroup, useAssignUserToGroup, useRemoveUserFromGroup, useGroupWhitelist, useAddWhitelistEmails, useRemoveWhitelistEmail } from '@/hooks/useGroups';
 import { useUsers } from '@/hooks/useUsers';
 import { Skeleton } from '@/components/ui/skeleton';
 import { format } from 'date-fns';
@@ -25,8 +25,15 @@ export default function AdminGroupsPage() {
   const [newGroupCode, setNewGroupCode] = useState('');
   const [editGroupName, setEditGroupName] = useState('');
   const [assignUserId, setAssignUserId] = useState('');
+  
+  const [whitelistGroup, setWhitelistGroup] = useState<{ id: string; name: string } | null>(null);
+  const [whitelistEmailsInput, setWhitelistEmailsInput] = useState('');
 
   const { data: members, isLoading: isMembersLoading } = useGroupMembers(membersGroupId);
+  const { data: whitelistData, isLoading: isWhitelistLoading } = useGroupWhitelist(whitelistGroup?.id);
+
+  const addWhitelist = useAddWhitelistEmails();
+  const removeWhitelist = useRemoveWhitelistEmail();
 
   const membersGroup = groups?.find(g => g.id === membersGroupId);
   const allUsers = usersData ?? [];
@@ -69,6 +76,22 @@ export default function AdminGroupsPage() {
     if (!membersGroupId) return;
     if (confirm('Keluarkan user ini dari grup?')) {
       removeUser.mutate({ groupId: membersGroupId, userId });
+    }
+  };
+
+  const handleAddWhitelist = async () => {
+    if (!whitelistGroup || !whitelistEmailsInput.trim()) return;
+    const emails = whitelistEmailsInput.split(/[\n,]+/).map(e => e.trim()).filter(Boolean);
+    if (emails.length === 0) return;
+    
+    await addWhitelist.mutateAsync({ groupId: whitelistGroup.id, emails });
+    setWhitelistEmailsInput('');
+  };
+
+  const handleRemoveWhitelist = (emailId: string, email: string) => {
+    if (!whitelistGroup) return;
+    if (confirm(`Yakin hapus ${email} dari whitelist?`)) {
+      removeWhitelist.mutate({ groupId: whitelistGroup.id, emailId });
     }
   };
 
@@ -136,6 +159,13 @@ export default function AdminGroupsPage() {
                     {format(new Date(group.createdAt), 'dd MMM yyyy')}
                   </div>
                   <div className="col-span-1 flex justify-end gap-1 pr-2">
+                    <button
+                      onClick={() => { setWhitelistGroup({ id: group.id, name: group.name }); setWhitelistEmailsInput(''); }}
+                      className="text-muted-foreground hover:text-primary transition-colors p-1"
+                      title="Atur Whitelist Email"
+                    >
+                      <Shield className="w-5 h-5" />
+                    </button>
                     <button
                       onClick={() => { setMembersGroupId(membersGroupId === group.id ? null : group.id); setAssignUserId(''); }}
                       className={`transition-colors p-1 ${membersGroupId === group.id ? 'text-primary' : 'text-muted-foreground hover:text-primary'}`}
@@ -344,6 +374,96 @@ export default function AdminGroupsPage() {
                   </button>
                 </div>
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal: Whitelist Grup */}
+      {whitelistGroup && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-md p-4">
+          <div className="absolute w-96 h-96 bg-primary/10 rounded-full blur-[100px] pointer-events-none"></div>
+          <div className="bg-card border border-border/50 rounded-xl w-full max-w-2xl shadow-[0px_24px_48px_rgba(0,0,0,0.6)] relative overflow-hidden flex flex-col max-h-[90vh]">
+            <div className="h-2 w-full bg-gradient-to-r from-primary to-emerald-700 absolute top-0 left-0"></div>
+            
+            <div className="p-6 md:p-8 flex flex-col flex-1 min-h-0">
+              <div className="flex justify-between items-start mb-6 shrink-0">
+                <div>
+                  <h4 className="font-display text-2xl font-bold tracking-tight text-foreground flex items-center gap-2">
+                    <Shield className="w-6 h-6 text-primary" />
+                    Whitelist Grup
+                  </h4>
+                  <p className="font-sans text-sm text-muted-foreground mt-1">Mengatur daftar email yang diizinkan mendaftar ke <span className="font-semibold text-foreground">{whitelistGroup.name}</span>.</p>
+                </div>
+                <button onClick={() => setWhitelistGroup(null)} className="text-muted-foreground hover:text-foreground transition-colors">
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+
+              <div className="space-y-4 shrink-0 mb-6">
+                <div className={`p-4 rounded-lg border flex items-start gap-3 ${whitelistData && whitelistData.length > 0 ? 'bg-primary/10 border-primary/30 text-primary' : 'bg-secondary/50 border-border/50 text-muted-foreground'}`}>
+                  <Info className="w-5 h-5 shrink-0 mt-0.5" />
+                  <div className="font-sans text-sm">
+                    {whitelistData && whitelistData.length > 0 ? (
+                      <p><strong>Pendaftaran Dibatasi!</strong> Hanya email di bawah ini yang dapat mendaftar menggunakan kode undangan grup ini.</p>
+                    ) : (
+                      <p><strong>Terbuka untuk Umum!</strong> Siapa saja yang memiliki kode undangan grup ini dapat mendaftar. Tambahkan email ke daftar di bawah untuk membatasi pendaftaran.</p>
+                    )}
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block font-sans text-xs text-muted-foreground uppercase tracking-widest mb-2">Tambahkan Email</label>
+                  <div className="flex flex-col gap-2">
+                    <textarea
+                      value={whitelistEmailsInput}
+                      onChange={(e) => setWhitelistEmailsInput(e.target.value)}
+                      placeholder="email1@example.com, email2@example.com&#10;Atau paste daftar email dari excel (pisahkan dengan koma atau baris baru)"
+                      className="w-full bg-secondary border border-border/50 rounded px-4 py-3 text-foreground font-sans text-sm focus:ring-1 focus:ring-primary outline-none min-h-[100px] resize-y custom-scrollbar"
+                    />
+                    <button
+                      onClick={handleAddWhitelist}
+                      disabled={!whitelistEmailsInput.trim() || addWhitelist.isPending}
+                      className="self-end bg-primary text-background font-display uppercase tracking-tight font-bold py-2 px-6 rounded hover:bg-primary/90 transition-all disabled:opacity-50"
+                    >
+                      {addWhitelist.isPending ? 'Menambahkan...' : 'Tambahkan'}
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex-1 min-h-0 flex flex-col">
+                <h5 className="font-sans text-xs text-muted-foreground uppercase tracking-widest mb-3 shrink-0">Daftar Whitelist ({whitelistData?.length || 0})</h5>
+                <div className="overflow-y-auto flex-1 border border-border/30 rounded-lg custom-scrollbar">
+                  {isWhitelistLoading ? (
+                    <div className="p-4 space-y-3">
+                      <Skeleton className="h-10 w-full" />
+                      <Skeleton className="h-10 w-full" />
+                    </div>
+                  ) : !whitelistData || whitelistData.length === 0 ? (
+                    <div className="p-8 text-center text-muted-foreground text-sm font-sans flex flex-col items-center gap-2 h-full justify-center">
+                      <Shield className="w-12 h-12 opacity-20" />
+                      Belum ada email di whitelist.
+                    </div>
+                  ) : (
+                    <div className="divide-y divide-border/30">
+                      {whitelistData.map((item) => (
+                        <div key={item.id} className="flex items-center justify-between px-4 py-3 bg-secondary/20 hover:bg-secondary/40 transition-colors">
+                          <span className="font-sans text-sm text-foreground">{item.email}</span>
+                          <button
+                            onClick={() => handleRemoveWhitelist(item.id, item.email)}
+                            className="text-destructive/70 hover:text-destructive p-1 transition-colors"
+                            title="Hapus dari whitelist"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+              
             </div>
           </div>
         </div>

@@ -2,8 +2,8 @@ import { auth } from "@/lib/auth";
 import { toNextJsHandler } from "better-auth/next-js";
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/db";
-import { groups, users } from "@/db/schema";
-import { sql } from "drizzle-orm";
+import { groups, users, groupWhitelists } from "@/db/schema";
+import { sql, eq } from "drizzle-orm";
 
 const handler = toNextJsHandler(auth);
 
@@ -57,6 +57,26 @@ export async function POST(req: NextRequest) {
         { data: null, error: { message: 'Kode undangan tidak valid', code: 'INVALID_INVITATION_CODE' } },
         { status: 400 }
       );
+    }
+
+    if (email) {
+      // Check whitelist
+      const whitelistedEmails = await db
+        .select({ email: groupWhitelists.email })
+        .from(groupWhitelists)
+        .where(eq(groupWhitelists.groupId, group.id));
+      
+      if (whitelistedEmails.length > 0) {
+        const isWhitelisted = whitelistedEmails.some(
+          w => w.email.toLowerCase() === email.toLowerCase()
+        );
+        if (!isWhitelisted) {
+          return NextResponse.json(
+            { data: null, error: { message: 'Email ini tidak diizinkan untuk mendaftar dengan kode undangan ini.', code: 'NOT_WHITELISTED' } },
+            { status: 403 }
+          );
+        }
+      }
     }
 
     const response = await handler.POST(req);

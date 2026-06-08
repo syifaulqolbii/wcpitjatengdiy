@@ -116,3 +116,41 @@ export function useRemoveUserFromGroup() {
     onError: (error: Error) => toast.error(error.message),
   });
 }
+
+// ─── Whitelist Hooks ──────────────────────────────────────────
+
+export function useGroupWhitelist(groupId?: string | null) {
+  return useQuery({
+    queryKey: ['groups', groupId, 'whitelist'],
+    queryFn: () => apiGet<{ id: string; email: string; createdAt: string }[]>(`/api/admin/groups/${groupId}/whitelist`),
+    enabled: !!groupId,
+  });
+}
+
+export function useAddWhitelistEmails() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ groupId, emails }: { groupId: string; emails: string[] }) =>
+      apiPost<{ addedCount: number }>(`/api/admin/groups/${groupId}/whitelist`, { emails }),
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: ['groups', variables.groupId, 'whitelist'] });
+      toast.success('Email berhasil ditambahkan ke whitelist');
+    },
+    onError: (err: Error) => toast.error(err.message),
+  });
+}
+
+export function useRemoveWhitelistEmail() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ groupId, emailId }: { groupId: string; emailId: string }) =>
+      apiDelete<{ success: boolean }>(`/api/admin/groups/${groupId}/whitelist`, { emailId }),
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: ['groups', variables.groupId, 'whitelist'] });
+      toast.success('Email dihapus dari whitelist');
+    },
+    onError: (err: Error) => toast.error(err.message),
+  });
+}
