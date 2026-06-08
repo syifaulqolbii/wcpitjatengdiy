@@ -497,7 +497,7 @@ export default function AdminUsersPage() {
           <div className="absolute w-96 h-96 bg-primary/10 rounded-full blur-[100px] pointer-events-none"></div>
           <div className="bg-card border border-border/50 rounded-xl w-full max-w-2xl shadow-[0px_24px_48px_rgba(0,0,0,0.6)] relative overflow-hidden max-h-[90vh] flex flex-col">
             <div className="h-2 w-full bg-gradient-to-r from-primary to-emerald-700 absolute top-0 left-0"></div>
-            <div className="p-6 md:p-8 flex flex-col h-full">
+            <div className="p-6 md:p-8 flex flex-col flex-1 min-h-0">
               <div className="flex justify-between items-start mb-6 shrink-0">
                 <div>
                   <h4 className="font-display text-2xl font-bold tracking-tight text-foreground">Riwayat Prediksi</h4>
