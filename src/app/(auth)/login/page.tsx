@@ -85,6 +85,9 @@ function LoginPageContent() {
           if (error.code === 'INVALID_INVITATION_CODE') {
             setErrorMsg("Kode undangan tidak valid. Hubungi admin untuk mendapatkan kode.");
             toast.error("Kode undangan tidak valid.");
+          } else if (error.code === 'NOT_WHITELISTED' || error.message?.includes('tidak diizinkan')) {
+            setErrorMsg("Email ini tidak diizinkan untuk mendaftar dengan kode undangan ini.");
+            toast.error("Pendaftaran Ditolak.");
           } else {
             setErrorMsg(error.message || "Failed to register.");
             toast.error(error.message || "Failed to register.");
