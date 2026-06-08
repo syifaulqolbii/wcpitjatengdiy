@@ -221,7 +221,7 @@ function LoginPageContent() {
               <input
                 id="password"
                 type={showPassword ? "text" : "password"}
-                placeholder="••••••••"
+                placeholder="•••••••• (Min. 8 karakter)"
                 className={cn(
                   "block w-full pl-10 pr-10 bg-secondary/50 border border-transparent rounded-md text-foreground font-sans text-base focus:border-primary focus:ring-1 focus:ring-primary focus:bg-secondary transition-colors placeholder:text-muted-foreground/50 py-3",
                   errors.password && "border-destructive focus:border-destructive focus:ring-destructive"

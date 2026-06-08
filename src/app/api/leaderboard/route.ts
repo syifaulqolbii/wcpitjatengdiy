@@ -18,6 +18,7 @@ export async function GET(req: NextRequest) {
       .select({
         userId: users.id,
         name: users.name,
+        email: users.email,
         image: users.image,
         groupId: users.groupId,
       })
@@ -102,9 +103,12 @@ export async function GET(req: NextRequest) {
       const m = matchStatsByUserId.get(u.userId);
       const championPoints = championPointsByUserId.get(u.userId) ?? 0;
       const matchPoints = m?.totalPoints ?? 0;
+      
+      const emailUsername = u.email ? u.email.split('@')[0] : u.name;
+
       return {
         userId: u.userId,
-        name: u.name,
+        name: emailUsername,
         image: u.image,
         totalPoints: matchPoints + championPoints,
         stagePoints: stagePointsByUserId.get(u.userId) ?? {},

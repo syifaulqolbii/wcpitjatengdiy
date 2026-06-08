@@ -8,6 +8,7 @@ import { useLeaderboard } from '@/hooks/useLeaderboard';
 import { useGroups, useAssignUserToGroup } from '@/hooks/useGroups';
 import { useUserPredictions } from '@/hooks/usePredictions';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Flag } from '@/components/shared/Flag';
 import { format } from 'date-fns';
 import { toast } from 'sonner';
 
@@ -405,7 +406,7 @@ export default function AdminUsersPage() {
                     type="password"
                     value={temporaryPassword}
                     onChange={(e) => setTemporaryPassword(e.target.value)}
-                    placeholder="Kosongkan jika hanya ubah email"
+                    placeholder="Minimal 8 karakter (kosongkan jika tidak diubah)"
                   />
                 </div>
 
@@ -529,7 +530,7 @@ export default function AdminUsersPage() {
                         <div className="flex items-center gap-4 flex-1">
                           <div className="flex-1 flex items-center justify-end gap-3 text-right">
                             <span className="font-display font-bold text-sm md:text-base text-foreground">{match.teamA}</span>
-                            <span className="text-xl md:text-2xl">{match.flagA}</span>
+                            <Flag flag={match.flagA} size="sm" className="w-6 md:w-8 shrink-0" />
                           </div>
                           
                           <div className="bg-background border border-border/50 rounded px-3 py-1 flex items-center gap-2 shadow-inner">
@@ -539,7 +540,7 @@ export default function AdminUsersPage() {
                           </div>
                           
                           <div className="flex-1 flex items-center justify-start gap-3">
-                            <span className="text-xl md:text-2xl">{match.flagB}</span>
+                            <Flag flag={match.flagB} size="sm" className="w-6 md:w-8 shrink-0" />
                             <span className="font-display font-bold text-sm md:text-base text-foreground">{match.teamB}</span>
                           </div>
                         </div>
