@@ -145,18 +145,8 @@ export async function DELETE(
 
     if (!existing) return Err.notFound("Match");
 
-    // Check if any predictions exist for this match
-    const [{ predictionCount }] = await db
-      .select({ predictionCount: count() })
-      .from(predictions)
-      .where(eq(predictions.matchId, params.matchId));
-
-    if (Number(predictionCount) > 0) {
-      return Err.conflict(
-        `Cannot delete match with ${predictionCount} existing prediction(s).`
-      );
-    }
-
+    // Database already has ON DELETE CASCADE on predictions, 
+    // so deleting the match will automatically delete its predictions.
     await db.delete(matches).where(eq(matches.id, params.matchId));
 
     return ok({ success: true });

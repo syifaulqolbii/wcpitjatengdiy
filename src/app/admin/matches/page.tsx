@@ -124,7 +124,7 @@ export default function AdminMatchesPage() {
     const targetMatch = match || selectedMatch;
     if (!targetMatch) return;
     
-    if (confirm('Yakin ingin menghapus pertandingan ini? Pastikan belum ada prediksi untuk pertandingan ini.')) {
+    if (confirm('Yakin ingin menghapus pertandingan ini? Jika ada prediksi dari user, maka prediksi tersebut JUGA akan terhapus secara permanen.')) {
       try {
         await deleteMatch.mutateAsync(targetMatch.id);
         if (selectedMatch?.id === targetMatch.id) {
@@ -290,15 +290,13 @@ export default function AdminMatchesPage() {
                             >
                               <LucideFlag className="w-4 h-4" />
                             </button>
-                            {(isLive || isUpcoming) && (
-                              <button 
-                                onClick={() => handleOpenEditModal(match)}
-                                className="p-2 text-muted-foreground hover:text-primary transition-colors rounded bg-background flex items-center justify-center border border-border/50" 
-                                title="Edit Match"
-                              >
-                                <Edit className="w-4 h-4" />
-                              </button>
-                            )}
+                            <button 
+                              onClick={() => handleOpenEditModal(match)}
+                              className="p-2 text-muted-foreground hover:text-primary transition-colors rounded bg-background flex items-center justify-center border border-border/50" 
+                              title="Edit Match"
+                            >
+                              <Edit className="w-4 h-4" />
+                            </button>
                             <button 
                               onClick={() => handleDelete(match)}
                               disabled={deleteMatch.isPending}
