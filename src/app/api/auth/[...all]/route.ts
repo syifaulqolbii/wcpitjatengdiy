@@ -73,7 +73,7 @@ export async function POST(req: NextRequest) {
         if (!isWhitelisted) {
           return NextResponse.json(
             { data: null, error: { message: 'Email ini tidak diizinkan untuk mendaftar dengan kode undangan ini.', code: 'NOT_WHITELISTED' } },
-            { status: 403 }
+            { status: 400 }
           );
         }
       }
