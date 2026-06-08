@@ -73,6 +73,7 @@ export async function POST(req: NextRequest) {
         flagA: input.flagA,
         flagB: input.flagB,
         group: input.group,
+        stage: input.stage ?? "group_stage",
         kickoffTime: new Date(input.kickoffTime),
         status: "upcoming",
       })

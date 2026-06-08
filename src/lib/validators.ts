@@ -7,6 +7,7 @@ export const createMatchSchema = z.object({
   flagA: z.string().min(1, "flagA is required"),
   flagB: z.string().min(1, "flagB is required"),
   group: z.string().min(1, "group is required"),
+  stage: z.string().optional(),
   kickoffTime: z.string().datetime({ message: "kickoffTime must be a valid ISO datetime" }),
 });
 
@@ -16,6 +17,7 @@ export const updateMatchSchema = z.object({
   flagA: z.string().min(1).optional(),
   flagB: z.string().min(1).optional(),
   group: z.string().min(1).optional(),
+  stage: z.string().optional(),
   kickoffTime: z.string().datetime().optional(),
   status: z.enum(["upcoming", "live", "finished"]).optional(),
   scoreA: z.number().int().min(0).nullable().optional(),

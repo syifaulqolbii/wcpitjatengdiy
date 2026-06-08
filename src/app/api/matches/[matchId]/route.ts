@@ -87,6 +87,7 @@ export async function PUT(
         ...(input.flagA !== undefined && { flagA: input.flagA }),
         ...(input.flagB !== undefined && { flagB: input.flagB }),
         ...(input.group !== undefined && { group: input.group }),
+        ...(input.stage !== undefined && { stage: input.stage }),
         ...(input.kickoffTime !== undefined && {
           kickoffTime: new Date(input.kickoffTime),
         }),
