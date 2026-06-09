@@ -1,6 +1,6 @@
 "use client";
 
-import React, { Suspense, useState, useMemo } from 'react';
+import React, { Suspense, useState, useEffect, useMemo } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { useMatches } from '@/hooks/useMatches';
 import { usePredictions } from '@/hooks/usePredictions';

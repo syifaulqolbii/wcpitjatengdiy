@@ -35,6 +35,9 @@ export const metadata: Metadata = {
     ],
     apple: [{ url: "/icon-192.png", sizes: "192x192", type: "image/png" }],
   },
+  other: {
+    "mobile-web-app-capable": "yes",
+  },
 };
 
 export const viewport: Viewport = {
