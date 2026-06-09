@@ -46,7 +46,7 @@ export default function AdminDashboardPage() {
 
   // Today Matches
   const today = new Date();
-  const localTz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+  const localTz = 'Asia/Jakarta';
   const todayDateString = formatInTimeZone(today, localTz, 'yyyy-MM-dd');
 
   const todayMatches = matches?.filter(m => {
@@ -292,7 +292,7 @@ export default function AdminDashboardPage() {
                       const isFinished = match.status === 'finished';
                       const isLive = match.status === 'live';
                       const isUpcoming = match.status === 'upcoming';
-                      const matchTime = formatInTimeZone(new Date(match.kickoffTime), Intl.DateTimeFormat().resolvedOptions().timeZone, 'HH:mm');
+                      const matchTime = formatInTimeZone(new Date(match.kickoffTime), 'Asia/Jakarta', 'HH:mm');
 
                       return (
                         <tr key={match.id} className="hover:bg-secondary/30 transition-colors">
@@ -452,7 +452,7 @@ export default function AdminDashboardPage() {
                               </div>
                             </td>
                             <td className="py-3 px-3 text-muted-foreground text-xs">
-                              {formatInTimeZone(new Date(pred.submittedAt), Intl.DateTimeFormat().resolvedOptions().timeZone, 'dd MMM yyyy, HH:mm')}
+                              {formatInTimeZone(new Date(pred.submittedAt), 'Asia/Jakarta', 'dd MMM yyyy, HH:mm')}
                             </td>
                             <td className="py-3 px-3 text-right">
                               {pred.points !== null ? (

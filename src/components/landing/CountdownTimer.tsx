@@ -23,9 +23,12 @@ function getTimeLeft(): TimeLeft {
 }
 
 export function CountdownTimer() {
-  const [timeLeft, setTimeLeft] = useState<TimeLeft>(() => getTimeLeft());
+  const [mounted, setMounted] = useState(false);
+  const [timeLeft, setTimeLeft] = useState<TimeLeft>({ days: 0, hours: 0, minutes: 0, seconds: 0 });
 
   useEffect(() => {
+    setMounted(true);
+    setTimeLeft(getTimeLeft());
     const interval = window.setInterval(() => {
       setTimeLeft(getTimeLeft());
     }, 1000);
@@ -48,7 +51,7 @@ export function CountdownTimer() {
       {units.map((unit) => (
         <div key={unit.label} className="flex flex-col items-center">
           <div className="flex h-16 w-14 items-center justify-center rounded-md bg-primary shadow-[0_0_28px_rgba(0,230,118,0.18)] sm:h-20 sm:w-16 md:h-28 md:w-24">
-            <span className="font-display text-2xl font-black tabular-nums text-primary-foreground sm:text-3xl md:text-5xl">
+            <span suppressHydrationWarning className="font-display text-2xl font-black tabular-nums text-primary-foreground sm:text-3xl md:text-5xl">
               {String(unit.value).padStart(2, "0")}
             </span>
           </div>

@@ -19,10 +19,15 @@ function PredictionsPageContent() {
   const { data: settings } = useSettings();
   const lockInMinutes = settings?.lockInMinutes ? parseInt(settings.lockInMinutes, 10) : 15;
 
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   const getPrediction = (matchId: string) => predictions?.find(p => p.matchId === matchId);
 
   const filteredMatches = useMemo(() => {
-    if (!matches) return [];
+    if (!matches || !mounted) return [];
     return matches.filter(match => {
       if (filter === 'all') return true;
       if (filter === 'finished') return match.status === 'finished';
@@ -39,7 +44,7 @@ function PredictionsPageContent() {
     for (const match of filteredMatches) {
       // Group by "Group A - 15 Jun 2026"
       try {
-        const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+        const tz = 'Asia/Jakarta';
         const dateStr = formatInTimeZone(new Date(match.kickoffTime), tz, 'dd MMM yyyy');
         const groupKey = `${match.group} — ${dateStr}`;
         if (!groups[groupKey]) groups[groupKey] = [];
@@ -86,7 +91,7 @@ function PredictionsPageContent() {
 
       {/* Match Feed */}
       <section className="flex flex-col gap-5">
-        {(isMatchesLoading || isPredictionsLoading) ? (
+        {(isMatchesLoading || isPredictionsLoading || !mounted) ? (
           <>
             <Skeleton className="h-12 w-1/2" />
             <Skeleton className="h-64 w-full rounded-xl" />

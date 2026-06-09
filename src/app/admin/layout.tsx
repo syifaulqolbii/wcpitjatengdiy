@@ -43,7 +43,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       {/* SideNavBar */}
       <nav aria-label="Main Navigation" className="fixed left-0 top-0 h-full flex flex-col p-6 space-y-8 bg-secondary/20 w-64 border-r border-border/50 z-20">
         <div className="mb-4">
-          <Link href="/dashboard" aria-label="Kembali ke dashboard user" className="mb-3 block w-44">
+          <Link href="/dashboard" aria-label="Kembali ke dashboard user" className="mb-3 block w-auto">
             <BrandLogo compact />
           </Link>
           <p className="text-muted-foreground text-xs font-display uppercase tracking-widest">ADMIN CONSOLE</p>

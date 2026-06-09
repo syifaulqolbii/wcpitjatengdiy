@@ -62,6 +62,18 @@ export function MatchCard({ match, prediction }: { match: Match; prediction?: Pr
   const lockedTeamNameClass = "min-w-0 max-w-full font-display text-xs md:text-xl font-black text-muted-foreground tracking-tight uppercase leading-tight break-words";
   const activeTeamNameClass = "min-w-0 max-w-full font-display text-sm md:text-2xl font-black tracking-tight text-foreground uppercase leading-tight break-words";
 
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) {
+    // Render a safe empty placeholder that will always match SSR
+    return (
+      <div className="bg-card rounded-xl p-6 h-[250px] flex flex-col relative overflow-hidden border border-border/50 opacity-50"></div>
+    );
+  }
+
   if (isFinished) {
     const points = prediction?.points ?? 0;
     const isWin = points > 0;

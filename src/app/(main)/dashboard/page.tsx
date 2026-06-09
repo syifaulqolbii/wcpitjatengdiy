@@ -32,8 +32,10 @@ export default function DashboardPage() {
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [, forceTick] = useState(0);
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
+    setMounted(true);
     const interval = setInterval(() => forceTick((t) => t + 1), 30000);
     return () => clearInterval(interval);
   }, []);
@@ -44,6 +46,14 @@ export default function DashboardPage() {
   const nextMatch = upcomingMatches && upcomingMatches.length > 0 ? upcomingMatches[0] : null;
   const heroMatch = liveMatch || nextMatch;
   const isLive = !!liveMatch;
+
+  if (!mounted) {
+    return (
+      <div className="flex h-screen w-full items-center justify-center">
+        <Skeleton className="h-32 w-32 rounded-full opacity-50" />
+      </div>
+    );
+  }
 
   const recentResults = finishedMatches
     ? [...finishedMatches]
@@ -319,7 +329,7 @@ export default function DashboardPage() {
                     <AlertCircle className="h-6 w-6 text-primary shrink-0" />
                     <div>
                       <span className="text-xs text-primary font-bold uppercase tracking-widest">Belum Ada Prediksi</span>
-                      <p className="mt-1 text-sm text-muted-foreground">Deadline: {lockInMinutes} menit sebelum kickoff · {countdownLabel}</p>
+                      <p suppressHydrationWarning className="mt-1 text-sm text-muted-foreground">Deadline: {lockInMinutes} menit sebelum kickoff · {countdownLabel}</p>
                     </div>
                   </div>
                   <a href="/predictions?filter=open" className="inline-flex items-center justify-center gap-2 rounded-md bg-primary px-4 py-2 text-xs font-bold uppercase tracking-widest text-background transition-colors hover:bg-primary/90">

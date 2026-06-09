@@ -256,10 +256,10 @@ export default function AdminMatchesPage() {
                         </td>
                         <td className="py-5 px-6 text-muted-foreground">
                           <div className="font-medium text-foreground">
-                            {formatInTimeZone(new Date(match.kickoffTime), Intl.DateTimeFormat().resolvedOptions().timeZone, 'dd MMM yyyy')}
+                            {formatInTimeZone(new Date(match.kickoffTime), 'Asia/Jakarta', 'dd MMM yyyy')}
                           </div>
                           <div className="text-xs font-sans">
-                            {formatInTimeZone(new Date(match.kickoffTime), Intl.DateTimeFormat().resolvedOptions().timeZone, 'HH:mm')}
+                            {formatInTimeZone(new Date(match.kickoffTime), 'Asia/Jakarta', 'HH:mm')}
                           </div>
                         </td>
                         <td className="py-5 px-6">
@@ -448,7 +448,7 @@ export default function AdminMatchesPage() {
                             </span>
                           </td>
                           <td className="px-4 py-4 text-right text-xs text-muted-foreground">
-                            {formatInTimeZone(new Date(prediction.submittedAt), Intl.DateTimeFormat().resolvedOptions().timeZone, 'dd MMM yyyy HH:mm')}
+                            {formatInTimeZone(new Date(prediction.submittedAt), 'Asia/Jakarta', 'dd MMM yyyy HH:mm')}
                           </td>
                         </tr>
                       ))}

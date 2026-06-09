@@ -21,7 +21,7 @@ export default function ResultsPage() {
     const sorted = [...matches].sort((a, b) => new Date(b.kickoffTime).getTime() - new Date(a.kickoffTime).getTime());
     for (const match of sorted) {
       try {
-        const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+        const tz = 'Asia/Jakarta';
         const dateStr = formatInTimeZone(new Date(match.kickoffTime), tz, 'dd MMM yyyy');
         const groupKey = `${match.group} — ${dateStr}`;
         if (!groups[groupKey]) groups[groupKey] = [];

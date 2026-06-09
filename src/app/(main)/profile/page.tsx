@@ -55,7 +55,7 @@ export default function ProfilePage() {
     for (const pred of finishedPredictions) {
       if (!pred.match) continue;
       try {
-        const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+        const tz = 'Asia/Jakarta';
         const dateStr = formatInTimeZone(new Date(pred.match.kickoffTime), tz, 'dd MMM yyyy');
         if (!groups[dateStr]) groups[dateStr] = [];
         groups[dateStr].push(pred);
