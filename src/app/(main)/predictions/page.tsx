@@ -37,7 +37,7 @@ function PredictionsPageContent() {
       }
       return true;
     });
-  }, [matches, filter, lockInMinutes]);
+  }, [matches, filter, lockInMinutes, mounted]);
 
   const groupedMatches = useMemo(() => {
     const groups: Record<string, Match[]> = {};

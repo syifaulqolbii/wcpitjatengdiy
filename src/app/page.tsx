@@ -12,6 +12,7 @@ import { CountdownTimer } from "@/components/landing/CountdownTimer";
 import logo from "@/components/img/it_jaya_putih.png";
 import operaLogo from "@/components/img/opera.png";
 import aocLogo from "@/components/img/aoc.png";
+import { LandingNavbar } from "@/components/landing/LandingNavbar";
 
 const leaderboard = [
   { rank: "04", name: "JODY MULYADI", points: 42 },
@@ -254,47 +255,7 @@ export default function Home() {
         }
       `}} />
       <main className="min-h-screen overflow-hidden bg-[#0e0e0e] text-foreground">
-        <header className="fixed inset-x-0 top-0 z-50 border-b border-white/5 bg-[#0a1010]/85 backdrop-blur-md">
-          <div className="mx-auto flex w-full max-w-7xl items-center justify-between px-4 py-3 sm:px-6 md:py-5">
-            <Link href="/" className="flex items-center gap-3 md:gap-4">
-              <Image
-                src={logo}
-                alt="IT-JAYA"
-                className="h-9 w-auto object-contain sm:h-11 md:h-14"
-                priority
-              />
-              <Image
-                src={operaLogo}
-                alt="IT Opera"
-                className="h-9 w-auto object-contain sm:h-11 md:h-14"
-                priority
-              />
-              <Image
-                src={aocLogo}
-                alt="AOC"
-                className="h-9 w-auto object-contain sm:h-11 md:h-14"
-                priority
-              />
-            </Link>
-            <nav className="hidden items-center gap-8 md:flex">
-              <a className="border-b-2 border-primary pb-1 font-bold text-primary" href="#">
-                HOME
-              </a>
-              <a className="font-medium text-muted-foreground transition-colors hover:text-primary" href="#rules">
-                RULES
-              </a>
-              <a className="font-medium text-muted-foreground transition-colors hover:text-primary" href="#leaderboard">
-                LEADERBOARD
-              </a>
-              <Link
-                className="inline-flex h-10 items-center justify-center rounded-sm bg-primary px-5 text-sm font-black uppercase leading-none text-primary-foreground transition-all hover:shadow-[0_0_20px_rgba(0,230,118,0.35)]"
-                href="/register"
-              >
-                IKUT PREDIKSI
-              </Link>
-            </nav>
-          </div>
-        </header>
+        <LandingNavbar />
 
         <section className="relative flex min-h-screen flex-col items-center justify-center px-4 pb-16 pt-28 text-center sm:px-6">
           <div className="absolute inset-0 -rotate-12 scale-150 bg-[radial-gradient(circle_at_center,rgba(0,230,118,0.36)_1px,transparent_1px)] bg-[length:24px_24px] opacity-20 [mask-image:linear-gradient(to_bottom,black,transparent)]" />
