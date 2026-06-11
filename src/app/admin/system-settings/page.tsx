@@ -31,10 +31,11 @@ function utcToWibInput(isoUtc: string) {
 }
 
 function wibInputToUtcIso(localValue: string) {
-  const date = new Date(localValue);
+  // localValue dari input datetime-local adalah format "YYYY-MM-DDTHH:mm"
+  // Tambahkan offset +07:00 secara eksplisit agar JS menganggapnya WIB (UTC+7)
+  const date = new Date(`${localValue}+07:00`);
   if (Number.isNaN(date.getTime())) return null;
-  const utcMs = date.getTime() - (7 * 60 * 60 * 1000);
-  return new Date(utcMs).toISOString();
+  return date.toISOString();
 }
 
 export default function AdminSystemSettingsPage() {
