@@ -81,3 +81,26 @@ export function useRecoverUserAccount() {
     },
   });
 }
+
+export function useInjectChampion() {
+  return useMutation({
+    mutationFn: async ({ userId, predictedWinner, predictedWinnerFlag }: { userId: string; predictedWinner: string; predictedWinnerFlag: string }) => {
+      const response = await fetch(`/api/admin/users/${userId}/champion`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ predictedWinner, predictedWinnerFlag }),
+      });
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.error?.message || 'Gagal inject juara');
+      }
+      return data;
+    },
+    onSuccess: () => {
+      toast.success('Berhasil inject tebakan juara');
+    },
+    onError: (error) => {
+      toast.error(error.message);
+    },
+  });
+}

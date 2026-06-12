@@ -1,8 +1,8 @@
 "use client";
 
 import React, { useState } from 'react';
-import { Search, Link as LinkIcon, Key, Trash2, X, Copy, Clock, Shield, UsersRound, History } from 'lucide-react';
-import { useUsers, useUpdateUserRole, useDeleteUser, useRecoverUserAccount } from '@/hooks/useUsers';
+import { Search, Link as LinkIcon, Key, Trash2, X, Copy, Clock, Shield, UsersRound, History, Trophy } from 'lucide-react';
+import { useUsers, useUpdateUserRole, useDeleteUser, useRecoverUserAccount, useInjectChampion } from '@/hooks/useUsers';
 import { MAX_USER_SLOTS } from '@/lib/constants';
 import { useLeaderboard } from '@/hooks/useLeaderboard';
 import { useGroups, useAssignUserToGroup } from '@/hooks/useGroups';
@@ -11,6 +11,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Flag } from '@/components/shared/Flag';
 import { format } from 'date-fns';
 import { toast } from 'sonner';
+import { WC2026_TEAMS } from '@/lib/wc2026-teams';
 
 export default function AdminUsersPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -35,6 +36,10 @@ export default function AdminUsersPage() {
 
   const [assignGroupUser, setAssignGroupUser] = useState<{ id: string; name: string; groupId?: string | null } | null>(null);
   const [selectedGroupId, setSelectedGroupId] = useState('');
+
+  const [injectChampionUser, setInjectChampionUser] = useState<{ id: string; name: string } | null>(null);
+  const [selectedChampionName, setSelectedChampionName] = useState('');
+  const injectChampion = useInjectChampion();
 
   const handleRoleChange = (userId: string, currentRole: string) => {
     const newRole = currentRole === 'admin' ? 'user' : 'admin';
@@ -118,6 +123,20 @@ export default function AdminUsersPage() {
     await assignUserToGroup.mutateAsync({ groupId: selectedGroupId, userId: assignGroupUser.id });
     setAssignGroupUser(null);
     setSelectedGroupId('');
+  };
+
+  const handleInjectChampion = async () => {
+    if (!injectChampionUser || !selectedChampionName) { toast.error('Pilih tim juara terlebih dahulu'); return; }
+    const team = WC2026_TEAMS.find(t => t.name === selectedChampionName);
+    if (!team) return;
+    
+    await injectChampion.mutateAsync({
+      userId: injectChampionUser.id,
+      predictedWinner: team.name,
+      predictedWinnerFlag: team.flag
+    });
+    setInjectChampionUser(null);
+    setSelectedChampionName('');
   };
 
   return (
@@ -249,6 +268,13 @@ export default function AdminUsersPage() {
                         title="Assign Grup"
                       >
                         <UsersRound className="w-5 h-5" />
+                      </button>
+                      <button
+                        onClick={() => { setInjectChampionUser({ id: user.id, name: user.name }); setSelectedChampionName(''); }}
+                        className="text-muted-foreground hover:text-amber-500 transition-colors p-1"
+                        title="Inject Tebakan Juara"
+                      >
+                        <Trophy className="w-5 h-5" />
                       </button>
                       <button
                         onClick={() => openRecoveryModal(user)}
@@ -567,6 +593,56 @@ export default function AdminUsersPage() {
                     );
                   })
                 )}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal: Inject Juara */}
+      {injectChampionUser && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-md">
+          <div className="absolute w-96 h-96 bg-amber-500/10 rounded-full blur-[100px] pointer-events-none"></div>
+          <div className="bg-card border border-border/50 rounded-xl w-full max-w-md shadow-[0px_24px_48px_rgba(0,0,0,0.6)] relative overflow-hidden">
+            <div className="h-2 w-full bg-gradient-to-r from-amber-500 to-amber-700 absolute top-0 left-0"></div>
+            <div className="p-8">
+              <div className="flex justify-between items-start mb-6">
+                <div>
+                  <h4 className="font-display text-2xl font-bold tracking-tight text-foreground flex items-center gap-2">
+                    <Trophy className="w-6 h-6 text-amber-500" /> Inject Juara
+                  </h4>
+                  <p className="font-sans text-sm text-muted-foreground mt-1">Set tebakan juara untuk <span className="text-foreground font-semibold">{injectChampionUser.name}</span>.</p>
+                </div>
+                <button onClick={() => setInjectChampionUser(null)} className="text-muted-foreground hover:text-foreground transition-colors">
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+              <div className="space-y-4">
+                <div>
+                  <label className="block font-sans text-xs text-muted-foreground uppercase tracking-widest mb-2">Pilih Tim Juara</label>
+                  <select
+                    value={selectedChampionName}
+                    onChange={(e) => setSelectedChampionName(e.target.value)}
+                    className="w-full bg-secondary border border-border/50 rounded px-4 py-3 text-foreground font-sans text-sm focus:ring-1 focus:ring-primary outline-none"
+                  >
+                    <option value="">-- Pilih Tim Juara --</option>
+                    {WC2026_TEAMS.map(t => (
+                      <option key={t.name} value={t.name}>{t.flag} {t.name}</option>
+                    ))}
+                  </select>
+                </div>
+                <div className="flex gap-3 pt-2">
+                  <button onClick={() => setInjectChampionUser(null)} className="flex-1 border border-border text-muted-foreground font-display uppercase tracking-tight font-bold py-3 rounded hover:bg-secondary/50 transition-colors">
+                    Batal
+                  </button>
+                  <button
+                    onClick={handleInjectChampion}
+                    disabled={!selectedChampionName || injectChampion.isPending}
+                    className="flex-1 bg-amber-500 text-black font-display uppercase tracking-tight font-bold py-3 rounded hover:bg-amber-400 transition-all disabled:opacity-50"
+                  >
+                    {injectChampion.isPending ? 'Menyimpan...' : 'Inject'}
+                  </button>
+                </div>
               </div>
             </div>
           </div>
