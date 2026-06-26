@@ -1,26 +1,8 @@
-/**
- * Calculate the points earned for a prediction based on the actual match result.
- *
- * Rules (configurable via settings):
- * - Perfect score (exact predicted A and B matches actual A and B): perfectScore points
- * - Correct result (predicted winner/draw matches actual winner/draw): correctResult points
- * - Wrong prediction: wrongPrediction points
- */
-export interface ScoringRules {
-  perfectScore: number;
-  correctResult: number;
-  wrongPrediction: number;
-  lockInMinutes: number;
-}
+export * from "./scoring-engine";
+import { calculatePoints } from "./scoring-engine";
 
-export const DEFAULT_SCORING_RULES: ScoringRules = {
-  perfectScore: 5,
-  correctResult: 2,
-  wrongPrediction: 0,
-  lockInMinutes: 15,
-};
-
-export async function getScoringRules(): Promise<ScoringRules> {
+/** Get lock-in minutes from database settings. */
+export async function getLockInMinutes(): Promise<number> {
   const [{ db }, { settings }] = await Promise.all([
     import("@/db"),
     import("@/db/schema"),
@@ -32,63 +14,47 @@ export async function getScoringRules(): Promise<ScoringRules> {
     return acc;
   }, {} as Record<string, string>);
 
-  const parseIntSafe = (val: string | undefined, fallback: number) => {
-    if (val === undefined) return fallback;
-    const n = parseInt(val, 10);
-    return Number.isFinite(n) ? n : fallback;
-  };
-
-  return {
-    perfectScore: parseIntSafe(map.perfectScore, DEFAULT_SCORING_RULES.perfectScore),
-    correctResult: parseIntSafe(map.correctResult, DEFAULT_SCORING_RULES.correctResult),
-    wrongPrediction: parseIntSafe(map.wrongPrediction, DEFAULT_SCORING_RULES.wrongPrediction),
-    lockInMinutes: parseIntSafe(map.lockInMinutes, DEFAULT_SCORING_RULES.lockInMinutes),
-  };
+  const val = map.lockInMinutes;
+  if (val === undefined) return 15;
+  const n = parseInt(val, 10);
+  return Number.isFinite(n) ? n : 15;
 }
 
-export function calculatePoints(
-  predictedA: number,
-  predictedB: number,
-  actualA: number,
-  actualB: number,
-  rules: ScoringRules = DEFAULT_SCORING_RULES
-): number {
-  // 1. Perfect score
-  if (predictedA === actualA && predictedB === actualB) {
-    return rules.perfectScore;
-  }
-
-  // 2. Correct result (Win/Draw/Loss)
-  const predictedResult = Math.sign(predictedA - predictedB);
-  const actualResult = Math.sign(actualA - actualB);
-
-  if (predictedResult === actualResult) {
-    return rules.correctResult;
-  }
-
-  // 3. Wrong prediction
-  return rules.wrongPrediction;
+/**
+ * Build a SQL CASE expression that maps match stage to its perfect score value.
+ * Used for counting perfect scores across different stages in aggregate queries.
+ */
+function buildPerfectScoreCaseSQL(stageColumn: unknown, sql: typeof import("drizzle-orm").sql) {
+  return sql`CASE ${stageColumn}
+    WHEN 'group_stage' THEN 5
+    WHEN 'round_32' THEN 6
+    WHEN 'round_16' THEN 7
+    WHEN 'quarter_final' THEN 8
+    WHEN 'semi_final' THEN 10
+    WHEN 'juara_3' THEN 12
+    WHEN 'final' THEN 15
+    ELSE 5
+  END`;
 }
 
 export async function getCurrentLeaderboardSnapshot() {
-  const [{ db }, { predictions, tournamentPredictions, users }, { count, eq, isNotNull, sql }] =
+  const [{ db }, { predictions, tournamentPredictions, users, matches }, { eq, isNotNull, sql }] =
     await Promise.all([
       import("@/db"),
       import("@/db/schema"),
       import("drizzle-orm"),
     ]);
 
-  const rules = await getScoringRules();
+  const perfectScoreCase = buildPerfectScoreCaseSQL(matches.stage, sql);
 
   const matchRows = await db
     .select({
       userId: predictions.userId,
       totalPoints: sql<number>`COALESCE(SUM(${predictions.points}), 0)`.mapWith(Number),
-      perfectScores: count(
-        sql`CASE WHEN ${predictions.points} = ${rules.perfectScore} THEN 1 END`
-      ).mapWith(Number),
+      perfectScores: sql<number>`COUNT(CASE WHEN ${predictions.points} = ${perfectScoreCase} THEN 1 END)`.mapWith(Number),
     })
     .from(predictions)
+    .innerJoin(matches, eq(predictions.matchId, matches.id))
     .innerJoin(users, eq(predictions.userId, users.id))
     .where(isNotNull(predictions.points))
     .groupBy(predictions.userId);
@@ -189,10 +155,7 @@ export async function recalculateMatchPoints(matchId: string): Promise<number> {
 
   if (matchPredictions.length === 0) return 0;
 
-  const [snapshotEntries, rules] = await Promise.all([
-    getCurrentLeaderboardSnapshot(),
-    getScoringRules(),
-  ]);
+  const snapshotEntries = await getCurrentLeaderboardSnapshot();
 
   let updatedCount = 0;
   await db.transaction(async (tx) => {
@@ -212,7 +175,7 @@ export async function recalculateMatchPoints(matchId: string): Promise<number> {
         prediction.predictedB,
         match.scoreA!,
         match.scoreB!,
-        rules
+        match.stage
       );
 
       await tx

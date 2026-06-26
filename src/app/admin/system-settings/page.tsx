@@ -12,9 +12,6 @@ import { Flag } from '@/components/shared/Flag';
 import { toast } from 'sonner';
 
 const settingsSchema = z.object({
-  perfectScore: z.coerce.number().int().min(1, "Minimal 1").max(10, "Maksimal 10"),
-  correctResult: z.coerce.number().int().min(0, "Minimal 0"),
-  wrongPrediction: z.coerce.number().int(),
   lockInMinutes: z.coerce.number().int().min(5, "Minimal 5").max(60, "Maksimal 60"),
   inviteEnabled: z.boolean(),
   invitation_code: z.string().min(6, 'Minimal 6 karakter').max(30, 'Maksimal 30 karakter').regex(/^[a-zA-Z0-9]+$/, 'Hanya huruf dan angka'),
@@ -67,25 +64,17 @@ export default function AdminSystemSettingsPage() {
   } = useForm<SettingsFormInput, unknown, SettingsFormData>({
     resolver: zodResolver(settingsSchema),
     defaultValues: {
-      perfectScore: 3,
-      correctResult: 1,
-      wrongPrediction: 0,
       lockInMinutes: 15,
       inviteEnabled: true,
       invitation_code: '',
     }
   });
 
-  // Keep perfectScore watch to validate correctResult dynamically
-  watch("perfectScore");
   watch("inviteEnabled");
 
   useEffect(() => {
     if (settings) {
       reset({
-        perfectScore: parseInt(settings.perfectScore, 10),
-        correctResult: parseInt(settings.correctResult, 10),
-        wrongPrediction: parseInt(settings.wrongPrediction, 10),
         lockInMinutes: parseInt(settings.lockInMinutes, 10),
         inviteEnabled: settings.inviteEnabled === 'true',
         invitation_code: settings.invitation_code || '',
@@ -97,23 +86,15 @@ export default function AdminSystemSettingsPage() {
   }, [settings, reset]);
 
   const onSubmit = async (data: SettingsFormData) => {
-    if (data.correctResult >= data.perfectScore) {
-      toast.error("Correct Result harus kurang dari Perfect Score");
-      return;
-    }
-    
     try {
       await updateSettings.mutateAsync({
-        perfectScore: data.perfectScore.toString(),
-        correctResult: data.correctResult.toString(),
-        wrongPrediction: data.wrongPrediction.toString(),
         lockInMinutes: data.lockInMinutes.toString(),
         inviteEnabled: data.inviteEnabled.toString(),
         invitation_code: data.invitation_code,
       });
       // The reset happens automatically via useQuery invalidate, or we can manually reset to clean isDirty
       reset(data);
-      toast.success('Kode undangan berhasil diperbarui');
+      toast.success('Pengaturan berhasil diperbarui');
     } catch {
       // Error handled by mutation
     }
@@ -192,74 +173,50 @@ export default function AdminSystemSettingsPage() {
       <div className="p-10 max-w-5xl mx-auto w-full">
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-12">
           
-          {/* SECTION 1: PENGATURAN POIN */}
+          {/* SECTION 1: POIN PER BABAK (Read-Only) */}
           <section className="bg-card rounded-xl p-8 border border-border/50 shadow-[0_8px_32px_rgba(0,0,0,0.4)] relative overflow-hidden">
             <div className="absolute top-0 left-0 w-1 h-full bg-primary"></div>
-            <h3 className="font-display text-2xl font-bold tracking-tight text-foreground mb-6">PENGATURAN POIN</h3>
+            <h3 className="font-display text-2xl font-bold tracking-tight text-foreground mb-6">POIN PER BABAK</h3>
             
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-              {/* Perfect Score */}
-              <div className="bg-secondary/30 p-4 rounded-lg border border-border/30">
-                <label className="block font-sans text-xs font-bold text-muted-foreground uppercase tracking-widest mb-3">Perfect Score</label>
-                <div className="relative">
-                  <input 
-                    type="number" 
-                    className="w-full bg-background border border-border/50 rounded-md py-3 px-4 text-foreground font-display text-2xl font-black text-center focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all shadow-[inset_0_2px_10px_rgba(0,0,0,0.5)]"
-                    {...register("perfectScore")}
-                  />
-                </div>
-                {errors.perfectScore && <p className="text-destructive text-xs mt-2 font-bold">{errors.perfectScore.message}</p>}
-                <p className="text-xs text-muted-foreground mt-2">Tebak pemenang & skor dengan tepat.</p>
-              </div>
-
-              {/* Correct Result */}
-              <div className="bg-secondary/30 p-4 rounded-lg border border-border/30">
-                <label className="block font-sans text-xs font-bold text-muted-foreground uppercase tracking-widest mb-3">Correct Result</label>
-                <div className="relative">
-                  <input 
-                    type="number" 
-                    className="w-full bg-background border border-border/50 rounded-md py-3 px-4 text-foreground font-display text-2xl font-black text-center focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all shadow-[inset_0_2px_10px_rgba(0,0,0,0.5)]"
-                    {...register("correctResult")}
-                  />
-                </div>
-                {errors.correctResult && <p className="text-destructive text-xs mt-2 font-bold">{errors.correctResult.message}</p>}
-                <p className="text-xs text-muted-foreground mt-2">Tebak pemenang saja dengan benar.</p>
-              </div>
-
-              {/* Wrong Prediction */}
-              <div className="bg-secondary/10 p-4 rounded-lg border border-border/10 opacity-70">
-                <label className="block font-sans text-xs font-bold text-muted-foreground uppercase tracking-widest mb-3">Wrong Prediction</label>
-                <div className="relative">
-                  <input 
-                    type="number" 
-                    disabled
-                    className="w-full bg-background/50 border border-border/30 rounded-md py-3 px-4 text-muted-foreground font-display text-2xl font-black text-center cursor-not-allowed shadow-[inset_0_2px_10px_rgba(0,0,0,0.3)]"
-                    {...register("wrongPrediction")}
-                  />
-                </div>
-                <p className="text-xs text-muted-foreground mt-2">Tebakan salah.</p>
-              </div>
+            <div className="overflow-hidden rounded-lg border border-border/50 mb-6">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="bg-secondary/50 text-xs uppercase tracking-widest text-muted-foreground">
+                    <th className="px-4 py-3 text-left font-medium">Babak</th>
+                    <th className="px-4 py-3 text-center font-medium">🎯 Perfect</th>
+                    <th className="px-4 py-3 text-center font-medium">✅ Correct</th>
+                    <th className="px-4 py-3 text-center font-medium">❌ Wrong</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-border/30 font-display">
+                  {[
+                    { label: 'Babak Grup', perfect: 5, correct: 2 },
+                    { label: '32 Besar', perfect: 6, correct: 3 },
+                    { label: '16 Besar', perfect: 7, correct: 4 },
+                    { label: 'Perempat Final', perfect: 8, correct: 5 },
+                    { label: 'Semi Final', perfect: 10, correct: 6 },
+                    { label: 'Juara 3', perfect: 12, correct: 7 },
+                    { label: 'Final', perfect: 15, correct: 10 },
+                  ].map((row) => (
+                    <tr key={row.label} className="hover:bg-secondary/20 transition-colors">
+                      <td className="px-4 py-3 font-bold text-foreground">{row.label}</td>
+                      <td className="px-4 py-3 text-center font-black text-primary text-lg">{row.perfect}</td>
+                      <td className="px-4 py-3 text-center font-bold text-muted-foreground">{row.correct}</td>
+                      <td className="px-4 py-3 text-center font-bold text-muted-foreground/50">0</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
 
-            <div className="flex items-start gap-3 bg-primary/10 p-4 rounded-lg border border-primary/20 mb-8">
+            <div className="flex items-start gap-3 bg-primary/10 p-4 rounded-lg border border-primary/20">
               <Info className="w-5 h-5 text-primary shrink-0 mt-0.5" />
               <p className="text-sm font-sans text-primary">
-                Perubahan poin akan langsung berlaku untuk pertandingan yang belum dihitung (unsettled). Untuk re-kalkulasi keseluruhan, gunakan tombol di halaman Match Management.
+                Poin ditentukan per babak dan bersifat tetap. Untuk re-kalkulasi keseluruhan, gunakan tombol di halaman Match Management.
               </p>
             </div>
-
-            <div className="flex justify-end">
-              <button 
-                type="submit" 
-                disabled={!isDirty || updateSettings.isPending}
-                className="bg-primary text-background font-display font-bold px-8 py-3 rounded uppercase tracking-wider hover:bg-primary-dim transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center shadow-[0_0_15px_rgba(151,169,255,0.2)] hover:shadow-[0_0_25px_rgba(151,169,255,0.4)]"
-              >
-                {updateSettings.isPending && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
-                <Save className="w-4 h-4 mr-2" />
-                Simpan Pengaturan Poin
-              </button>
-            </div>
           </section>
+
 
           {/* SECTION 2: PENGATURAN LOCK-IN */}
           <section className="bg-card rounded-xl p-8 border border-border/50 shadow-[0_8px_32px_rgba(0,0,0,0.4)] relative overflow-hidden">

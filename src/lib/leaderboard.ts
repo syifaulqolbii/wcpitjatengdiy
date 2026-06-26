@@ -1,7 +1,6 @@
 import { db } from "@/db";
 import { leaderboardSnapshots, predictions, tournamentPredictions, users, matches } from "@/db/schema";
 import { eq, sql, isNotNull, and, inArray } from "drizzle-orm";
-import { getScoringRules } from "@/lib/scoring";
 
 export interface LeaderboardEntry {
   rank: number;
@@ -17,8 +16,6 @@ export interface LeaderboardEntry {
 }
 
 export async function getLeaderboardData(groupId: string | null): Promise<LeaderboardEntry[]> {
-  const rules = await getScoringRules();
-
   const usersQuery = db
     .select({
       userId: users.id,
@@ -36,15 +33,39 @@ export async function getLeaderboardData(groupId: string | null): Promise<Leader
   const userIds = userRows.map((u) => u.userId);
   if (userIds.length === 0) return [];
 
+  // Stage-aware perfect score and correct result SQL CASE expressions
+  const perfectScoreCase = sql`CASE ${matches.stage}
+    WHEN 'group_stage' THEN 5
+    WHEN 'round_32' THEN 6
+    WHEN 'round_16' THEN 7
+    WHEN 'quarter_final' THEN 8
+    WHEN 'semi_final' THEN 10
+    WHEN 'juara_3' THEN 12
+    WHEN 'final' THEN 15
+    ELSE 5
+  END`;
+
+  const correctResultCase = sql`CASE ${matches.stage}
+    WHEN 'group_stage' THEN 2
+    WHEN 'round_32' THEN 3
+    WHEN 'round_16' THEN 4
+    WHEN 'quarter_final' THEN 5
+    WHEN 'semi_final' THEN 6
+    WHEN 'juara_3' THEN 7
+    WHEN 'final' THEN 10
+    ELSE 2
+  END`;
+
   const matchStats = await db
     .select({
       userId: predictions.userId,
       totalPoints: sql<number>`COALESCE(SUM(${predictions.points}), 0)`.mapWith(Number),
-      perfectScores: sql<number>`COUNT(CASE WHEN ${predictions.points} = ${rules.perfectScore} THEN 1 END)`.mapWith(Number),
-      correctResults: sql<number>`COUNT(CASE WHEN ${predictions.points} = ${rules.correctResult} THEN 1 END)`.mapWith(Number),
+      perfectScores: sql<number>`COUNT(CASE WHEN ${predictions.points} = ${perfectScoreCase} THEN 1 END)`.mapWith(Number),
+      correctResults: sql<number>`COUNT(CASE WHEN ${predictions.points} = ${correctResultCase} THEN 1 END)`.mapWith(Number),
       totalPredicted: sql<number>`COUNT(${predictions.id})`.mapWith(Number),
     })
     .from(predictions)
+    .innerJoin(matches, eq(predictions.matchId, matches.id))
     .where(and(isNotNull(predictions.points), inArray(predictions.userId, userIds)))
     .groupBy(predictions.userId);
 

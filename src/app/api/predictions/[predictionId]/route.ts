@@ -9,7 +9,7 @@ import {
   handleError,
 } from "@/lib/api-helpers";
 import { updatePredictionSchema } from "@/lib/validators";
-import { getScoringRules } from "@/lib/scoring";
+import { getLockInMinutes } from "@/lib/scoring";
 import { z } from "zod";
 
 // ─── Lock-in check helper ─────────────────────────────────────
@@ -58,7 +58,7 @@ export async function PUT(
     }
 
     // 4. Lock-in check: same rule as POST
-    const { lockInMinutes } = await getScoringRules();
+    const lockInMinutes = await getLockInMinutes();
     if (isLocked(match.kickoffTime, lockInMinutes)) {
       return Err.badRequest(
         `Predictions are locked ${lockInMinutes} minutes before kick-off.`,

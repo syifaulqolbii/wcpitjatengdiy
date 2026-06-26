@@ -10,7 +10,7 @@ import {
   handleError,
 } from "@/lib/api-helpers";
 import { createPredictionSchema } from "@/lib/validators";
-import { getScoringRules } from "@/lib/scoring";
+import { getLockInMinutes } from "@/lib/scoring";
 
 // ─── Lock-in check helper ─────────────────────────────────────
 // Returns true if the current time is within the configured lock window of kickoff
@@ -132,7 +132,7 @@ export async function POST(req: NextRequest) {
     }
 
     // 3. Lock-in check: configured minutes before kickoff
-    const { lockInMinutes } = await getScoringRules();
+    const lockInMinutes = await getLockInMinutes();
     if (isLocked(match.kickoffTime, lockInMinutes)) {
       return Err.badRequest(
         `Predictions are locked ${lockInMinutes} minutes before kick-off.`,

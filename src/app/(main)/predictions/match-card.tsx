@@ -2,10 +2,11 @@
 
 import React, { useState, useEffect } from 'react';
 import { Match, Prediction } from '@/types';
-import { Timer, Lock, CheckCircle2, XCircle } from 'lucide-react';
+import { Timer, Lock, CheckCircle2, XCircle, Flame } from 'lucide-react';
 import { useSubmitPrediction, useUpdatePrediction } from '@/hooks/usePredictions';
 import { useSettings } from '@/hooks/useSettings';
 import { Flag } from '@/components/shared/Flag';
+import { STAGE_SCORING } from '@/lib/scoring-engine';
 
 export function MatchCard({ match, prediction }: { match: Match; prediction?: Prediction }) {
   const [predictedA, setPredictedA] = useState<string>(prediction?.predictedA?.toString() ?? '');
@@ -167,6 +168,12 @@ export function MatchCard({ match, prediction }: { match: Match; prediction?: Pr
           <Timer className="w-4 h-4" />
           {lockLabel}
         </div>
+        {match.stage !== 'group_stage' && (
+          <div className="flex items-center gap-1 bg-amber-500/15 text-amber-400 px-2.5 py-1 rounded-full text-xs font-bold border border-amber-500/30">
+            <Flame className="w-3.5 h-3.5" />
+            MAX {(STAGE_SCORING[match.stage] ?? STAGE_SCORING.group_stage).perfectScore} PTS
+          </div>
+        )}
       </div>
       
       <div className="grid w-full grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-start gap-2 md:gap-6 z-10 mb-8">
